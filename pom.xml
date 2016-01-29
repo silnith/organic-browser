@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.silnith</groupId>
+	<artifactId>organic-browser</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Organic Browser</name>
+	<url>https://silnith.org/projects/OrganicBrowser/</url>
+	<description>A browser that grew organically.</description>
+	<inceptionYear>2014</inceptionYear>
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+	<organization>
+		<name>silnith.org</name>
+		<url>https://silnith.org/</url>
+	</organization>
+	<scm>
+		<url>https://svn.silnith.org/svn/repos/java/applications/OrganicBrowser/trunk/</url>
+		<connection>scm:svn:https://svn.silnith.org/svn/repos/java/applications/OrganicBrowser/trunk/</connection>
+		<developerConnection>scm:svn:https://svn.silnith.org/svn/repos/java/applications/OrganicBrowser/trunk/</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>https://jenkins.silnith.org/jenkins/job/OrganicBrowser/</url>
+	</ciManagement>
+	<dependencies>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.cssparser</groupId>
+			<artifactId>cssparser</artifactId>
+			<version>0.9.15</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.10.19</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
