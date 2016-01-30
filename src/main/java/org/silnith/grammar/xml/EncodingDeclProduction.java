@@ -17,43 +17,48 @@ import org.silnith.grammar.NonTerminalSymbol;
 import org.silnith.grammar.ProductionHandler;
 import org.silnith.grammar.UnicodeTerminalSymbols;
 
+
 /**
- * [80]   	EncodingDecl	   ::=   	{@linkplain SProduction S} 'encoding' {@linkplain EqProduction Eq} ('"' {@linkplain EncNameProduction EncName} '"' | "'" {@linkplain EncNameProduction EncName} "'" ) 
+ * [80] EncodingDecl ::= {@linkplain SProduction S} 'encoding'
+ * {@linkplain EqProduction Eq} ('"' {@linkplain EncNameProduction EncName} '"'
+ * | "'" {@linkplain EncNameProduction EncName} "'" )
  * 
- * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-EncodingDecl">EncodingDecl</a>
+ * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-EncodingDecl">
+ *      EncodingDecl</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class EncodingDeclProduction extends XMLProduction {
-
-	private static class TwelfthElementHandler implements ProductionHandler {
-
-		@Override
-		public Object handleReduction(final List<Object> rightHandSide) {
-			return rightHandSide.get(11);
-		}
-
-	}
-
-	private final NonTerminalSymbol EncodingDecl;
-
-	public EncodingDeclProduction(final Grammar<UnicodeTerminalSymbols> grammar,
-			final SProduction sProduction, final EqProduction eqProduction,
-			final EncNameProduction encNameProduction) {
-		super(grammar);
-		EncodingDecl = this.grammar.getNonTerminalSymbol("EncodingDecl");
-		
-		final NonTerminalSymbol S = sProduction.getNonTerminalSymbol();
-		final NonTerminalSymbol Eq = eqProduction.getNonTerminalSymbol();
-		final NonTerminalSymbol EncName = encNameProduction.getNonTerminalSymbol();
-		
-		final TwelfthElementHandler twelfthElementHandler = new TwelfthElementHandler();
-		this.grammar.addProduction(EncodingDecl, twelfthElementHandler, S, smallE, smallN, smallC, smallO, smallD, smallI, smallN, smallG, Eq, quotationMark, EncName, quotationMark);
-		this.grammar.addProduction(EncodingDecl, twelfthElementHandler, S, smallE, smallN, smallC, smallO, smallD, smallI, smallN, smallG, Eq, apostrophe, EncName, apostrophe);
-	}
-
-	@Override
-	public NonTerminalSymbol getNonTerminalSymbol() {
-		return EncodingDecl;
-	}
-
+    
+    private static class TwelfthElementHandler implements ProductionHandler {
+        
+        @Override
+        public Object handleReduction(final List<Object> rightHandSide) {
+            return rightHandSide.get(11);
+        }
+        
+    }
+    
+    private final NonTerminalSymbol EncodingDecl;
+    
+    public EncodingDeclProduction(final Grammar<UnicodeTerminalSymbols> grammar, final SProduction sProduction,
+            final EqProduction eqProduction, final EncNameProduction encNameProduction) {
+        super(grammar);
+        EncodingDecl = this.grammar.getNonTerminalSymbol("EncodingDecl");
+        
+        final NonTerminalSymbol S = sProduction.getNonTerminalSymbol();
+        final NonTerminalSymbol Eq = eqProduction.getNonTerminalSymbol();
+        final NonTerminalSymbol EncName = encNameProduction.getNonTerminalSymbol();
+        
+        final TwelfthElementHandler twelfthElementHandler = new TwelfthElementHandler();
+        this.grammar.addProduction(EncodingDecl, twelfthElementHandler, S, smallE, smallN, smallC, smallO, smallD,
+                smallI, smallN, smallG, Eq, quotationMark, EncName, quotationMark);
+        this.grammar.addProduction(EncodingDecl, twelfthElementHandler, S, smallE, smallN, smallC, smallO, smallD,
+                smallI, smallN, smallG, Eq, apostrophe, EncName, apostrophe);
+    }
+    
+    @Override
+    public NonTerminalSymbol getNonTerminalSymbol() {
+        return EncodingDecl;
+    }
+    
 }

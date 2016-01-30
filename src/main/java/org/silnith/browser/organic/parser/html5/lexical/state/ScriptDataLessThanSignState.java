@@ -11,40 +11,43 @@ import org.silnith.browser.organic.parser.html5.lexical.Tokenizer;
 import org.silnith.browser.organic.parser.html5.lexical.token.CharacterToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.Token;
 
+
 /**
- * @see <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#script-data-less-than-sign-state">12.2.4.17 Script data less-than sign state</a>
+ * @see <a href=
+ *      "http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#script-data-less-than-sign-state">
+ *      12.2.4.17 Script data less-than sign state</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class ScriptDataLessThanSignState extends TokenizerState {
-
-	public ScriptDataLessThanSignState(final Tokenizer tokenizer) {
-		super(tokenizer);
-	}
-
-	@Override
-	public int getMaxPushback() {
-		return 1;
-	}
-
-	@Override
-	public List<Token> getNextTokens() throws IOException {
-		final int ch = consume();
-		switch (ch) {
-		case SOLIDUS: {
-			createTemporaryBuffer();
-			setTokenizerState(Tokenizer.State.SCRIPT_DATA_END_TAG_OPEN);
-			return NOTHING;
-		} // break;
-		case EXCLAMATION_MARK: {
-			setTokenizerState(Tokenizer.State.SCRIPT_DATA_ESCAPE_START);
-			return CharacterToken.toTokens(LESS_THAN_SIGN, EXCLAMATION_MARK);
-		} // break;
-		default: {
-			unconsume(ch);
-			setTokenizerState(Tokenizer.State.SCRIPT_DATA);
-			return one(new CharacterToken(LESS_THAN_SIGN));
-		} // break;
-		}
-	}
-
+    
+    public ScriptDataLessThanSignState(final Tokenizer tokenizer) {
+        super(tokenizer);
+    }
+    
+    @Override
+    public int getMaxPushback() {
+        return 1;
+    }
+    
+    @Override
+    public List<Token> getNextTokens() throws IOException {
+        final int ch = consume();
+        switch (ch) {
+        case SOLIDUS: {
+            createTemporaryBuffer();
+            setTokenizerState(Tokenizer.State.SCRIPT_DATA_END_TAG_OPEN);
+            return NOTHING;
+        } // break;
+        case EXCLAMATION_MARK: {
+            setTokenizerState(Tokenizer.State.SCRIPT_DATA_ESCAPE_START);
+            return CharacterToken.toTokens(LESS_THAN_SIGN, EXCLAMATION_MARK);
+        } // break;
+        default: {
+            unconsume(ch);
+            setTokenizerState(Tokenizer.State.SCRIPT_DATA);
+            return one(new CharacterToken(LESS_THAN_SIGN));
+        } // break;
+        }
+    }
+    
 }

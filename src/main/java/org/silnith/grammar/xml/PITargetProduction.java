@@ -73,99 +73,96 @@ import org.silnith.grammar.Grammar;
 import org.silnith.grammar.NonTerminalSymbol;
 import org.silnith.grammar.UnicodeTerminalSymbols;
 
+
 /**
- * [17]   	PITarget	   ::=   	{@linkplain NameProduction Name} - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
+ * [17] PITarget ::= {@linkplain NameProduction Name} - (('X' | 'x') ('M' | 'm')
+ * ('L' | 'l'))
  * 
- * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-PITarget">PITarget</a>
+ * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-PITarget">
+ *      PITarget</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class PITargetProduction extends XMLProduction {
-
-	private final NonTerminalSymbol PITarget;
-
-	public PITargetProduction(final Grammar<UnicodeTerminalSymbols> grammar,
-			final NameCharProduction nameCharProduction) {
-		super(grammar);
-		PITarget = this.grammar.getNonTerminalSymbol("PITarget");
-		
-		final NonTerminalSymbol NonXNameStartChar = this.grammar.getNonTerminalSymbol("NonXNameStartChar");
-		final NonTerminalSymbol NonMNameChar = this.grammar.getNonTerminalSymbol("NonMNameChar");
-		final NonTerminalSymbol NonLNameChar = this.grammar.getNonTerminalSymbol("NonLNameChar");
-		
-		final NonTerminalSymbol NameChar_Plus = nameCharProduction.getPlus();
-		
-		// PITarget ::= Name - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
-		// PITarget ~= xm*
-		this.grammar.addProduction(PITarget, stringHandler, capitalX, capitalM, NonLNameChar, NameChar_Plus);
-		this.grammar.addProduction(PITarget, stringHandler, capitalX, smallM, NonLNameChar, NameChar_Plus);
-		this.grammar.addProduction(PITarget, stringHandler, smallX, capitalM, NonLNameChar, NameChar_Plus);
-		this.grammar.addProduction(PITarget, stringHandler, smallX, smallM, NonLNameChar, NameChar_Plus);
-		this.grammar.addProduction(PITarget, stringHandler, capitalX, capitalM, NonLNameChar);
-		this.grammar.addProduction(PITarget, stringHandler, capitalX, smallM, NonLNameChar);
-		this.grammar.addProduction(PITarget, stringHandler, smallX, capitalM, NonLNameChar);
-		this.grammar.addProduction(PITarget, stringHandler, smallX, smallM, NonLNameChar);
-		// PITarget ~= x*
-		this.grammar.addProduction(PITarget, stringHandler, capitalX, NonMNameChar, NameChar_Plus);
-		this.grammar.addProduction(PITarget, stringHandler, smallX, NonMNameChar, NameChar_Plus);
-		this.grammar.addProduction(PITarget, stringHandler, capitalX, NonMNameChar);
-		this.grammar.addProduction(PITarget, stringHandler, smallX, NonMNameChar);
-		// PITarget ~= [^x].*
-		this.grammar.addProduction(PITarget, stringHandler, NonXNameStartChar);
-		this.grammar.addProduction(PITarget, stringHandler, NonXNameStartChar, NameChar_Plus);
-
-		this.grammar.addProduction(NonMNameChar, characterHandler, hyphenMinus);
-		this.grammar.addProduction(NonLNameChar, characterHandler, hyphenMinus);
-		this.grammar.addProduction(NonMNameChar, characterHandler, fullStop);
-		this.grammar.addProduction(NonLNameChar, characterHandler, fullStop);
-		for (final UnicodeTerminalSymbols s : Arrays.asList(
-				digitZero, digitOne, digitTwo, digitThree, digitFour,
-				digitFive, digitSix, digitSeven, digitEight, digitNine)) {
-			this.grammar.addProduction(NonMNameChar, characterHandler, s);
-			this.grammar.addProduction(NonLNameChar, characterHandler, s);
-		}
-		this.grammar.addProduction(NonXNameStartChar, characterHandler, colon);
-		this.grammar.addProduction(NonMNameChar, characterHandler, colon);
-		this.grammar.addProduction(NonLNameChar, characterHandler, colon);
-		for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] {
-				capitalA, capitalB, capitalC, capitalD, capitalE, capitalF,
-				capitalG, capitalH, capitalI, capitalJ, capitalK,
-				capitalL, capitalM, capitalN, capitalO, capitalP,
-				capitalQ, capitalR, capitalS, capitalT, capitalU,
-				capitalV, capitalW, capitalX, capitalY, capitalZ}) {
-			if (s != capitalX) {
-				this.grammar.addProduction(NonXNameStartChar, characterHandler, s);
-			}
-			if (s != capitalM) {
-				this.grammar.addProduction(NonMNameChar, characterHandler, s);
-			}
-			if (s != capitalL) {
-				this.grammar.addProduction(NonLNameChar, characterHandler, s);
-			}
-		}
-		this.grammar.addProduction(NonXNameStartChar, characterHandler, lowLine);
-		this.grammar.addProduction(NonMNameChar, characterHandler, lowLine);
-		this.grammar.addProduction(NonLNameChar, characterHandler, lowLine);
-		for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] {
-				smallA, smallB, smallC, smallD, smallE, smallF,
-				smallG, smallH, smallI, smallJ, smallK,
-				smallL, smallM, smallN, smallO, smallP,
-				smallQ, smallR, smallS, smallT, smallU,
-				smallV, smallW, smallX, smallY, smallZ}) {
-			if (s != smallX) {
-				this.grammar.addProduction(NonXNameStartChar, characterHandler, s);
-			}
-			if (s != smallM) {
-				this.grammar.addProduction(NonMNameChar, characterHandler, s);
-			}
-			if (s != smallL) {
-				this.grammar.addProduction(NonLNameChar, characterHandler, s);
-			}
-		}
-	}
-
-	@Override
-	public NonTerminalSymbol getNonTerminalSymbol() {
-		return PITarget;
-	}
-
+    
+    private final NonTerminalSymbol PITarget;
+    
+    public PITargetProduction(final Grammar<UnicodeTerminalSymbols> grammar,
+            final NameCharProduction nameCharProduction) {
+        super(grammar);
+        PITarget = this.grammar.getNonTerminalSymbol("PITarget");
+        
+        final NonTerminalSymbol NonXNameStartChar = this.grammar.getNonTerminalSymbol("NonXNameStartChar");
+        final NonTerminalSymbol NonMNameChar = this.grammar.getNonTerminalSymbol("NonMNameChar");
+        final NonTerminalSymbol NonLNameChar = this.grammar.getNonTerminalSymbol("NonLNameChar");
+        
+        final NonTerminalSymbol NameChar_Plus = nameCharProduction.getPlus();
+        
+        // PITarget ::= Name - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
+        // PITarget ~= xm*
+        this.grammar.addProduction(PITarget, stringHandler, capitalX, capitalM, NonLNameChar, NameChar_Plus);
+        this.grammar.addProduction(PITarget, stringHandler, capitalX, smallM, NonLNameChar, NameChar_Plus);
+        this.grammar.addProduction(PITarget, stringHandler, smallX, capitalM, NonLNameChar, NameChar_Plus);
+        this.grammar.addProduction(PITarget, stringHandler, smallX, smallM, NonLNameChar, NameChar_Plus);
+        this.grammar.addProduction(PITarget, stringHandler, capitalX, capitalM, NonLNameChar);
+        this.grammar.addProduction(PITarget, stringHandler, capitalX, smallM, NonLNameChar);
+        this.grammar.addProduction(PITarget, stringHandler, smallX, capitalM, NonLNameChar);
+        this.grammar.addProduction(PITarget, stringHandler, smallX, smallM, NonLNameChar);
+        // PITarget ~= x*
+        this.grammar.addProduction(PITarget, stringHandler, capitalX, NonMNameChar, NameChar_Plus);
+        this.grammar.addProduction(PITarget, stringHandler, smallX, NonMNameChar, NameChar_Plus);
+        this.grammar.addProduction(PITarget, stringHandler, capitalX, NonMNameChar);
+        this.grammar.addProduction(PITarget, stringHandler, smallX, NonMNameChar);
+        // PITarget ~= [^x].*
+        this.grammar.addProduction(PITarget, stringHandler, NonXNameStartChar);
+        this.grammar.addProduction(PITarget, stringHandler, NonXNameStartChar, NameChar_Plus);
+        
+        this.grammar.addProduction(NonMNameChar, characterHandler, hyphenMinus);
+        this.grammar.addProduction(NonLNameChar, characterHandler, hyphenMinus);
+        this.grammar.addProduction(NonMNameChar, characterHandler, fullStop);
+        this.grammar.addProduction(NonLNameChar, characterHandler, fullStop);
+        for (final UnicodeTerminalSymbols s : Arrays.asList(digitZero, digitOne, digitTwo, digitThree, digitFour,
+                digitFive, digitSix, digitSeven, digitEight, digitNine)) {
+            this.grammar.addProduction(NonMNameChar, characterHandler, s);
+            this.grammar.addProduction(NonLNameChar, characterHandler, s);
+        }
+        this.grammar.addProduction(NonXNameStartChar, characterHandler, colon);
+        this.grammar.addProduction(NonMNameChar, characterHandler, colon);
+        this.grammar.addProduction(NonLNameChar, characterHandler, colon);
+        for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] { capitalA, capitalB, capitalC, capitalD,
+                capitalE, capitalF, capitalG, capitalH, capitalI, capitalJ, capitalK, capitalL, capitalM, capitalN,
+                capitalO, capitalP, capitalQ, capitalR, capitalS, capitalT, capitalU, capitalV, capitalW, capitalX,
+                capitalY, capitalZ }) {
+            if (s != capitalX) {
+                this.grammar.addProduction(NonXNameStartChar, characterHandler, s);
+            }
+            if (s != capitalM) {
+                this.grammar.addProduction(NonMNameChar, characterHandler, s);
+            }
+            if (s != capitalL) {
+                this.grammar.addProduction(NonLNameChar, characterHandler, s);
+            }
+        }
+        this.grammar.addProduction(NonXNameStartChar, characterHandler, lowLine);
+        this.grammar.addProduction(NonMNameChar, characterHandler, lowLine);
+        this.grammar.addProduction(NonLNameChar, characterHandler, lowLine);
+        for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] { smallA, smallB, smallC, smallD, smallE,
+                smallF, smallG, smallH, smallI, smallJ, smallK, smallL, smallM, smallN, smallO, smallP, smallQ, smallR,
+                smallS, smallT, smallU, smallV, smallW, smallX, smallY, smallZ }) {
+            if (s != smallX) {
+                this.grammar.addProduction(NonXNameStartChar, characterHandler, s);
+            }
+            if (s != smallM) {
+                this.grammar.addProduction(NonMNameChar, characterHandler, s);
+            }
+            if (s != smallL) {
+                this.grammar.addProduction(NonLNameChar, characterHandler, s);
+            }
+        }
+    }
+    
+    @Override
+    public NonTerminalSymbol getNonTerminalSymbol() {
+        return PITarget;
+    }
+    
 }

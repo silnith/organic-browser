@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 
 import org.silnith.browser.organic.BoxRenderer;
 import org.silnith.browser.organic.CSSPseudoElementRule;
@@ -41,284 +42,294 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
+
 public class BrowserPane extends JPanel {
-
-	private static final long serialVersionUID = 1L;
-
+    
+    private static final long serialVersionUID = 1L;
+    
 //	private static final ScheduledExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
-
-	private final DownloadManager downloadManager;
-
-	private final DocumentParser documentParser;
-
-	private final StyleParser styleParser;
-
-	private final JTextField urlBar;
-
-	private final JScrollPane scrollPane;
-
-	private BoxRenderer boxRenderer;
-
-	private Thread monitorThread;
-
-	public BrowserPane(final DownloadManager downloadManager, final DocumentParser documentParser, final StyleParser styleParser) {
-		super(new BorderLayout());
-		this.downloadManager = downloadManager;
-		this.documentParser = documentParser;
-		this.styleParser = styleParser;
-		this.boxRenderer = null;
-		this.monitorThread = null;
-		
-		this.scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		BrowserPane.this.add(scrollPane, BorderLayout.CENTER);
-
-		this.urlBar = new JTextField();
-		this.urlBar.setText("http://www.w3.org/");
+    
+    private final DownloadManager downloadManager;
+    
+    private final DocumentParser documentParser;
+    
+    private final StyleParser styleParser;
+    
+    private final JTextField urlBar;
+    
+    private final JScrollPane scrollPane;
+    
+    private BoxRenderer boxRenderer;
+    
+    private Thread monitorThread;
+    
+    public BrowserPane(final DownloadManager downloadManager, final DocumentParser documentParser,
+            final StyleParser styleParser) {
+        super(new BorderLayout());
+        this.downloadManager = downloadManager;
+        this.documentParser = documentParser;
+        this.styleParser = styleParser;
+        this.boxRenderer = null;
+        this.monitorThread = null;
+        
+        this.scrollPane = new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        BrowserPane.this.add(scrollPane, BorderLayout.CENTER);
+        
+        this.urlBar = new JTextField();
+        this.urlBar.setText("http://www.w3.org/");
 //		this.urlBar.setText("http://motherfuckingwebsite.com/");
-		BrowserPane.this.add(urlBar, BorderLayout.NORTH);
-		urlBar.addActionListener(new UrlBarListener());
-		
-		scrollPane.setPreferredSize(new Dimension(800, 600));
-	}
-
-	private class Monitor implements Runnable {
-
-		private final String urlText;
-
-		public Monitor(final String urlText) {
-			super();
-			this.urlText = urlText;
-		}
-
-		private <T> T getResult(final String operation, final Callable<T> callable) throws InterruptedException, ExecutionException {
-			final TimedCallable<T> timedCallable = new TimedCallable<>(callable);
+        BrowserPane.this.add(urlBar, BorderLayout.NORTH);
+        urlBar.addActionListener(new UrlBarListener());
+        
+        scrollPane.setPreferredSize(new Dimension(800, 600));
+    }
+    
+    private class Monitor implements Runnable {
+        
+        private final String urlText;
+        
+        public Monitor(final String urlText) {
+            super();
+            this.urlText = urlText;
+        }
+        
+        private <T> T getResult(final String operation, final Callable<T> callable)
+                throws InterruptedException, ExecutionException {
+            final TimedCallable<T> timedCallable = new TimedCallable<>(callable);
 //			final Future<T> future = EXECUTOR_SERVICE.submit(timedCallable);
 //			final T result = future.get();
-			final T result;
-			try {
-				result = timedCallable.call();
-			} catch (final Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			System.out.println(operation + " duration: " + timedCallable.getDuration() + "ms");
-			return result;
-		}
-
-		private void printNode(final Node node) {
-			try {
-				final DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
-				final DOMImplementation domImpl = registry.getDOMImplementation("Core 3.0 +LS 3.0");
-				final DOMImplementationLS domImplLS = (DOMImplementationLS) domImpl.getFeature("+LS", "3.0");
-				final LSSerializer serializer = domImplLS.createLSSerializer();
-				serializer.getDomConfig().setParameter("format-pretty-print", true);
-				final LSOutput output = domImplLS.createLSOutput();
-				output.setByteStream(System.out);
-				serializer.write(node, output);
-			} catch (final DOMException e) {
-				e.printStackTrace();
-			} catch (final ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (final InstantiationException e) {
-				e.printStackTrace();
-			} catch (final IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (final ClassCastException e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		public void run() {
-			final URL url;
-			try {
-				url = new URL(urlText);
-			} catch (final MalformedURLException ex) {
-				ex.printStackTrace();
-				return;
-			}
-			
-			try {
-				final Downloader downloader = new Downloader(url);
-				final Download download = getResult("Download", downloader);
-				
-				final Parser parser = new Parser(download);
-				final Document document = getResult("Parse", parser);
-				
-				printNode(document);
-				
-				final Styler styler = new Styler(new StyleTreeBuilder(), document);
-				final StyledElement styledElement = getResult("Style", styler);
-				
-				try {
-					styleParser.parseStyleRules(download);
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-				
-				final Collection<CSSRule> cssRules = styleParser.parseStyleRules(document);
-				final Collection<CSSPseudoElementRule> pseudoRules = styleParser.parsePseudoElementStyleRules(document);
-				
-				final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
-				final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
-				final Cascader cascader = new Cascader(cascadeApplier, styledElement, cssRules, pseudoRules);
-				getResult("Cascade", cascader);
-				
+            final T result;
+            try {
+                result = timedCallable.call();
+            } catch (final Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+            System.out.println(operation + " duration: " + timedCallable.getDuration() + "ms");
+            return result;
+        }
+        
+        private void printNode(final Node node) {
+            try {
+                final DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
+                final DOMImplementation domImpl = registry.getDOMImplementation("Core 3.0 +LS 3.0");
+                final DOMImplementationLS domImplLS = (DOMImplementationLS) domImpl.getFeature("+LS", "3.0");
+                final LSSerializer serializer = domImplLS.createLSSerializer();
+                serializer.getDomConfig().setParameter("format-pretty-print", true);
+                final LSOutput output = domImplLS.createLSOutput();
+                output.setByteStream(System.out);
+                serializer.write(node, output);
+            } catch (final DOMException e) {
+                e.printStackTrace();
+            } catch (final ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (final InstantiationException e) {
+                e.printStackTrace();
+            } catch (final IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (final ClassCastException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        @Override
+        public void run() {
+            final URL url;
+            try {
+                url = new URL(urlText);
+            } catch (final MalformedURLException ex) {
+                ex.printStackTrace();
+                return;
+            }
+            
+            try {
+                final Downloader downloader = new Downloader(url);
+                final Download download = getResult("Download", downloader);
+                
+                final Parser parser = new Parser(download);
+                final Document document = getResult("Parse", parser);
+                
+                printNode(document);
+                
+                final Styler styler = new Styler(new StyleTreeBuilder(), document);
+                final StyledElement styledElement = getResult("Style", styler);
+                
+                try {
+                    styleParser.parseStyleRules(download);
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                }
+                
+                final Collection<CSSRule> cssRules = styleParser.parseStyleRules(document);
+                final Collection<CSSPseudoElementRule> pseudoRules = styleParser.parsePseudoElementStyleRules(document);
+                
+                final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
+                final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
+                final Cascader cascader = new Cascader(cascadeApplier, styledElement, cssRules, pseudoRules);
+                getResult("Cascade", cascader);
+                
 //				printNode(styledElement.createDOM(document));
-				
-				@SuppressWarnings("unchecked")
-				final PropertyAccessor<Display> displayAccessor = (PropertyAccessor<Display>) propertyAccessorFactory.getPropertyAccessor(PropertyName.DISPLAY);
-				@SuppressWarnings("unchecked")
-				final PropertyAccessor<AbsoluteLength> fontSizeAccessor = (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_SIZE);
-				@SuppressWarnings("unchecked")
-				final PropertyAccessor<ListStylePosition> listStylePositionAccessor = (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(PropertyName.LIST_STYLE_POSITION);
-				final Formatter formatter = new Formatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
-				final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
-				final BlockLevelBox blockBox = getResult("Format", formatter2);
-				
+                
+                @SuppressWarnings("unchecked")
+                final PropertyAccessor<Display> displayAccessor =
+                        (PropertyAccessor<Display>) propertyAccessorFactory.getPropertyAccessor(PropertyName.DISPLAY);
+                @SuppressWarnings("unchecked")
+                final PropertyAccessor<AbsoluteLength> fontSizeAccessor =
+                        (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(
+                                PropertyName.FONT_SIZE);
+                @SuppressWarnings("unchecked")
+                final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
+                        (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
+                                PropertyName.LIST_STYLE_POSITION);
+                final Formatter formatter = new Formatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
+                final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
+                final BlockLevelBox blockBox = getResult("Format", formatter2);
+                
 //				printNode(blockBox.createDOM(document));
-				
-				final BoxRenderer renderer = new BoxRenderer(blockBox);
-				scrollPane.getViewport().removeChangeListener(boxRenderer);
-				boxRenderer = renderer;
-				scrollPane.setViewportView(boxRenderer);
-				scrollPane.getViewport().addChangeListener(boxRenderer);
-			} catch (final ExecutionException e) {
-				e.printStackTrace();
-				return;
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
-				return;
-			}
-		}
-
-	}
-
-	private class Downloader implements Callable<Download> {
-
-		private final URL url;
-
-		public Downloader(final URL url) {
-			super();
-			if (url == null) {
-				throw new NullPointerException();
-			}
-			this.url = url;
-		}
-
-		@Override
-		public Download call() throws Exception {
-			final Download download = downloadManager.download(url);
-			download.connect();
-			download.download();
-			return download;
-		}
-
-	}
-
-	private class Parser implements Callable<Document> {
-
-		private final Download download;
-
-		public Parser(final Download download) {
-			super();
-			this.download = download;
-		}
-
-		@Override
-		public Document call() throws Exception {
-			return documentParser.parseDocument(download);
+                
+                final BoxRenderer renderer = new BoxRenderer(blockBox);
+                scrollPane.getViewport().removeChangeListener(boxRenderer);
+                boxRenderer = renderer;
+                scrollPane.setViewportView(boxRenderer);
+                scrollPane.getViewport().addChangeListener(boxRenderer);
+            } catch (final ExecutionException e) {
+                e.printStackTrace();
+                return;
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        
+    }
+    
+    private class Downloader implements Callable<Download> {
+        
+        private final URL url;
+        
+        public Downloader(final URL url) {
+            super();
+            if (url == null) {
+                throw new NullPointerException();
+            }
+            this.url = url;
+        }
+        
+        @Override
+        public Download call() throws Exception {
+            final Download download = downloadManager.download(url);
+            download.connect();
+            download.download();
+            return download;
+        }
+        
+    }
+    
+    private class Parser implements Callable<Document> {
+        
+        private final Download download;
+        
+        public Parser(final Download download) {
+            super();
+            this.download = download;
+        }
+        
+        @Override
+        public Document call() throws Exception {
+            return documentParser.parseDocument(download);
 //			return documentParser.createDocument(download);
-		}
-
-	}
-
-	private class Styler implements Callable<StyledElement> {
-
-		private final StyleTreeBuilder styleTreeBuilder;
-
-		private final Document document;
-
-		public Styler(final StyleTreeBuilder styleTreeBuilder, final Document document) {
-			super();
-			this.styleTreeBuilder = styleTreeBuilder;
-			this.document = document;
-		}
-
-		@Override
-		public StyledElement call() throws Exception {
-			return styleTreeBuilder.addStyleInformation(document);
-		}
-
-	}
-
-	private class Cascader implements Runnable, Callable<Object> {
-
-		private final CascadeApplier cascadeApplier;
-
-		private final StyledElement styledElement;
-
-		private final Collection<CSSRule> rules;
-		private final Collection<CSSPseudoElementRule> pseudoRules;
-
-		public Cascader(final CascadeApplier cascadeApplier, final StyledElement styledElement,
-				final Collection<CSSRule> rules, final Collection<CSSPseudoElementRule> pseudoRules) {
-			super();
-			this.cascadeApplier = cascadeApplier;
-			this.styledElement = styledElement;
-			this.rules = rules;
-			this.pseudoRules = pseudoRules;
-		}
-
-		@Override
-		public void run() {
-			cascadeApplier.cascade(styledElement, rules, pseudoRules);
-		}
-
-		@Override
-		public Object call() throws Exception {
-			run();
-			return null;
-		}
-
-	}
-
-	private class Formatter2 implements Callable<BlockLevelBox> {
-
-		private final Formatter formatter;
-
-		private final StyledElement styledElement;
-
-		public Formatter2(final Formatter formatter, final StyledElement styledElement) {
-			super();
-			this.styledElement = styledElement;
-			this.formatter = formatter;
-		}
-
-		@Override
-		public BlockLevelBox call() throws Exception {
-			return formatter.createBlockBox(styledElement);
-		}
-
-	}
-
-	private class UrlBarListener implements ActionListener {
-
-		private UrlBarListener() {
-			super();
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-			System.out.println(e);
-			final String urlText = urlBar.getText();
-			
-			final Monitor monitor = new Monitor(urlText);
-			
-			monitorThread = new Thread(monitor);
-			monitorThread.start();
-		}
-
-	}
-
+        }
+        
+    }
+    
+    private class Styler implements Callable<StyledElement> {
+        
+        private final StyleTreeBuilder styleTreeBuilder;
+        
+        private final Document document;
+        
+        public Styler(final StyleTreeBuilder styleTreeBuilder, final Document document) {
+            super();
+            this.styleTreeBuilder = styleTreeBuilder;
+            this.document = document;
+        }
+        
+        @Override
+        public StyledElement call() throws Exception {
+            return styleTreeBuilder.addStyleInformation(document);
+        }
+        
+    }
+    
+    private class Cascader implements Runnable, Callable<Object> {
+        
+        private final CascadeApplier cascadeApplier;
+        
+        private final StyledElement styledElement;
+        
+        private final Collection<CSSRule> rules;
+        
+        private final Collection<CSSPseudoElementRule> pseudoRules;
+        
+        public Cascader(final CascadeApplier cascadeApplier, final StyledElement styledElement,
+                final Collection<CSSRule> rules, final Collection<CSSPseudoElementRule> pseudoRules) {
+            super();
+            this.cascadeApplier = cascadeApplier;
+            this.styledElement = styledElement;
+            this.rules = rules;
+            this.pseudoRules = pseudoRules;
+        }
+        
+        @Override
+        public void run() {
+            cascadeApplier.cascade(styledElement, rules, pseudoRules);
+        }
+        
+        @Override
+        public Object call() throws Exception {
+            run();
+            return null;
+        }
+        
+    }
+    
+    private class Formatter2 implements Callable<BlockLevelBox> {
+        
+        private final Formatter formatter;
+        
+        private final StyledElement styledElement;
+        
+        public Formatter2(final Formatter formatter, final StyledElement styledElement) {
+            super();
+            this.styledElement = styledElement;
+            this.formatter = formatter;
+        }
+        
+        @Override
+        public BlockLevelBox call() throws Exception {
+            return formatter.createBlockBox(styledElement);
+        }
+        
+    }
+    
+    private class UrlBarListener implements ActionListener {
+        
+        private UrlBarListener() {
+            super();
+        }
+        
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            System.out.println(e);
+            final String urlText = urlBar.getText();
+            
+            final Monitor monitor = new Monitor(urlText);
+            
+            monitorThread = new Thread(monitor);
+            monitorThread.start();
+        }
+        
+    }
+    
 }

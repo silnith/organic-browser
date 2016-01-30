@@ -113,7 +113,7 @@
 //		this.terminalSetFactory = terminalSetFactory;
 //		this.nonTerminalMapFactory = nonTerminalMapFactory;
 //		this.nonTerminalSetFactory = nonTerminalSetFactory;
-//		
+//
 //		this.lexicon = this.terminalSetFactory.getNewSet();
 //		this.productions = this.nonTerminalMapFactory.getNewMap();
 //		this.nullable = this.nonTerminalSetFactory.getNewSet();
@@ -298,7 +298,7 @@
 //
 //	public Parser<T> createParser(final NonTerminalSymbol startSymbol, final T endOfFileSymbol) {
 //		final long startTime = System.currentTimeMillis();
-//		
+//
 //		final Set<ItemSet> parserStates = new HashSet<>();
 //		final Set<Edge> edges = new HashSet<>();
 //		final LookaheadItem initialProduction = createInitialProduction(startSymbol, endOfFileSymbol);
@@ -334,12 +334,12 @@
 //			// single: 1169592
 //			// batch: 1439974
 //		} while (changed);
-//		
+//
 //		final long endTime = System.currentTimeMillis();
-//		
+//
 //		System.out.print("Duration: ");
 //		System.out.println(endTime - startTime);
-//		
+//
 //		final Parser<T> parser = new Parser<>(parserStates, edges, startState, endOfFileSymbol);
 //		return parser;
 //	}
@@ -372,7 +372,7 @@
 //				final Edge newEdge = new Edge(itemSet, nextSymbolInProduction, newParserState);
 ////				changed = parserStates.add(newParserState) || changed;
 ////				changed = edges.add(newEdge) || changed;
-//				
+//
 //				final Integer previousName = parserStates.putIfAbsent(newParserState, stateCounter.incrementAndGet());
 //				if (previousName == null) {
 //					changed = true;
@@ -395,7 +395,7 @@
 //
 //	public Parser<T> threadedCreateParser(final NonTerminalSymbol startSymbol, final T endOfFileSymbol, final ExecutorService executorService) throws InterruptedException, ExecutionException {
 //		final long startTime = System.currentTimeMillis();
-//		
+//
 ////		final ConcurrentMap<ItemSet, Integer> parserStates = new ConcurrentHashMap<>();
 ////		final AtomicInteger stateCounter = new AtomicInteger();
 ////		final Set<Edge> edges = new HashSet<>();
@@ -422,12 +422,12 @@
 //			// single: 1169592
 //			// batch: 1439974
 //		} while (changed);
-//		
+//
 //		final long endTime = System.currentTimeMillis();
-//		
+//
 //		System.out.print("Duration: ");
 //		System.out.println(endTime - startTime);
-//		
+//
 //		final Parser<T> parser = new Parser<>(parserStates.keySet(), edges.keySet(), startState, endOfFileSymbol);
 //		return parser;
 //	}
@@ -437,14 +437,14 @@
 //		for (final Map.Entry<NonTerminalSymbol, Set<Production>> entry : productions.entrySet()) {
 ////			final NonTerminalSymbol nonTerminal = entry.getKey();
 //			final Set<Production> productionsForSymbol = entry.getValue();
-//			
+//
 //			for (final Production production : productionsForSymbol) {
 //				for (final Symbol symbol : production.getSymbols()) {
 //					if (symbol.getType() == Symbol.Type.TERMINAL) {
 ////						System.out.println("Terminal symbol found: " + symbol.getName());
 //					} else {
 //						assert symbol.getType() == Symbol.Type.NON_TERMINAL;
-//						
+//
 //						if (productions.containsKey(symbol)) {
 ////							System.out.println("Valid non-terminal symbol: " + symbol.getName());
 //						} else {
@@ -484,7 +484,7 @@
 //		for (final T terminalSymbol : lexicon) {
 //			getFirstSet(terminalSymbol).add(terminalSymbol);
 //		}
-//		
+//
 //		boolean changed;
 //		do {
 //			changed = false;
@@ -492,12 +492,12 @@
 //				final NonTerminalSymbol nonTerminal = entry.getKey();
 //				final Set<T> firstSetForLeftHandSide = getFirstSet(nonTerminal);
 //				final Set<Production> productionsForSymbol = entry.getValue();
-//				
+//
 //				for (final Production production : productionsForSymbol) {
 //					for (final Symbol symbol : production.getSymbols()) {
 //						final Set<T> firstSetForSymbolInProduction = getFirstSet(symbol);
 //						changed = firstSetForLeftHandSide.addAll(firstSetForSymbolInProduction) || changed;
-//						
+//
 //						if ( !isNullable(symbol)) {
 //							break;
 //						}
@@ -515,7 +515,7 @@
 //				final NonTerminalSymbol nonTerminal = entry.getKey();
 //				final Set<T> followSetForLeftHandSide = getFollowSet(nonTerminal);
 //				final Set<Production> productionsForSymbol = entry.getValue();
-//				
+//
 //				for (final Production production : productionsForSymbol) {
 //					final List<Symbol> productionSymbols = production.getSymbols();
 //					final ListIterator<Symbol> revIter = productionSymbols.listIterator(productionSymbols.size());
@@ -527,7 +527,7 @@
 //							break;
 //						}
 //					}
-//					
+//
 //					final ListIterator<Symbol> forwardIter = productionSymbols.listIterator();
 //					while (forwardIter.hasNext()) {
 //						final int startIndex = forwardIter.nextIndex();

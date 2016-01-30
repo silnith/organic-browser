@@ -73,61 +73,58 @@ import org.silnith.grammar.Grammar;
 import org.silnith.grammar.NonTerminalSymbol;
 import org.silnith.grammar.UnicodeTerminalSymbols;
 
+
 /**
- * [4a]   	NameChar	   ::=   	{@linkplain NameStartCharProduction NameStartChar} | "-" | "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
+ * [4a] NameChar ::= {@linkplain NameStartCharProduction NameStartChar} | "-" |
+ * "." | [0-9] | #xB7 | [#x0300-#x036F] | [#x203F-#x2040]
  * 
- * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-NameChar">NameChar</a>
+ * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-NameChar">
+ *      NameChar</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class NameCharProduction extends XMLProduction {
-
-	private final NonTerminalSymbol NameChar;
-
-	private final NonTerminalSymbol NameChar_Plus;
-
-	public NameCharProduction(final Grammar<UnicodeTerminalSymbols> grammar) {
-		super(grammar);
-		NameChar = this.grammar.getNonTerminalSymbol("NameChar");
-		NameChar_Plus = this.grammar.getNonTerminalSymbol("NameChar_Plus");
-		
-		this.grammar.addProduction(NameChar, characterHandler, hyphenMinus);
-		this.grammar.addProduction(NameChar, characterHandler, fullStop);
-		for (final UnicodeTerminalSymbols s : Arrays.asList(
-				digitZero, digitOne, digitTwo, digitThree, digitFour,
-				digitFive, digitSix, digitSeven, digitEight, digitNine)) {
-			this.grammar.addProduction(NameChar, characterHandler, s);
-		}
-		this.grammar.addProduction(NameChar, characterHandler, colon);
-		for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] {
-				capitalA, capitalB, capitalC, capitalD, capitalE, capitalF,
-				capitalG, capitalH, capitalI, capitalJ, capitalK,
-				capitalL, capitalM, capitalN, capitalO, capitalP,
-				capitalQ, capitalR, capitalS, capitalT, capitalU,
-				capitalV, capitalW, capitalX, capitalY, capitalZ}) {
-			this.grammar.addProduction(NameChar, characterHandler, s);
-		}
-		this.grammar.addProduction(NameChar, characterHandler, lowLine);
-		for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] {
-				smallA, smallB, smallC, smallD, smallE, smallF,
-				smallG, smallH, smallI, smallJ, smallK,
-				smallL, smallM, smallN, smallO, smallP,
-				smallQ, smallR, smallS, smallT, smallU,
-				smallV, smallW, smallX, smallY, smallZ}) {
-			this.grammar.addProduction(NameChar, characterHandler, s);
-		}
-		// TODO: upper characters
-		
-		this.grammar.addProduction(NameChar_Plus, stringHandler, NameChar_Plus, NameChar);
-		this.grammar.addProduction(NameChar_Plus, stringHandler, NameChar);
-	}
-
-	@Override
-	public NonTerminalSymbol getNonTerminalSymbol() {
-		return NameChar;
-	}
-
-	public NonTerminalSymbol getPlus() {
-		return NameChar_Plus;
-	}
-
+    
+    private final NonTerminalSymbol NameChar;
+    
+    private final NonTerminalSymbol NameChar_Plus;
+    
+    public NameCharProduction(final Grammar<UnicodeTerminalSymbols> grammar) {
+        super(grammar);
+        NameChar = this.grammar.getNonTerminalSymbol("NameChar");
+        NameChar_Plus = this.grammar.getNonTerminalSymbol("NameChar_Plus");
+        
+        this.grammar.addProduction(NameChar, characterHandler, hyphenMinus);
+        this.grammar.addProduction(NameChar, characterHandler, fullStop);
+        for (final UnicodeTerminalSymbols s : Arrays.asList(digitZero, digitOne, digitTwo, digitThree, digitFour,
+                digitFive, digitSix, digitSeven, digitEight, digitNine)) {
+            this.grammar.addProduction(NameChar, characterHandler, s);
+        }
+        this.grammar.addProduction(NameChar, characterHandler, colon);
+        for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] { capitalA, capitalB, capitalC, capitalD,
+                capitalE, capitalF, capitalG, capitalH, capitalI, capitalJ, capitalK, capitalL, capitalM, capitalN,
+                capitalO, capitalP, capitalQ, capitalR, capitalS, capitalT, capitalU, capitalV, capitalW, capitalX,
+                capitalY, capitalZ }) {
+            this.grammar.addProduction(NameChar, characterHandler, s);
+        }
+        this.grammar.addProduction(NameChar, characterHandler, lowLine);
+        for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] { smallA, smallB, smallC, smallD, smallE,
+                smallF, smallG, smallH, smallI, smallJ, smallK, smallL, smallM, smallN, smallO, smallP, smallQ, smallR,
+                smallS, smallT, smallU, smallV, smallW, smallX, smallY, smallZ }) {
+            this.grammar.addProduction(NameChar, characterHandler, s);
+        }
+        // TODO: upper characters
+        
+        this.grammar.addProduction(NameChar_Plus, stringHandler, NameChar_Plus, NameChar);
+        this.grammar.addProduction(NameChar_Plus, stringHandler, NameChar);
+    }
+    
+    @Override
+    public NonTerminalSymbol getNonTerminalSymbol() {
+        return NameChar;
+    }
+    
+    public NonTerminalSymbol getPlus() {
+        return NameChar_Plus;
+    }
+    
 }

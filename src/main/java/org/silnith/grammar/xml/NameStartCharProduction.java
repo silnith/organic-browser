@@ -59,44 +59,44 @@ import org.silnith.grammar.Grammar;
 import org.silnith.grammar.NonTerminalSymbol;
 import org.silnith.grammar.UnicodeTerminalSymbols;
 
+
 /**
- * [4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
+ * [4] NameStartChar ::= ":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] |
+ * [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] |
+ * [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] |
+ * [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
  * 
- * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-NameStartChar">NameStartChar</a>
+ * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-NameStartChar">
+ *      NameStartChar</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class NameStartCharProduction extends XMLProduction {
-
-	private final NonTerminalSymbol NameStartChar;
-
-	public NameStartCharProduction(final Grammar<UnicodeTerminalSymbols> grammar) {
-		super(grammar);
-		NameStartChar = this.grammar.getNonTerminalSymbol("NameStartChar");
-		
-		this.grammar.addProduction(NameStartChar, characterHandler, colon);
-		for (UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] {
-				capitalA, capitalB, capitalC, capitalD, capitalE, capitalF,
-				capitalG, capitalH, capitalI, capitalJ, capitalK,
-				capitalL, capitalM, capitalN, capitalO, capitalP,
-				capitalQ, capitalR, capitalS, capitalT, capitalU,
-				capitalV, capitalW, capitalX, capitalY, capitalZ}) {
-			this.grammar.addProduction(NameStartChar, characterHandler, s);
-		}
-		this.grammar.addProduction(NameStartChar, characterHandler, lowLine);
-		for (UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] {
-				smallA, smallB, smallC, smallD, smallE, smallF,
-				smallG, smallH, smallI, smallJ, smallK,
-				smallL, smallM, smallN, smallO, smallP,
-				smallQ, smallR, smallS, smallT, smallU,
-				smallV, smallW, smallX, smallY, smallZ}) {
-			this.grammar.addProduction(NameStartChar, characterHandler, s);
-		}
-		// TODO: upper characters
-	}
-
-	@Override
-	public NonTerminalSymbol getNonTerminalSymbol() {
-		return NameStartChar;
-	}
-
+    
+    private final NonTerminalSymbol NameStartChar;
+    
+    public NameStartCharProduction(final Grammar<UnicodeTerminalSymbols> grammar) {
+        super(grammar);
+        NameStartChar = this.grammar.getNonTerminalSymbol("NameStartChar");
+        
+        this.grammar.addProduction(NameStartChar, characterHandler, colon);
+        for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] { capitalA, capitalB, capitalC, capitalD,
+                capitalE, capitalF, capitalG, capitalH, capitalI, capitalJ, capitalK, capitalL, capitalM, capitalN,
+                capitalO, capitalP, capitalQ, capitalR, capitalS, capitalT, capitalU, capitalV, capitalW, capitalX,
+                capitalY, capitalZ }) {
+            this.grammar.addProduction(NameStartChar, characterHandler, s);
+        }
+        this.grammar.addProduction(NameStartChar, characterHandler, lowLine);
+        for (final UnicodeTerminalSymbols s : new UnicodeTerminalSymbols[] { smallA, smallB, smallC, smallD, smallE,
+                smallF, smallG, smallH, smallI, smallJ, smallK, smallL, smallM, smallN, smallO, smallP, smallQ, smallR,
+                smallS, smallT, smallU, smallV, smallW, smallX, smallY, smallZ }) {
+            this.grammar.addProduction(NameStartChar, characterHandler, s);
+        }
+        // TODO: upper characters
+    }
+    
+    @Override
+    public NonTerminalSymbol getNonTerminalSymbol() {
+        return NameStartChar;
+    }
+    
 }

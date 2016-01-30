@@ -17,29 +17,28 @@ import org.silnith.grammar.Grammar;
 import org.silnith.grammar.NonTerminalSymbol;
 import org.silnith.grammar.UnicodeTerminalSymbols;
 
+
 public class DecimalNumberLiteralProduction extends XMLProduction {
-
-	private final NonTerminalSymbol DECIMAL_DIGIT_Plus;
-
-	public DecimalNumberLiteralProduction(
-			final Grammar<UnicodeTerminalSymbols> grammar) {
-		super(grammar);
-		DECIMAL_DIGIT_Plus = this.grammar.getNonTerminalSymbol("DECIMAL-DIGIT-Plus");
-		final NonTerminalSymbol DECIMAL_DIGIT = this.grammar.getNonTerminalSymbol("DECIMAL-DIGIT");
-		
-		this.grammar.addProduction(DECIMAL_DIGIT_Plus, stringHandler, DECIMAL_DIGIT_Plus, DECIMAL_DIGIT);
-		this.grammar.addProduction(DECIMAL_DIGIT_Plus, stringHandler, DECIMAL_DIGIT);
-		
-		for (final UnicodeTerminalSymbols s : Arrays.asList(
-				digitZero, digitOne, digitTwo, digitThree, digitFour,
-				digitFive, digitSix, digitSeven, digitEight, digitNine)) {
-			this.grammar.addProduction(DECIMAL_DIGIT, characterHandler, s);
-		}
-	}
-
-	@Override
-	public NonTerminalSymbol getNonTerminalSymbol() {
-		return DECIMAL_DIGIT_Plus;
-	}
-
+    
+    private final NonTerminalSymbol DECIMAL_DIGIT_Plus;
+    
+    public DecimalNumberLiteralProduction(final Grammar<UnicodeTerminalSymbols> grammar) {
+        super(grammar);
+        DECIMAL_DIGIT_Plus = this.grammar.getNonTerminalSymbol("DECIMAL-DIGIT-Plus");
+        final NonTerminalSymbol DECIMAL_DIGIT = this.grammar.getNonTerminalSymbol("DECIMAL-DIGIT");
+        
+        this.grammar.addProduction(DECIMAL_DIGIT_Plus, stringHandler, DECIMAL_DIGIT_Plus, DECIMAL_DIGIT);
+        this.grammar.addProduction(DECIMAL_DIGIT_Plus, stringHandler, DECIMAL_DIGIT);
+        
+        for (final UnicodeTerminalSymbols s : Arrays.asList(digitZero, digitOne, digitTwo, digitThree, digitFour,
+                digitFive, digitSix, digitSeven, digitEight, digitNine)) {
+            this.grammar.addProduction(DECIMAL_DIGIT, characterHandler, s);
+        }
+    }
+    
+    @Override
+    public NonTerminalSymbol getNonTerminalSymbol() {
+        return DECIMAL_DIGIT_Plus;
+    }
+    
 }

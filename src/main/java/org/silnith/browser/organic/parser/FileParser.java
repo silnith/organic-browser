@@ -4,10 +4,11 @@ import java.io.IOException;
 
 import org.silnith.browser.organic.network.Download;
 
+
 public interface FileParser<T> {
-
-	T parse(Download download) throws IOException;
-
-	void dispose();
-
+    
+    T parse(Download download) throws IOException;
+    
+    void dispose();
+    
 }

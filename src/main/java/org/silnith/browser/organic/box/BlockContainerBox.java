@@ -1,7 +1,8 @@
 package org.silnith.browser.organic.box;
 
 /**
- * Either establishes a {@link BlockFormattingContext} or {@link InlineFormattingContext}.
+ * Either establishes a {@link BlockFormattingContext} or
+ * {@link InlineFormattingContext}.
  * 
  * @author kent
  */

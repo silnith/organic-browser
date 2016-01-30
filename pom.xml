@@ -20,9 +20,9 @@
 		<url>https://silnith.org/</url>
 	</organization>
 	<scm>
-		<url>https://svn.silnith.org/svn/repos/java/applications/OrganicBrowser/trunk/</url>
-		<connection>scm:svn:https://svn.silnith.org/svn/repos/java/applications/OrganicBrowser/trunk/</connection>
-		<developerConnection>scm:svn:https://svn.silnith.org/svn/repos/java/applications/OrganicBrowser/trunk/</developerConnection>
+		<url>https://github.com/silnith/organic-browser</url>
+        <connection>scm:git:https://github.com/silnith/organic-browser.git</connection>
+		<developerConnection>scm:git:https://github.com/silnith/organic-browser.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<ciManagement>

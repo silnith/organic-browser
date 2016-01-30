@@ -17,38 +17,40 @@ import org.silnith.grammar.Grammar;
 import org.silnith.grammar.NonTerminalSymbol;
 import org.silnith.grammar.UnicodeTerminalSymbols;
 
+
 /**
- * 	TokenizedType	   ::=   	'ID'
- * 		| 'IDREF'
- * 		| 'IDREFS'
- * 		| 'ENTITY'
- * 		| 'ENTITIES'
- * 	| 'NMTOKEN'
- * 	| 'NMTOKENS'
+ * TokenizedType ::= 'ID' | 'IDREF' | 'IDREFS' | 'ENTITY' | 'ENTITIES' |
+ * 'NMTOKEN' | 'NMTOKENS'
  * 
- * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-TokenizedType">TokenizedType</a>
+ * @see <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#NT-TokenizedType">
+ *      TokenizedType</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class TokenizedTypeProduction extends XMLProduction {
-
-	private final NonTerminalSymbol TokenizedType;
-
-	public TokenizedTypeProduction(final Grammar<UnicodeTerminalSymbols> grammar) {
-		super(grammar);
-		TokenizedType = this.grammar.getNonTerminalSymbol("TokenizedType");
-		
-		this.grammar.addProduction(TokenizedType, nullHandler, capitalI, capitalD);
-		this.grammar.addProduction(TokenizedType, nullHandler, capitalI, capitalD, capitalR, capitalE, capitalF);
-		this.grammar.addProduction(TokenizedType, nullHandler, capitalI, capitalD, capitalR, capitalE, capitalF, capitalS);
-		this.grammar.addProduction(TokenizedType, nullHandler, capitalE, capitalN, capitalT, capitalI, capitalT, capitalY);
-		this.grammar.addProduction(TokenizedType, nullHandler, capitalE, capitalN, capitalT, capitalI, capitalT, capitalI, capitalE, capitalS);
-		this.grammar.addProduction(TokenizedType, nullHandler, capitalN, capitalM, capitalT, capitalO, capitalK, capitalE, capitalN);
-		this.grammar.addProduction(TokenizedType, nullHandler, capitalN, capitalM, capitalT, capitalO, capitalK, capitalE, capitalN, capitalS);
-	}
-
-	@Override
-	public NonTerminalSymbol getNonTerminalSymbol() {
-		return TokenizedType;
-	}
-
+    
+    private final NonTerminalSymbol TokenizedType;
+    
+    public TokenizedTypeProduction(final Grammar<UnicodeTerminalSymbols> grammar) {
+        super(grammar);
+        TokenizedType = this.grammar.getNonTerminalSymbol("TokenizedType");
+        
+        this.grammar.addProduction(TokenizedType, nullHandler, capitalI, capitalD);
+        this.grammar.addProduction(TokenizedType, nullHandler, capitalI, capitalD, capitalR, capitalE, capitalF);
+        this.grammar.addProduction(TokenizedType, nullHandler, capitalI, capitalD, capitalR, capitalE, capitalF,
+                capitalS);
+        this.grammar.addProduction(TokenizedType, nullHandler, capitalE, capitalN, capitalT, capitalI, capitalT,
+                capitalY);
+        this.grammar.addProduction(TokenizedType, nullHandler, capitalE, capitalN, capitalT, capitalI, capitalT,
+                capitalI, capitalE, capitalS);
+        this.grammar.addProduction(TokenizedType, nullHandler, capitalN, capitalM, capitalT, capitalO, capitalK,
+                capitalE, capitalN);
+        this.grammar.addProduction(TokenizedType, nullHandler, capitalN, capitalM, capitalT, capitalO, capitalK,
+                capitalE, capitalN, capitalS);
+    }
+    
+    @Override
+    public NonTerminalSymbol getNonTerminalSymbol() {
+        return TokenizedType;
+    }
+    
 }

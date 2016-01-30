@@ -8,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+
 /**
  * An inline-level box for an element with "display: list-item" and
  * "list-style-position: inside".
@@ -15,22 +16,23 @@ import org.w3c.dom.Node;
  * @author kent
  */
 public class InlineListItemMarker extends AnonymousInlineBox {
-
-	private final StyledElement listItemElement;
-
-	/**
-	 * @param listItemElement the list item being marked
-	 */
-	public InlineListItemMarker(final PropertyAccessor<AbsoluteLength> fontSizeAccessor, final StyledElement listItemElement) {
-		super(fontSizeAccessor, new StyledText(listItemElement, "1. "));
-		this.listItemElement = listItemElement;
-	}
-
-	@Override
-	public Node createDOM(final Document document) {
-		final Element node = document.createElement("InlineListItemMarker");
-		node.appendChild(document.createTextNode("1. "));
-		return node;
-	}
-
+    
+    private final StyledElement listItemElement;
+    
+    /**
+     * @param listItemElement the list item being marked
+     */
+    public InlineListItemMarker(final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
+            final StyledElement listItemElement) {
+        super(fontSizeAccessor, new StyledText(listItemElement, "1. "));
+        this.listItemElement = listItemElement;
+    }
+    
+    @Override
+    public Node createDOM(final Document document) {
+        final Element node = document.createElement("InlineListItemMarker");
+        node.appendChild(document.createTextNode("1. "));
+        return node;
+    }
+    
 }

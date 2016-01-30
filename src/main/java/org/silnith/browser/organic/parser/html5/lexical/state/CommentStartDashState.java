@@ -13,62 +13,65 @@ import org.silnith.browser.organic.parser.html5.lexical.Tokenizer;
 import org.silnith.browser.organic.parser.html5.lexical.token.CommentToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.Token;
 
+
 /**
- * @see <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#comment-start-dash-state">12.2.4.47 Comment start dash state</a>
+ * @see <a href=
+ *      "http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#comment-start-dash-state">
+ *      12.2.4.47 Comment start dash state</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class CommentStartDashState extends TokenizerState {
-
-	public CommentStartDashState(final Tokenizer tokenizer) {
-		super(tokenizer);
-	}
-
-	@Override
-	public int getMaxPushback() {
-		return 0;
-	}
-
-	@Override
-	public List<Token> getNextTokens() throws IOException {
-		final int ch = consume();
-		switch (ch) {
-		case HYPHEN_MINUS: {
-			setTokenizerState(Tokenizer.State.COMMENT_END);
-			return NOTHING;
-		} // break;
-		case NULL: {
-			if (isAllowParseErrors()) {
-				appendToCommentToken(HYPHEN_MINUS, REPLACEMENT_CHARACTER);
-				setTokenizerState(Tokenizer.State.COMMENT);
-				return NOTHING;
-			} else {
-				throw new ParseErrorException("Null character in comment start dash state.");
-			}
-		} // break;
-		case GREATER_THAN_SIGN: {
-			if (isAllowParseErrors()) {
-				setTokenizerState(Tokenizer.State.DATA);
-				final CommentToken commentToken = clearCommentToken();
-				return one(commentToken);
-			} else {
-				throw new ParseErrorException("Unexpected '>' in comment start dash state.");
-			}
-		} // break;
-		case EOF: {
-			if (isAllowParseErrors()) {
-				setTokenizerState(Tokenizer.State.DATA);
-				final CommentToken commentToken = clearCommentToken();
-				return one(commentToken);
-			} else {
-				throw new ParseErrorException("Unexpected end-of-file in comment start dash state.");
-			}
-		} // break;
-		default: {
-			appendToCommentToken(HYPHEN_MINUS, (char) ch);
-			setTokenizerState(Tokenizer.State.COMMENT);
-			return NOTHING;
-		} // break;
-		}
-	}
-
+    
+    public CommentStartDashState(final Tokenizer tokenizer) {
+        super(tokenizer);
+    }
+    
+    @Override
+    public int getMaxPushback() {
+        return 0;
+    }
+    
+    @Override
+    public List<Token> getNextTokens() throws IOException {
+        final int ch = consume();
+        switch (ch) {
+        case HYPHEN_MINUS: {
+            setTokenizerState(Tokenizer.State.COMMENT_END);
+            return NOTHING;
+        } // break;
+        case NULL: {
+            if (isAllowParseErrors()) {
+                appendToCommentToken(HYPHEN_MINUS, REPLACEMENT_CHARACTER);
+                setTokenizerState(Tokenizer.State.COMMENT);
+                return NOTHING;
+            } else {
+                throw new ParseErrorException("Null character in comment start dash state.");
+            }
+        } // break;
+        case GREATER_THAN_SIGN: {
+            if (isAllowParseErrors()) {
+                setTokenizerState(Tokenizer.State.DATA);
+                final CommentToken commentToken = clearCommentToken();
+                return one(commentToken);
+            } else {
+                throw new ParseErrorException("Unexpected '>' in comment start dash state.");
+            }
+        } // break;
+        case EOF: {
+            if (isAllowParseErrors()) {
+                setTokenizerState(Tokenizer.State.DATA);
+                final CommentToken commentToken = clearCommentToken();
+                return one(commentToken);
+            } else {
+                throw new ParseErrorException("Unexpected end-of-file in comment start dash state.");
+            }
+        } // break;
+        default: {
+            appendToCommentToken(HYPHEN_MINUS, (char) ch);
+            setTokenizerState(Tokenizer.State.COMMENT);
+            return NOTHING;
+        } // break;
+        }
+    }
+    
 }
