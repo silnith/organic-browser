@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.silnith.browser.organic.CSSPseudoElementRule;
+import org.silnith.browser.organic.CSSPseudoElementRuleSet;
 import org.silnith.browser.organic.CSSRule;
 import org.silnith.browser.organic.network.Download;
 import org.silnith.css.model.data.PropertyName;
@@ -45,7 +45,7 @@ public class StyleParser {
         return rules;
     }
     
-    public Collection<CSSPseudoElementRule> parsePseudoElementStyleRules(final Object documentText) {
+    public Collection<CSSPseudoElementRuleSet> parsePseudoElementStyleRules(final Object documentText) {
         return createGeneratedContentRules();
     }
     
@@ -221,19 +221,19 @@ public class StyleParser {
         return cssRules;
     }
     
-    private static Collection<CSSPseudoElementRule> createGeneratedContentRules() {
-        final ArrayList<CSSPseudoElementRule> pseudoRules = new ArrayList<>();
+    private static Collection<CSSPseudoElementRuleSet> createGeneratedContentRules() {
+        final ArrayList<CSSPseudoElementRuleSet> pseudoRules = new ArrayList<>();
         final ArrayList<CSSRule> beforeRules = new ArrayList<>();
         final ArrayList<CSSRule> afterRules = new ArrayList<>();
         
-        pseudoRules.add(new CSSPseudoElementRule("div", "Div: ", null));
+        pseudoRules.add(new CSSPseudoElementRuleSet("div", "Div: ", null));
         beforeRules.clear();
         afterRules.clear();
         afterRules.add(new CSSRule(":after", PropertyName.DISPLAY, "none"));
         afterRules.add(new CSSRule(":after", PropertyName.BACKGROUND_COLOR, "aqua"));
         afterRules.add(new CSSRule(":after", PropertyName.BORDER_TOP_STYLE, "solid"));
         afterRules.add(new CSSRule(":after", PropertyName.COLOR, "red"));
-        pseudoRules.add(new CSSPseudoElementRule("p", null, "yomama", beforeRules, afterRules));
+        pseudoRules.add(new CSSPseudoElementRuleSet("p", null, "yomama", beforeRules, afterRules));
         
         return pseudoRules;
     }

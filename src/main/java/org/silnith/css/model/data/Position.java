@@ -4,6 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * An enumeration of the legal values for the "position" property in CSS.
+ * 
+ * @author kent
+ * @see PropertyName#POSITION
+ * @see org.silnith.browser.organic.property.accessor.PositionAccessor
+ */
 public enum Position {
     STATIC("static"),
     RELATIVE("relative"),

@@ -18,6 +18,11 @@ import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
 
 
+/**
+ * A Swing component that can render CSS box content.
+ * 
+ * @author kent
+ */
 public class BoxRenderer extends JPanel implements ChangeListener {
     
     private static final long serialVersionUID = 1L;
@@ -86,7 +91,7 @@ public class BoxRenderer extends JPanel implements ChangeListener {
         final long startTime = System.currentTimeMillis();
         renderableContent = blockLevelBox.layoutContents(negotiatedWidth, negotiatedWidth, graphics);
         final long endTime = System.currentTimeMillis();
-        System.out.println("rendering time: " + (endTime - startTime));
+        System.out.println("layout time: " + (endTime - startTime));
         super.doLayout();
     }
     

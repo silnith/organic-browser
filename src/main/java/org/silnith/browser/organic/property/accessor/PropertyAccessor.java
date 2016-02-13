@@ -42,6 +42,11 @@ public abstract class PropertyAccessor<T> {
         this.inherited = inherited;
     }
     
+    /**
+     * Returns the property that this accessor computes.
+     * 
+     * @return the property name that this accessor understands
+     */
     public final PropertyName getPropertyName() {
         return propertyName;
     }
@@ -95,8 +100,9 @@ public abstract class PropertyAccessor<T> {
     protected abstract T parse(StyleData styleData, String specifiedValue);
     
     /**
-     * Computes the property value for the given element. The algorithm is as
-     * follows:
+     * Computes the property value for the given element.  The specified value
+     * must have already been set, if any.
+     * The algorithm is as follows:
      * <ol>
      * <li>If the property is specified explicitly for this element and is the
      * string "inherit", then the property value is the computed value of the
@@ -115,10 +121,10 @@ public abstract class PropertyAccessor<T> {
      * For inherited values, if the element is the root element then the value
      * is the initial value.
      * 
-     * @param styleData
+     * @param styleData the styling information for the node being computed
      */
     public void computeValue(final StyleData styleData) {
-//		assert !styleData.isPropertyComputed(propertyName);
+//        assert !styleData.isPropertyComputed(propertyName);
         
         final T computedValue;
         if (styleData.isPropertySpecified(getPropertyName())) {
@@ -146,6 +152,12 @@ public abstract class PropertyAccessor<T> {
         styleData.setComputedValue(propertyName, computedValue);
     }
     
+    /**
+     * Performs steps 3 and 4 of the algorithm defined for {@link #computeValue(StyleData)}.
+     * 
+     * @param styleData the styling information for the node being computed
+     * @return the computed value
+     */
     private T getValueWhenUnspecified(final StyleData styleData) {
         if (inherited) {
             // inherit

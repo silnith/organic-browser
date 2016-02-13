@@ -66,7 +66,7 @@ public class Program {
         final StyledElement styledElement = styleTreeBuilder.addStyleInformation(domDocument);
         
         final Collection<CSSRule> cssRules = createStyleList();
-        final Collection<CSSPseudoElementRule> pseudoRules = createGeneratedContentRules();
+        final Collection<CSSPseudoElementRuleSet> pseudoRules = createGeneratedContentRules();
         
         final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
         final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
@@ -74,6 +74,8 @@ public class Program {
         cascadeApplier.cascade(styledElement, cssRules, pseudoRules);
         final long cascadeEndTime = System.currentTimeMillis();
         System.out.println("Cascade time: " + (cascadeEndTime - cascadeStartTime));
+        
+        // debug output of the style information
         final Document styledDocument = domImpl.createDocument("namespace", "Styled", null);
         styledDocument.getDocumentElement().appendChild(styledElement.createDOM(styledDocument));
         serializer.write(styledDocument, output);
@@ -90,6 +92,8 @@ public class Program {
                         PropertyName.LIST_STYLE_POSITION);
         final Formatter formatter = new Formatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
         final BlockLevelBox blockBox = formatter.createBlockBox(styledElement);
+        
+        // debug output of the formatting information
         final Document formattedDocument = domImpl.createDocument("namespace", "Formatted", null);
         formattedDocument.getDocumentElement().appendChild(blockBox.createDOM(formattedDocument));
         serializer.write(formattedDocument, output);
@@ -238,19 +242,19 @@ public class Program {
         return cssRules;
     }
     
-    private static Collection<CSSPseudoElementRule> createGeneratedContentRules() {
-        final ArrayList<CSSPseudoElementRule> pseudoRules = new ArrayList<>();
+    private static Collection<CSSPseudoElementRuleSet> createGeneratedContentRules() {
+        final ArrayList<CSSPseudoElementRuleSet> pseudoRules = new ArrayList<>();
         final ArrayList<CSSRule> beforeRules = new ArrayList<>();
         final ArrayList<CSSRule> afterRules = new ArrayList<>();
         
-        pseudoRules.add(new CSSPseudoElementRule("div", "Div: ", null));
+        pseudoRules.add(new CSSPseudoElementRuleSet("div", "Div: ", null));
         beforeRules.clear();
         afterRules.clear();
         afterRules.add(new CSSRule(":after", PropertyName.DISPLAY, "none"));
         afterRules.add(new CSSRule(":after", PropertyName.BACKGROUND_COLOR, "aqua"));
         afterRules.add(new CSSRule(":after", PropertyName.BORDER_TOP_STYLE, "solid"));
         afterRules.add(new CSSRule(":after", PropertyName.COLOR, "red"));
-        pseudoRules.add(new CSSPseudoElementRule("p", null, "yomama", beforeRules, afterRules));
+        pseudoRules.add(new CSSPseudoElementRuleSet("p", null, "yomama", beforeRules, afterRules));
         
         return pseudoRules;
     }

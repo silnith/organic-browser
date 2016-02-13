@@ -23,8 +23,8 @@ public class TestDOM {
         for (int i = 0; i < domImplementationList.getLength(); i++ ) {
             System.out.println(domImplementationList.item(i).hasFeature("+Stylesheet", null));
         }
-//		final DOMImplementation domImplementation = registry.getDOMImplementation("HTML +CSS +LS");
-        final DOMImplementation domImplementation = registry.getDOMImplementation("HTML");
+        final DOMImplementation domImplementation = registry.getDOMImplementation("HTML +CSS +LS");
+//        final DOMImplementation domImplementation = registry.getDOMImplementation("HTML");
         
         final DocumentType htmlDocType = domImplementation.createDocumentType("HTML", "-//W3C//DTD HTML 4.01//EN",
                 "http://www.w3.org/TR/html4/strict.dtd");

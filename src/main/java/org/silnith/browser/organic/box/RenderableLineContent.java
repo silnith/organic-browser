@@ -2,9 +2,10 @@ package org.silnith.browser.organic.box;
 
 /**
  * An object that can be rendered, as returned by
- * {@link InlineLevelBox#layoutContents(int, java.awt.Graphics2D, boolean)}.
+ * {@link InlineLevelBox#layoutContents(org.silnith.css.model.data.AbsoluteLength, org.silnith.css.model.data.AbsoluteLength, java.awt.Graphics2D, boolean)}.
  * 
  * @author kent
+ * @see javax.swing.text.View
  */
 public interface RenderableLineContent extends RenderableContent {
     

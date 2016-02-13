@@ -12,6 +12,17 @@ import org.silnith.css.model.data.PropertyName;
 import org.silnith.css.model.data.RelativeLength;
 
 
+/**
+ * An abstract base class for all the property accessors for the "border-*-width" properties.
+ * <p>
+ * Note that this is not an accessor for the "border-width" pseudo-property.
+ * 
+ * @author kent
+ * @see BorderTopWidthAccessor
+ * @see BorderRightWidthAccessor
+ * @see BorderBottomWidthAccessor
+ * @see BorderLeftWidthAccessor
+ */
 public abstract class BorderWidthAccessor extends PropertyAccessor<AbsoluteLength> {
     
     private final LengthParser lengthParser;

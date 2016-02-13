@@ -1,5 +1,11 @@
 package org.silnith.css.model.data;
 
+/**
+ * A parser for CSS length values.  A CSS length value is simply a CSS number
+ * with a unit suffix.
+ * 
+ * @author kent
+ */
 public class LengthParser {
     
     private final AbsoluteLengthParser absoluteLengthParser;

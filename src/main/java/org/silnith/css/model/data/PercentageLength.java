@@ -1,5 +1,10 @@
 package org.silnith.css.model.data;
 
+/**
+ * A percentage length value as defined in the CSS specification.
+ * 
+ * @author kent
+ */
 public class PercentageLength extends Length<PercentageUnit> implements Comparable<PercentageLength> {
     
     /**
@@ -21,7 +26,7 @@ public class PercentageLength extends Length<PercentageUnit> implements Comparab
     }
     
     /**
-     * Returns {@link Type#PERCENTAGE}.
+     * Returns {@link Length.Type#PERCENTAGE}.
      */
     @Override
     public Type getType() {

@@ -9,6 +9,13 @@ import org.silnith.css.model.data.ColorParser;
 import org.silnith.css.model.data.PropertyName;
 
 
+/**
+ * An abstract base class for property accessors where the property depends on
+ * the computed value of the "color" property.
+ * 
+ * @author kent
+ * @see PropertyName#COLOR
+ */
 public abstract class PropertyThatDependsOnTheColorPropertyAccessor extends PropertyAccessor<Color> {
     
     private final ColorParser colorParser;

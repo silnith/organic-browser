@@ -1,5 +1,11 @@
 package org.silnith.css.model.data;
 
+/**
+ * An enumeration with the percentage unit from the CSS specification.
+ * The interpretation of the percentage value is specific to each property.
+ * 
+ * @author kent
+ */
 public enum PercentageUnit implements Unit {
     PERCENTAGE("%");
     

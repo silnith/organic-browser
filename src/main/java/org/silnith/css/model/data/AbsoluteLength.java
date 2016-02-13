@@ -1,5 +1,10 @@
 package org.silnith.css.model.data;
 
+/**
+ * An absolute length value as defined in the CSS specification.
+ * 
+ * @author kent
+ */
 public class AbsoluteLength extends Length<AbsoluteUnit> implements Comparable<AbsoluteLength> {
     
     public static final AbsoluteLength ZERO = getZero(AbsoluteUnit.IN);

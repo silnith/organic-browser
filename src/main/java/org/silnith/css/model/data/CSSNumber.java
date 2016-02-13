@@ -1,9 +1,19 @@
 package org.silnith.css.model.data;
 
+/**
+ * A number as it is defined in the CSS specification.  Each instance is
+ * immutable.  The mathematical functions such as {@link #plus(CSSNumber)} and
+ * {@link #times(float)} return new instances without modifying the inputs.
+ * 
+ * @author kent
+ */
 public class CSSNumber extends Number implements Comparable<CSSNumber> {
     
     private static final long serialVersionUID = 1L;
     
+    /**
+     * A constant for the number {@code 0}.
+     */
     public static final CSSNumber ZERO = CSSNumber.valueOf(0);
     
     public static CSSNumber valueOf(final float value) {

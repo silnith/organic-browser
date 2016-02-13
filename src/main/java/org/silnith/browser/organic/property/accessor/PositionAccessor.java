@@ -8,6 +8,13 @@ import org.silnith.css.model.data.Position;
 import org.silnith.css.model.data.PropertyName;
 
 
+/**
+ * A property accessor for the "position" property.
+ * 
+ * @author kent
+ * @see PropertyName#POSITION
+ * @see Position
+ */
 public class PositionAccessor extends PropertyAccessor<Position> {
     
     public PositionAccessor() {

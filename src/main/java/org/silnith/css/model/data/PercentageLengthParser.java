@@ -1,5 +1,12 @@
 package org.silnith.css.model.data;
 
+/**
+ * A parser for CSS percentage length values.  A length value is simply a CSS number with a unit suffix.
+ * <p>
+ * A percentage length value is a length value where the unit is a {@link PercentageUnit}.
+ * 
+ * @author kent
+ */
 public class PercentageLengthParser {
     
     private final CSSNumberParser cssNumberParser;

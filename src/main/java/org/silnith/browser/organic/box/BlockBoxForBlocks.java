@@ -22,6 +22,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 
+/**
+ * A block box that contains other block boxes.
+ * 
+ * @author kent
+ */
 public class BlockBoxForBlocks implements BlockLevelBox, BlockFormattingContext {
     
     private final StyledElement styledElement;

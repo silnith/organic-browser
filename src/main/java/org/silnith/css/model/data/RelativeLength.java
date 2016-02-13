@@ -1,5 +1,10 @@
 package org.silnith.css.model.data;
 
+/**
+ * A relative length value as defined in the CSS specification.
+ * 
+ * @author kent
+ */
 public class RelativeLength extends Length<RelativeUnit> {
     
     public RelativeLength(final CSSNumber length, final RelativeUnit unit) {
@@ -11,7 +16,7 @@ public class RelativeLength extends Length<RelativeUnit> {
     }
     
     /**
-     * Returns {@link Type#RELATIVE}.
+     * Returns {@link Length.Type#RELATIVE}.
      */
     @Override
     public Type getType() {

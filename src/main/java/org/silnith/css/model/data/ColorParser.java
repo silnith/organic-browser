@@ -7,6 +7,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+/**
+ * A parser that can parse the various formats allowed for color values in CSS.
+ * 
+ * @author kent
+ */
 public class ColorParser {
     
     private static final Pattern SIX_HEX_PATTERN;

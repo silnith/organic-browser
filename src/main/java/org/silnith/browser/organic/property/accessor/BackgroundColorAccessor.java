@@ -9,6 +9,12 @@ import org.silnith.css.model.data.ColorParser;
 import org.silnith.css.model.data.PropertyName;
 
 
+/**
+ * A property accessor for computing the value of the "background-color" property.
+ * 
+ * @author kent
+ * @see PropertyName#BACKGROUND_COLOR
+ */
 public class BackgroundColorAccessor extends PropertyAccessor<Color> {
     
     private final ColorParser colorParser;

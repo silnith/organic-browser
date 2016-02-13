@@ -12,6 +12,11 @@ import org.silnith.css.model.data.PropertyName;
 import org.silnith.css.model.data.RelativeLengthParser;
 
 
+/**
+ * A factory that provides access to all of the {@link PropertyAccessor}s.
+ * 
+ * @author kent
+ */
 public class PropertyAccessorFactory {
     
     public static PropertyAccessorFactory getInstance() {

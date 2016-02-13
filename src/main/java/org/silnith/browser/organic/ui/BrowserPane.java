@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
 import org.silnith.browser.organic.BoxRenderer;
-import org.silnith.browser.organic.CSSPseudoElementRule;
+import org.silnith.browser.organic.CSSPseudoElementRuleSet;
 import org.silnith.browser.organic.CSSRule;
 import org.silnith.browser.organic.CascadeApplier;
 import org.silnith.browser.organic.StyleTreeBuilder;
@@ -162,7 +162,7 @@ public class BrowserPane extends JPanel {
                 }
                 
                 final Collection<CSSRule> cssRules = styleParser.parseStyleRules(document);
-                final Collection<CSSPseudoElementRule> pseudoRules = styleParser.parsePseudoElementStyleRules(document);
+                final Collection<CSSPseudoElementRuleSet> pseudoRules = styleParser.parsePseudoElementStyleRules(document);
                 
                 final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
                 final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
@@ -270,10 +270,10 @@ public class BrowserPane extends JPanel {
         
         private final Collection<CSSRule> rules;
         
-        private final Collection<CSSPseudoElementRule> pseudoRules;
+        private final Collection<CSSPseudoElementRuleSet> pseudoRules;
         
         public Cascader(final CascadeApplier cascadeApplier, final StyledElement styledElement,
-                final Collection<CSSRule> rules, final Collection<CSSPseudoElementRule> pseudoRules) {
+                final Collection<CSSRule> rules, final Collection<CSSPseudoElementRuleSet> pseudoRules) {
             super();
             this.cascadeApplier = cascadeApplier;
             this.styledElement = styledElement;

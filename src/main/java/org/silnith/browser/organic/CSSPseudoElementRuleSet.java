@@ -10,7 +10,12 @@ import org.silnith.css.model.data.Display;
 import org.silnith.css.model.data.PropertyName;
 
 
-public class CSSPseudoElementRule {
+/**
+ * A set of CSS rules to apply to a pseudo-element.
+ * 
+ * @author kent
+ */
+public class CSSPseudoElementRuleSet {
     
     private final String elementName;
     
@@ -24,7 +29,7 @@ public class CSSPseudoElementRule {
     
     private final PropertyAccessorFactory propertyAccessorFactory;
     
-    public CSSPseudoElementRule(final String elementName, final String beforeString, final String afterString) {
+    public CSSPseudoElementRuleSet(final String elementName, final String beforeString, final String afterString) {
         this.elementName = elementName;
         this.beforeString = beforeString;
         this.afterString = afterString;
@@ -33,7 +38,7 @@ public class CSSPseudoElementRule {
         this.propertyAccessorFactory = new PropertyAccessorFactory();
     }
     
-    public CSSPseudoElementRule(final String elementName, final String beforeString, final String afterString,
+    public CSSPseudoElementRuleSet(final String elementName, final String beforeString, final String afterString,
             final List<CSSRule> beforeRules, final List<CSSRule> afterRules) {
         this(elementName, beforeString, afterString);
         this.beforeRules.addAll(beforeRules);
@@ -50,6 +55,14 @@ public class CSSPseudoElementRule {
         return false;
     }
     
+    /**
+     * Sets the computed values for all CSS properties for the pseudo-elements
+     * this rule set applies to with the given element as the parent of the
+     * pseudo-elements.  The computed values for the element must already have
+     * been set before calling this method.
+     * 
+     * @param styledElement
+     */
     public void apply(final StyledElement styledElement) {
         final DisplayAccessor displayAccessor = new DisplayAccessor();
         if (beforeString != null) {
@@ -98,7 +111,7 @@ public class CSSPseudoElementRule {
     
     @Override
     public String toString() {
-        return "CSSPseudoElementRule {before: " + beforeString + ", after: " + afterString + ", before rules: "
+        return "CSSPseudoElementRules {before: " + beforeString + ", after: " + afterString + ", before rules: "
                 + beforeRules + ", after rules: " + afterRules + "}";
     }
     

@@ -8,7 +8,8 @@ import java.util.List;
  * boxes.
  * 
  * @author kent
- * @param <T>
+ * @param <T> the type of children this formatting context contains, either
+ *         {@link BlockLevelBox} or {@link InlineLevelBox}
  */
 public interface FormattingContext<T> {
     

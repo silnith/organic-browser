@@ -4,6 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * An enumeration of the legal values for the "display" property in CSS.
+ * 
+ * @author kent
+ * @see PropertyName#DISPLAY
+ * @see org.silnith.browser.organic.property.accessor.DisplayAccessor
+ */
 public enum Display {
     INLINE("inline"),
     BLOCK("block"),

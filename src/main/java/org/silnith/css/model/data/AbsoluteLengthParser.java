@@ -1,5 +1,12 @@
 package org.silnith.css.model.data;
 
+/**
+ * A parser for CSS absolute length values.  A length value is simply a CSS number with a unit suffix.
+ * <p>
+ * An absolute length value is a length value where the unit is an {@link AbsoluteUnit}.
+ * 
+ * @author kent
+ */
 public class AbsoluteLengthParser {
     
     private final CSSNumberParser cssNumberParser;

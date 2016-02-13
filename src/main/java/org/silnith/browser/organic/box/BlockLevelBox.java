@@ -51,7 +51,7 @@ public interface BlockLevelBox {
      * Neither this object nor the returned object will maintain a reference to
      * the {@link Graphics2D} object. However, if the {@link Graphics2D} object
      * later passed to
-     * {@link RenderableContent#paintComponent(java.awt.Point, java.awt.Graphics)}
+     * {@link RenderableContent#paintComponent(java.awt.geom.Point2D, Graphics2D)}
      * is different, the rendering results may be undefined.
      * 
      * @param containingBlockWidth the width of the containing block. This is
@@ -64,6 +64,14 @@ public interface BlockLevelBox {
     RenderableContent layoutContents(AbsoluteLength containingBlockWidth, AbsoluteLength targetWidth,
             Graphics2D graphics);
             
+    /**
+     * Creates a DOM Node to represent the state of this box. This is primarily
+     * used for debugging, so that the state of the layout information can be
+     * output in an easily-readable format.
+     * 
+     * @param document the owning document, needed for creating new nodes
+     * @return a Node representing this styled content
+     */
     Node createDOM(final Document document);
     
 }

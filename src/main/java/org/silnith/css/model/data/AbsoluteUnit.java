@@ -1,5 +1,10 @@
 package org.silnith.css.model.data;
 
+/**
+ * A enumeration of all the absolute units in the CSS specification.
+ * 
+ * @author kent
+ */
 public enum AbsoluteUnit implements Unit {
     /**
      * 2.54cm 25.4mm 72pt 96px

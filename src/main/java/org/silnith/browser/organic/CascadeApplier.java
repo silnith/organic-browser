@@ -29,8 +29,17 @@ public class CascadeApplier {
         this.propertyAccessorFactory = propertyAccessorFactory;
     }
     
+    /**
+     * The main entry point to apply Cascaded Style Sheet rules.  This applies
+     * the given CSS rules to the provided element, and then recursively applies
+     * the rules to all children.
+     * 
+     * @param styledElement
+     * @param rules
+     * @param pseudoRules
+     */
     public void cascade(final StyledElement styledElement, final Collection<CSSRule> rules,
-            final Collection<CSSPseudoElementRule> pseudoRules) {
+            final Collection<CSSPseudoElementRuleSet> pseudoRules) {
         for (final CSSRule cssRule : rules) {
             if (cssRule.shouldApply(styledElement)) {
                 cssRule.apply(styledElement);
@@ -44,9 +53,9 @@ public class CascadeApplier {
          * computed, because they require access to the computed values of
          * properties.
          */
-        for (final CSSPseudoElementRule pseudoRule : pseudoRules) {
-            if (pseudoRule.shouldApply(styledElement)) {
-                pseudoRule.apply(styledElement);
+        for (final CSSPseudoElementRuleSet pseudoRuleSet : pseudoRules) {
+            if (pseudoRuleSet.shouldApply(styledElement)) {
+                pseudoRuleSet.apply(styledElement);
             }
         }
         
@@ -60,6 +69,14 @@ public class CascadeApplier {
         }
     }
     
+    /**
+     * Sets the computed value for every CSS property on the provided styled
+     * content.  Typically this content is an element, but the logic applies
+     * more generally.  All specified values must have been set prior to calling
+     * this method.
+     * 
+     * @param styledContent
+     */
     public void compute(final StyledContent styledContent) {
         final StyleData styleData = styledContent.getStyleData();
         // run through all properties and set the computed value from the
@@ -67,6 +84,8 @@ public class CascadeApplier {
         final Set<PropertyName> uncomputedPropertyNames = EnumSet.allOf(PropertyName.class);
         while ( !uncomputedPropertyNames.isEmpty()) {
             final int initialSize = uncomputedPropertyNames.size();
+            
+            assert initialSize > 0;
             
             final Iterator<PropertyName> iterator = uncomputedPropertyNames.iterator();
             while (iterator.hasNext()) {
@@ -81,6 +100,7 @@ public class CascadeApplier {
                 }
                 
                 final Set<PropertyName> dependencies = propertyAccessor.getDependencies();
+                // disjoint will iterate over the second parameter, so we want that to be the smaller collection
                 if (Collections.disjoint(uncomputedPropertyNames, dependencies)) {
                     iterator.remove();
                     propertyAccessor.computeValue(styleData);

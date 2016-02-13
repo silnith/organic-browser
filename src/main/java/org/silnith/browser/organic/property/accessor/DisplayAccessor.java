@@ -8,6 +8,13 @@ import org.silnith.css.model.data.Display;
 import org.silnith.css.model.data.PropertyName;
 
 
+/**
+ * A property accessor for computing the value of the "display" property.
+ * 
+ * @author kent
+ * @see PropertyName#DISPLAY
+ * @see Display
+ */
 public class DisplayAccessor extends PropertyAccessor<Display> {
     
     public DisplayAccessor() {

@@ -85,6 +85,14 @@ public interface InlineLevelBox {
 
 //	LayoutResults forceLayoutContents(AbsoluteLength parentWidth, AbsoluteLength targetWidth, Graphics2D graphics);
     
+  /**
+   * Creates a DOM Node to represent the state of this box. This is primarily
+   * used for debugging, so that the state of the layout information can be
+   * output in an easily-readable format.
+   * 
+   * @param document the owning document, needed for creating new nodes
+   * @return a Node representing this styled content
+   */
     Node createDOM(final Document document);
     
 }

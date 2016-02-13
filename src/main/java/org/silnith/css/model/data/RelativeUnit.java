@@ -1,5 +1,10 @@
 package org.silnith.css.model.data;
 
+/**
+ * An enumeration of all the relative units in the CSS specification.
+ * 
+ * @author kent
+ */
 public enum RelativeUnit implements Unit {
     EM("em"),
     EX("ex");

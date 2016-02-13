@@ -8,6 +8,17 @@ import org.silnith.css.model.data.BorderStyle;
 import org.silnith.css.model.data.PropertyName;
 
 
+/**
+ * An abstract base class for all the property accessors for the "border-*-style" properties.
+ * <p>
+ * Note that this is not an accessor for the "border-style" pseudo-property.
+ * 
+ * @author kent
+ * @see BorderTopStyleAccessor
+ * @see BorderRightStyleAccessor
+ * @see BorderBottomStyleAccessor
+ * @see BorderLeftStyleAccessor
+ */
 public abstract class BorderStyleAccessor extends PropertyAccessor<BorderStyle> {
     
     public BorderStyleAccessor(final PropertyName propertyName) {

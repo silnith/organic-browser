@@ -4,6 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * An enumeration of all the property names in Cascading Style Sheets.
+ * 
+ * @author kent
+ */
 public enum PropertyName {
     BACKGROUND_ATTACHMENT("background-attachment"),
     BACKGROUND_COLOR("background-color"),
@@ -120,6 +125,11 @@ public enum PropertyName {
         this.key = key;
     }
     
+    /**
+     * Returns the name of the property as it appears in the specification.
+     * 
+     * @return the property name as a string
+     */
     public String getKey() {
         return key;
     }

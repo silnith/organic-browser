@@ -7,8 +7,9 @@ import java.awt.geom.Point2D;
 
 /**
  * An object that can be rendered, as returned by
- * {@link BlockLevelBox#layoutContents(org.silnith.css.model.data.AbsoluteLength, org.silnith.css.model.data.AbsoluteLength, Graphics2D)}
- * .
+ * {@link BlockLevelBox#layoutContents(org.silnith.css.model.data.AbsoluteLength, org.silnith.css.model.data.AbsoluteLength, Graphics2D)}.
+ * This is similar to {@link javax.swing.text.View} except it can represent both
+ * block-level and inline-level content as defined in the CSS rendering model.
  * 
  * @author kent
  */

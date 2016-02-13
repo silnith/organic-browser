@@ -1,5 +1,12 @@
 package org.silnith.css.model.data;
 
+/**
+ * A parser for CSS relative length values.  A length value is simply a CSS number with a unit suffix.
+ * <p>
+ * A relative length value is a length value where the unit is a {@link RelativeUnit}.
+ * 
+ * @author kent
+ */
 public class RelativeLengthParser {
     
     private final CSSNumberParser cssNumberParser;

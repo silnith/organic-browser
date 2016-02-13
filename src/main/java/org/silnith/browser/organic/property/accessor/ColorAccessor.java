@@ -9,6 +9,12 @@ import org.silnith.css.model.data.ColorParser;
 import org.silnith.css.model.data.PropertyName;
 
 
+/**
+ * A property accessor for computing the value of the "color" property.
+ * 
+ * @author kent
+ * @see PropertyName#COLOR
+ */
 public class ColorAccessor extends PropertyAccessor<Color> {
     
     private final ColorParser colorParser;

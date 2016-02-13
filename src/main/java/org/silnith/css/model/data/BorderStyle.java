@@ -4,6 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * An enumeration of the legal values for the "border-*-style" properties.
+ * 
+ * @author kent
+ * @see PropertyName#BORDER_TOP_STYLE
+ * @see PropertyName#BORDER_RIGHT_STYLE
+ * @see PropertyName#BORDER_BOTTOM_STYLE
+ * @see PropertyName#BORDER_LEFT_STYLE
+ * @see org.silnith.browser.organic.property.accessor.BorderTopStyleAccessor
+ * @see org.silnith.browser.organic.property.accessor.BorderRightStyleAccessor
+ * @see org.silnith.browser.organic.property.accessor.BorderBottomStyleAccessor
+ * @see org.silnith.browser.organic.property.accessor.BorderLeftStyleAccessor
+ */
 public enum BorderStyle {
     NONE("none"),
     HIDDEN("hidden"),

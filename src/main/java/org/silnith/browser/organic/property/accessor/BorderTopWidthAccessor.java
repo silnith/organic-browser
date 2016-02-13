@@ -5,6 +5,12 @@ import org.silnith.css.model.data.LengthParser;
 import org.silnith.css.model.data.PropertyName;
 
 
+/**
+ * A property accessor for computing the value of the "border-top-width" property.
+ * 
+ * @author kent
+ * @see PropertyName#BORDER_TOP_WIDTH
+ */
 public class BorderTopWidthAccessor extends BorderWidthAccessor {
     
     public BorderTopWidthAccessor(final LengthParser lengthParser,

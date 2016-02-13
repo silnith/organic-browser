@@ -1,7 +1,23 @@
 package org.silnith.css.model.data;
 
+/**
+ * A length value as defined in the CSS specification.  This can be an absolute
+ * length, a relative length, or a percentage value.  Percentages are interpreted
+ * differently depending on what property is using them.
+ * <p>
+ * Length values are immutable.
+ * 
+ * @param <T> the type of units for this length value
+ * @author kent
+ */
 public abstract class Length<T extends Unit> {
     
+    /**
+     * An enumeration of the possible length types.  This identifies the
+     * specific sub-class of an instance.
+     * 
+     * @author kent
+     */
     public enum Type {
         ABSOLUTE,
         RELATIVE,
@@ -49,9 +65,9 @@ public abstract class Length<T extends Unit> {
      * </table>
      * 
      * @return the type of length this is
-     * @see {@link AbsoluteLength}
-     * @see {@link RelativeLength}
-     * @see {@link PercentageLength}
+     * @see AbsoluteLength
+     * @see RelativeLength
+     * @see PercentageLength
      */
     public abstract Type getType();
     
