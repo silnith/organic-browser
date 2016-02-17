@@ -1,9 +1,11 @@
 package org.silnith.browser.organic.property.accessor;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.Length;
 import org.silnith.css.model.data.LengthParser;
@@ -14,11 +16,11 @@ import org.silnith.css.model.data.RelativeLength;
 
 public abstract class PaddingAccessor extends PropertyAccessor<Length<?>> {
     
-    private final LengthParser lengthParser;
+    private final LengthParser<?> lengthParser;
     
     private final PropertyAccessor<AbsoluteLength> fontSizeAccessor;
     
-    public PaddingAccessor(final PropertyName propertyName, final LengthParser lengthParser,
+    public PaddingAccessor(final PropertyName propertyName, final LengthParser<?> lengthParser,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor) {
         super(propertyName, false);
         this.lengthParser = lengthParser;
@@ -64,6 +66,11 @@ public abstract class PaddingAccessor extends PropertyAccessor<Length<?>> {
         return absoluteLength;
     }
     
+    @Override
+    protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public Set<PropertyName> getDependencies() {
         return Collections.singleton(PropertyName.FONT_SIZE);

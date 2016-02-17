@@ -2,9 +2,11 @@ package org.silnith.browser.organic.property.accessor;
 
 import java.awt.Color;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.ColorParser;
 import org.silnith.css.model.data.PropertyName;
 
@@ -34,6 +36,11 @@ public class ColorAccessor extends PropertyAccessor<Color> {
     
     @Override
     protected Color parse(final StyleData styleData, final String specifiedValue) {
+        return colorParser.parse(specifiedValue);
+    }
+    
+    @Override
+    protected Color parse(final StyleData styleData, final List<Token> specifiedValue) {
         return colorParser.parse(specifiedValue);
     }
     

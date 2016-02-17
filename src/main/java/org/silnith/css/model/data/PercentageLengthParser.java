@@ -1,5 +1,9 @@
 package org.silnith.css.model.data;
 
+import java.util.List;
+
+import org.silnith.browser.organic.parser.css3.Token;
+
 /**
  * A parser for CSS percentage length values.  A length value is simply a CSS number with a unit suffix.
  * <p>
@@ -7,7 +11,7 @@ package org.silnith.css.model.data;
  * 
  * @author kent
  */
-public class PercentageLengthParser {
+public class PercentageLengthParser implements PropertyValueParser<PercentageLength> {
     
     private final CSSNumberParser cssNumberParser;
     
@@ -35,6 +39,11 @@ public class PercentageLengthParser {
             }
         }
         return null;
+    }
+
+    @Override
+    public PercentageLength parse(List<Token> specifiedValue) {
+        throw new UnsupportedOperationException();
     }
     
 }

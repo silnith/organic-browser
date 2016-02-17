@@ -4,8 +4,8 @@ public abstract class StringValueToken extends LexicalToken {
     
     private final StringBuilder value;
     
-    public StringValueToken() {
-        super();
+    public StringValueToken(final LexicalType lexicalType) {
+        super(lexicalType);
         this.value = new StringBuilder();
     }
     

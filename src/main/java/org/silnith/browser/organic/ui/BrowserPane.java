@@ -21,6 +21,8 @@ import org.silnith.browser.organic.CSSRule;
 import org.silnith.browser.organic.CascadeApplier;
 import org.silnith.browser.organic.StyleTreeBuilder;
 import org.silnith.browser.organic.StyledElement;
+import org.silnith.browser.organic.Stylesheet;
+import org.silnith.browser.organic.StylesheetBuilder;
 import org.silnith.browser.organic.box.BlockLevelBox;
 import org.silnith.browser.organic.box.Formatter;
 import org.silnith.browser.organic.network.Download;
@@ -156,7 +158,9 @@ public class BrowserPane extends JPanel {
                 final StyledElement styledElement = getResult("Style", styler);
                 
                 try {
-                    styleParser.parseStyleRules(download);
+//                    styleParser.parseStyleRules(download);
+                    final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
+                    stylesheetBuilder.buildStylesheet(document, url.toURI());
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
@@ -283,7 +287,7 @@ public class BrowserPane extends JPanel {
         
         @Override
         public void run() {
-            cascadeApplier.cascade(styledElement, rules, pseudoRules);
+            cascadeApplier.cascade(styledElement, new Stylesheet(rules, pseudoRules));
         }
         
         @Override

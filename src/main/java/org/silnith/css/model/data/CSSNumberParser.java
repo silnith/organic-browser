@@ -1,7 +1,10 @@
 package org.silnith.css.model.data;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.silnith.browser.organic.parser.css3.Token;
 
 
 /**
@@ -9,7 +12,7 @@ import java.util.regex.Pattern;
  * 
  * @author kent
  */
-public class CSSNumberParser {
+public class CSSNumberParser implements PropertyValueParser<CSSNumber> {
     
     /**
      * Numbers in CSS can either be integers or floating-point values. If they
@@ -42,6 +45,11 @@ public class CSSNumberParser {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public CSSNumber parse(List<Token> specifiedValue) {
+        throw new UnsupportedOperationException();
     }
     
 }

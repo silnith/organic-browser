@@ -16,14 +16,18 @@ public class Function extends ComponentValue {
     private final List<Token> value;
     
     public Function(final String name, final List<Token> value) {
-        super();
+        super(ComponentValueType.FUNCTION);
         this.name = name;
         this.value = value;
     }
     
     @Override
-    public ComponentValueType getComponentValueType() {
-        return ComponentValueType.FUNCTION;
+    public String toString() {
+        return "Function {"
+                + "name=" + name
+                + ", "
+                + "value=" + value
+                + "}";
     }
     
 }

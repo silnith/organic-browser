@@ -15,17 +15,12 @@ public class HashToken extends StringValueToken {
     private TypeFlag typeFlag;
     
     public HashToken() {
-        super();
+        super(LexicalType.HASH_TOKEN);
         this.typeFlag = TypeFlag.UNRESTRICTED;
     }
     
     public void setTypeFlag(final TypeFlag typeFlag) {
         this.typeFlag = typeFlag;
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.HASH_TOKEN;
     }
     
     @Override

@@ -3,7 +3,13 @@ package org.silnith.browser.organic.parser.css3;
 public abstract class Token {
     
     public enum Type {
+        /**
+         * @see org.silnith.browser.organic.parser.css3.grammar.token.ComponentValue
+         */
         COMPONENT_VALUE,
+        /**
+         * @see org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken
+         */
         LEXICAL_TOKEN,
         EOF_TOKEN
     }
@@ -18,5 +24,5 @@ public abstract class Token {
     public final Type getType() {
         return type;
     }
-    
+
 }

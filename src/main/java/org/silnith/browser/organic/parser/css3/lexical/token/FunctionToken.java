@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class FunctionToken extends StringValueToken {
     
     public FunctionToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.FUNCTION_TOKEN;
+        super(LexicalType.FUNCTION_TOKEN);
     }
     
     @Override

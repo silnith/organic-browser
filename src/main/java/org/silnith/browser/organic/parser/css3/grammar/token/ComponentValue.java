@@ -11,14 +11,25 @@ import org.silnith.browser.organic.parser.css3.Token;
 public abstract class ComponentValue extends Token {
     
     public enum ComponentValueType {
+        /**
+         * @see org.silnith.browser.organic.parser.css3.grammar.token.Function
+         */
         FUNCTION,
+        /**
+         * @see org.silnith.browser.organic.parser.css3.grammar.token.SimpleBlock
+         */
         SIMPLE_BLOCK
     }
     
-    public ComponentValue() {
-        super(Token.Type.COMPONENT_VALUE);
+    private final ComponentValueType componentValueType;
+    
+    public ComponentValue(final ComponentValueType componentValueType) {
+        super(Type.COMPONENT_VALUE);
+        this.componentValueType = componentValueType;
     }
     
-    public abstract ComponentValueType getComponentValueType();
+    public final ComponentValueType getComponentValueType() {
+        return componentValueType;
+    }
     
 }

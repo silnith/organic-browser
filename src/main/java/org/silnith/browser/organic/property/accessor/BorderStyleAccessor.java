@@ -1,9 +1,11 @@
 package org.silnith.browser.organic.property.accessor;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.BorderStyle;
 import org.silnith.css.model.data.PropertyName;
 
@@ -40,6 +42,11 @@ public abstract class BorderStyleAccessor extends PropertyAccessor<BorderStyle> 
         return borderStyle;
     }
     
+    @Override
+    protected BorderStyle parse(StyleData styleData, List<Token> specifiedValue) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public Set<PropertyName> getDependencies() {
         return Collections.emptySet();

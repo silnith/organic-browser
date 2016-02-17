@@ -4,8 +4,8 @@ public abstract class NumericValueToken extends StringValueToken {
     
     private Number numericValue;
     
-    public NumericValueToken() {
-        super();
+    public NumericValueToken(final LexicalType lexicalType) {
+        super(lexicalType);
         this.numericValue = Integer.valueOf(0);
     }
     

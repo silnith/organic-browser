@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class AtKeywordToken extends StringValueToken {
     
     public AtKeywordToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.AT_KEYWORD_TOKEN;
+        super(LexicalType.AT_KEYWORD_TOKEN);
     }
     
     @Override

@@ -18,18 +18,26 @@ public class SimpleBlock extends ComponentValue {
     private final List<Token> value;
     
     public SimpleBlock(final LexicalToken token, final List<Token> value) {
-        super();
+        super(ComponentValueType.SIMPLE_BLOCK);
         this.token = token;
         this.value = value;
     }
     
-    @Override
-    public ComponentValueType getComponentValueType() {
-        return ComponentValueType.SIMPLE_BLOCK;
-    }
-    
     public LexicalToken getToken() {
         return token;
+    }
+
+    public List<Token> getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "SimpleBlock {"
+                + "token=" + token
+                + ", "
+                + "value=" + value
+                + "}";
     }
     
 }

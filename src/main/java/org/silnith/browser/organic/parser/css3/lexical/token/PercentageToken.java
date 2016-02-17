@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class PercentageToken extends NumericValueToken {
     
     public PercentageToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.PERCENTAGE_TOKEN;
+        super(LexicalType.PERCENTAGE_TOKEN);
     }
     
     @Override

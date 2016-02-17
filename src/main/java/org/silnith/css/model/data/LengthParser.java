@@ -1,12 +1,16 @@
 package org.silnith.css.model.data;
 
+import java.util.List;
+
+import org.silnith.browser.organic.parser.css3.Token;
+
 /**
  * A parser for CSS length values.  A CSS length value is simply a CSS number
  * with a unit suffix.
  * 
  * @author kent
  */
-public class LengthParser {
+public class LengthParser<T extends Unit> implements PropertyValueParser<Length<T>> {
     
     private final AbsoluteLengthParser absoluteLengthParser;
     
@@ -22,26 +26,31 @@ public class LengthParser {
         this.percentageLengthParser = percentageLengthParser;
     }
     
-    public Length<?> parse(final String specifiedValue) {
+    public Length<T> parse(final String specifiedValue) {
         final AbsoluteLength absoluteLength = absoluteLengthParser.parse(specifiedValue);
         
         if (absoluteLength != null) {
-            return absoluteLength;
+            return (Length<T>) absoluteLength;
         } else {
             final RelativeLength relativeLength = relativeLengthParser.parse(specifiedValue);
             
             if (relativeLength != null) {
-                return relativeLength;
+                return (Length<T>) relativeLength;
             } else {
                 final PercentageLength percentageLength = percentageLengthParser.parse(specifiedValue);
                 
                 if (percentageLength != null) {
-                    return percentageLength;
+                    return (Length<T>) percentageLength;
                 } else {
                     return null;
                 }
             }
         }
+    }
+
+    @Override
+    public Length<T> parse(List<Token> specifiedValue) {
+        throw new UnsupportedOperationException();
     }
     
 }

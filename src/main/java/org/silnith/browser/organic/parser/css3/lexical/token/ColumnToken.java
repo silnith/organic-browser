@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class ColumnToken extends LexicalToken {
     
     public ColumnToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.COLUMN_TOKEN;
+        super(LexicalType.COLUMN_TOKEN);
     }
     
     @Override

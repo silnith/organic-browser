@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class LeftParenthesisToken extends LexicalToken {
     
     public LeftParenthesisToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.LEFT_PARENTHESIS_TOKEN;
+        super(LexicalType.LEFT_PARENTHESIS_TOKEN);
     }
     
     @Override

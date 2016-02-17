@@ -9,12 +9,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class PrefixMatchToken extends LexicalToken {
     
     public PrefixMatchToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.PREFIX_MATCH_TOKEN;
+        super(LexicalType.PREFIX_MATCH_TOKEN);
     }
     
     @Override

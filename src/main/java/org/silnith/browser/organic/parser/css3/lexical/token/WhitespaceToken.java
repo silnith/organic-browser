@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class WhitespaceToken extends LexicalToken {
     
     public WhitespaceToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.WHITESPACE_TOKEN;
+        super(LexicalType.WHITESPACE_TOKEN);
     }
     
     @Override

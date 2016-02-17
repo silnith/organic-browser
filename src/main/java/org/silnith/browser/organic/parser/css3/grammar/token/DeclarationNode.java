@@ -24,4 +24,21 @@ public class DeclarationNode implements Declaration {
         this.value = value;
     }
     
+    public boolean isImportantFlag() {
+        return importantFlag;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public List<Token> getValue() {
+        return value;
+    }
+    
+    @Override
+    public String toString() {
+        return "DeclarationNode [name=" + name + ", value=" + value + ", importantFlag=" + importantFlag + "]";
+    }
+    
 }

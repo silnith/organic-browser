@@ -1,8 +1,10 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.PropertyName;
 
 
@@ -98,6 +100,18 @@ public abstract class PropertyAccessor<T> {
      *         the property
      */
     protected abstract T parse(StyleData styleData, String specifiedValue);
+
+    /**
+     * Parses a specified value into the type {@code <T>}. The returned value
+     * cannot be {@code null}.
+     * 
+     * @param styleData
+     * @param specifiedValue the parsed list of tokens
+     * @return the specified value parsed into a typed value
+     * @throws IllegalArgumentException if the specified value is invalid for
+     *         the property
+     */
+    protected abstract T parse(StyleData styleData, List<Token> specifiedValue);
     
     /**
      * Computes the property value for the given element.  The specified value

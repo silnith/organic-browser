@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class BadStringToken extends LexicalToken {
     
     public BadStringToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.BAD_STRING_TOKEN;
+        super(LexicalType.BAD_STRING_TOKEN);
     }
     
     @Override

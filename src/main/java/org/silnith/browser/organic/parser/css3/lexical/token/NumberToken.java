@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class NumberToken extends TypedNumericValueToken {
     
     public NumberToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.NUMBER_TOKEN;
+        super(LexicalType.NUMBER_TOKEN);
     }
     
     @Override

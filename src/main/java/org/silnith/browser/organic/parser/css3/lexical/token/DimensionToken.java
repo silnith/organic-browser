@@ -10,7 +10,7 @@ public class DimensionToken extends TypedNumericValueToken {
     private final StringBuilder unit;
     
     public DimensionToken() {
-        super();
+        super(LexicalType.DIMENSION_TOKEN);
         this.unit = new StringBuilder();
     }
     
@@ -21,11 +21,6 @@ public class DimensionToken extends TypedNumericValueToken {
     
     public String getUnit() {
         return unit.toString();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.DIMENSION_TOKEN;
     }
     
     @Override

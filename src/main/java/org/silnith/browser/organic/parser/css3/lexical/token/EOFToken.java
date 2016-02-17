@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class EOFToken extends LexicalToken {
     
     public EOFToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.EOF;
+        super(LexicalType.EOF);
     }
     
     @Override

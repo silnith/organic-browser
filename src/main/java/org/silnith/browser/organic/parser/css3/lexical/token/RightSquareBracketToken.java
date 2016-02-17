@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class RightSquareBracketToken extends LexicalToken {
     
     public RightSquareBracketToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.RIGHT_BRACKET_TOKEN;
+        super(LexicalType.RIGHT_BRACKET_TOKEN);
     }
     
     @Override

@@ -1,8 +1,7 @@
 package org.silnith.browser.organic;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.net.URI;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -11,6 +10,8 @@ import javax.swing.WindowConstants;
 
 import org.silnith.browser.organic.box.BlockLevelBox;
 import org.silnith.browser.organic.box.Formatter;
+import org.silnith.browser.organic.network.Download;
+import org.silnith.browser.organic.parser.FileParser;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.AbsoluteLength;
@@ -42,6 +43,10 @@ public class Program {
         final DOMImplementationRegistry domImplRegistry = DOMImplementationRegistry.newInstance();
         final DOMImplementation domImpl = domImplRegistry.getDOMImplementation("Core 3.0 +LS 3.0");
         
+        final Download download = null;
+        final FileParser<Document> documentParser = null;
+        
+//        documentParser.parse(download);
         final Document domDocument = createDocument(domImpl);
         
         final DOMImplementationLS domImplLS = (DOMImplementationLS) domImpl.getFeature("+LS", "3.0");
@@ -65,13 +70,13 @@ public class Program {
         final StyleTreeBuilder styleTreeBuilder = new StyleTreeBuilder();
         final StyledElement styledElement = styleTreeBuilder.addStyleInformation(domDocument);
         
-        final Collection<CSSRule> cssRules = createStyleList();
-        final Collection<CSSPseudoElementRuleSet> pseudoRules = createGeneratedContentRules();
+        final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
+        final Stylesheet stylesheet = stylesheetBuilder.buildStylesheet(domDocument, URI.create(""));
         
         final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
         final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
         final long cascadeStartTime = System.currentTimeMillis();
-        cascadeApplier.cascade(styledElement, cssRules, pseudoRules);
+        cascadeApplier.cascade(styledElement, stylesheet);
         final long cascadeEndTime = System.currentTimeMillis();
         System.out.println("Cascade time: " + (cascadeEndTime - cascadeStartTime));
         
@@ -110,153 +115,6 @@ public class Program {
         
         jFrame.pack();
         jFrame.setVisible(true);
-    }
-    
-    private static Collection<CSSRule> createStyleList() {
-        final Collection<CSSRule> cssRules = new ArrayList<>();
-        cssRules.add(new CSSRule("html", PropertyName.DISPLAY, "block"));
-        cssRules.add(new CSSRule("html", PropertyName.COLOR, "black"));
-        cssRules.add(new CSSRule("head", PropertyName.DISPLAY, "none"));
-        cssRules.add(new CSSRule("head", PropertyName.FONT_SIZE, "x-small"));
-        cssRules.add(new CSSRule("title", PropertyName.DISPLAY, "inline"));
-        cssRules.add(new CSSRule("style", PropertyName.DISPLAY, "inherit"));
-        cssRules.add(new CSSRule("body", PropertyName.DISPLAY, "block"));
-        cssRules.add(new CSSRule("body", PropertyName.FONT_SIZE, "12pt"));
-        cssRules.add(new CSSRule("body", PropertyName.BACKGROUND_COLOR, "silver"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_TOP_STYLE, "solid"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_TOP_WIDTH, "15px"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_TOP_COLOR, "blue"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_RIGHT_STYLE, "solid"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_RIGHT_WIDTH, "15px"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_RIGHT_COLOR, "blue"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_BOTTOM_STYLE, "solid"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_BOTTOM_WIDTH, "15px"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_BOTTOM_COLOR, "blue"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_LEFT_STYLE, "solid"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_LEFT_WIDTH, "15px"));
-        cssRules.add(new CSSRule("body", PropertyName.BORDER_LEFT_COLOR, "blue"));
-        cssRules.add(new CSSRule("p", PropertyName.DISPLAY, "block"));
-        cssRules.add(new CSSRule("p", PropertyName.FONT_SIZE, "16pt"));
-        cssRules.add(new CSSRule("p", PropertyName.MARGIN_TOP, "3px"));
-        cssRules.add(new CSSRule("p", PropertyName.MARGIN_RIGHT, "3px"));
-        cssRules.add(new CSSRule("p", PropertyName.MARGIN_BOTTOM, "3px"));
-        cssRules.add(new CSSRule("p", PropertyName.MARGIN_LEFT, "3px"));
-        cssRules.add(new CSSRule("p", PropertyName.BACKGROUND_COLOR, "white"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_TOP_STYLE, "solid"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_TOP_WIDTH, "15px"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_TOP_COLOR, "lime"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_RIGHT_STYLE, "solid"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_RIGHT_WIDTH, "15px"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_RIGHT_COLOR, "lime"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_BOTTOM_STYLE, "solid"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_BOTTOM_WIDTH, "15px"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_BOTTOM_COLOR, "lime"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_LEFT_STYLE, "solid"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_LEFT_WIDTH, "15px"));
-        cssRules.add(new CSSRule("p", PropertyName.BORDER_LEFT_COLOR, "lime"));
-        cssRules.add(new CSSRule("p", PropertyName.PADDING_TOP, "3px"));
-        cssRules.add(new CSSRule("p", PropertyName.PADDING_RIGHT, "3px"));
-        cssRules.add(new CSSRule("p", PropertyName.PADDING_BOTTOM, "3px"));
-        cssRules.add(new CSSRule("p", PropertyName.PADDING_LEFT, "3px"));
-        cssRules.add(new CSSRule("em", PropertyName.FONT_STYLE, "italic"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_TOP_STYLE, "solid"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_TOP_WIDTH, "5px"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_TOP_COLOR, "fuchsia"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_RIGHT_STYLE, "solid"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_RIGHT_WIDTH, "5px"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_RIGHT_COLOR, "fuchsia"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_BOTTOM_STYLE, "solid"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_BOTTOM_WIDTH, "5px"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_BOTTOM_COLOR, "fuchsia"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_LEFT_STYLE, "solid"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_LEFT_WIDTH, "5px"));
-        cssRules.add(new CSSRule("em", PropertyName.BORDER_LEFT_COLOR, "fuchsia"));
-        cssRules.add(new CSSRule("strong", PropertyName.FONT_WEIGHT, "bold"));
-        cssRules.add(new CSSRule("strong", PropertyName.BACKGROUND_COLOR, "red"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_TOP_STYLE, "solid"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_TOP_WIDTH, "8px"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_TOP_COLOR, "gray"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_RIGHT_STYLE, "solid"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_RIGHT_WIDTH, "8px"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_RIGHT_COLOR, "gray"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_BOTTOM_STYLE, "solid"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_BOTTOM_WIDTH, "8px"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_BOTTOM_COLOR, "gray"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_LEFT_STYLE, "solid"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_LEFT_WIDTH, "8px"));
-        cssRules.add(new CSSRule("strong", PropertyName.BORDER_LEFT_COLOR, "gray"));
-        cssRules.add(new CSSRule("div", PropertyName.DISPLAY, "block"));
-        cssRules.add(new CSSRule("div", PropertyName.MARGIN_TOP, "2em"));
-        cssRules.add(new CSSRule("div", PropertyName.MARGIN_RIGHT, "2em"));
-        cssRules.add(new CSSRule("div", PropertyName.MARGIN_BOTTOM, "2em"));
-        cssRules.add(new CSSRule("div", PropertyName.MARGIN_LEFT, "2em"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_TOP_STYLE, "solid"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_TOP_WIDTH, "15px"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_TOP_COLOR, "red"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_RIGHT_STYLE, "solid"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_RIGHT_WIDTH, "15px"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_RIGHT_COLOR, "red"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_BOTTOM_STYLE, "solid"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_BOTTOM_WIDTH, "15px"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_BOTTOM_COLOR, "red"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_LEFT_STYLE, "solid"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_LEFT_WIDTH, "15px"));
-        cssRules.add(new CSSRule("div", PropertyName.BORDER_LEFT_COLOR, "red"));
-        cssRules.add(new CSSRule("div", PropertyName.PADDING_TOP, "6px"));
-        cssRules.add(new CSSRule("div", PropertyName.PADDING_RIGHT, "6px"));
-        cssRules.add(new CSSRule("div", PropertyName.PADDING_BOTTOM, "6px"));
-        cssRules.add(new CSSRule("div", PropertyName.PADDING_LEFT, "6px"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_TOP_STYLE, "solid"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_TOP_WIDTH, "3px"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_TOP_COLOR, "aqua"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_RIGHT_STYLE, "solid"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_RIGHT_WIDTH, "3px"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_RIGHT_COLOR, "aqua"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_BOTTOM_STYLE, "solid"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_BOTTOM_WIDTH, "3px"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_BOTTOM_COLOR, "aqua"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_LEFT_STYLE, "solid"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_LEFT_WIDTH, "3px"));
-        cssRules.add(new CSSRule("a", PropertyName.BORDER_LEFT_COLOR, "aqua"));
-        cssRules.add(new CSSRule("a", PropertyName.PADDING_TOP, "1px"));
-        cssRules.add(new CSSRule("a", PropertyName.PADDING_RIGHT, "1px"));
-        cssRules.add(new CSSRule("a", PropertyName.PADDING_BOTTOM, "1px"));
-        cssRules.add(new CSSRule("a", PropertyName.PADDING_LEFT, "1px"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_TOP_STYLE, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_TOP_WIDTH, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_TOP_COLOR, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_RIGHT_STYLE, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_RIGHT_WIDTH, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_RIGHT_COLOR, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_BOTTOM_STYLE, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_BOTTOM_WIDTH, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_BOTTOM_COLOR, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_LEFT_STYLE, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_LEFT_WIDTH, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.BORDER_LEFT_COLOR, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.PADDING_TOP, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.PADDING_RIGHT, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.PADDING_BOTTOM, "inherit"));
-        cssRules.add(new CSSRule("abbr", PropertyName.PADDING_LEFT, "inherit"));
-        
-        return cssRules;
-    }
-    
-    private static Collection<CSSPseudoElementRuleSet> createGeneratedContentRules() {
-        final ArrayList<CSSPseudoElementRuleSet> pseudoRules = new ArrayList<>();
-        final ArrayList<CSSRule> beforeRules = new ArrayList<>();
-        final ArrayList<CSSRule> afterRules = new ArrayList<>();
-        
-        pseudoRules.add(new CSSPseudoElementRuleSet("div", "Div: ", null));
-        beforeRules.clear();
-        afterRules.clear();
-        afterRules.add(new CSSRule(":after", PropertyName.DISPLAY, "none"));
-        afterRules.add(new CSSRule(":after", PropertyName.BACKGROUND_COLOR, "aqua"));
-        afterRules.add(new CSSRule(":after", PropertyName.BORDER_TOP_STYLE, "solid"));
-        afterRules.add(new CSSRule(":after", PropertyName.COLOR, "red"));
-        pseudoRules.add(new CSSPseudoElementRuleSet("p", null, "yomama", beforeRules, afterRules));
-        
-        return pseudoRules;
     }
     
     private static Document createDocument(final DOMImplementation domImpl) {

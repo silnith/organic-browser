@@ -13,7 +13,7 @@ public class UnicodeRangeToken extends LexicalToken {
     private int end;
     
     public UnicodeRangeToken() {
-        super();
+        super(LexicalType.UNICODE_RANGE_TOKEN);
     }
     
     public void setStart(final int start) {
@@ -30,11 +30,6 @@ public class UnicodeRangeToken extends LexicalToken {
     
     public int getEnd() {
         return end;
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.UNICODE_RANGE_TOKEN;
     }
     
     @Override

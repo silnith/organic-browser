@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class CommaToken extends LexicalToken {
     
     public CommaToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.COMMA_TOKEN;
+        super(LexicalType.COMMA_TOKEN);
     }
     
     @Override

@@ -22,8 +22,25 @@ public class QualifiedRuleNode implements Rule {
         this.block = null;
     }
     
+    public List<Token> getPrelude() {
+        return prelude;
+    }
+
+    public SimpleBlock getBlock() {
+        return block;
+    }
+
     public void setBlock(final SimpleBlock blockNode) {
         this.block = blockNode;
+    }
+
+    @Override
+    public String toString() {
+        return "QualifiedRuleNode {"
+                + "prelude=" + prelude
+                + ", "
+                + "block=" + block
+                + "}";
     }
     
 }

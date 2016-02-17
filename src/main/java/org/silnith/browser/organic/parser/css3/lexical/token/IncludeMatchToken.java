@@ -9,12 +9,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class IncludeMatchToken extends LexicalToken {
     
     public IncludeMatchToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.INCLUDE_MATCH_TOKEN;
+        super(LexicalType.INCLUDE_MATCH_TOKEN);
     }
     
     @Override

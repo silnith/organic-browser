@@ -500,6 +500,7 @@ public class Parser {
                         tempTokens.add(componentValue);
                     }
                     final Parser tempParser = new Parser(new TokenListStream(tempTokens));
+                    tempParser.prime();
                     final DeclarationNode declaration = tempParser.consumeDeclaration();
                     if (declaration != null) {
                         listOfDeclarations.add(declaration);

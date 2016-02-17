@@ -9,8 +9,8 @@ public abstract class TypedNumericValueToken extends NumericValueToken {
     
     private NumericType numericType;
     
-    public TypedNumericValueToken() {
-        super();
+    public TypedNumericValueToken(final LexicalType lexicalType) {
+        super(lexicalType);
         this.numericType = NumericType.INTEGER;
     }
     

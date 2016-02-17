@@ -1,6 +1,5 @@
 package org.silnith.browser.organic;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -35,12 +34,10 @@ public class CascadeApplier {
      * the rules to all children.
      * 
      * @param styledElement
-     * @param rules
-     * @param pseudoRules
+     * @param stylesheet
      */
-    public void cascade(final StyledElement styledElement, final Collection<CSSRule> rules,
-            final Collection<CSSPseudoElementRuleSet> pseudoRules) {
-        for (final CSSRule cssRule : rules) {
+    public void cascade(final StyledElement styledElement, final Stylesheet stylesheet) {
+        for (final CSSRule cssRule : stylesheet.getRules()) {
             if (cssRule.shouldApply(styledElement)) {
                 cssRule.apply(styledElement);
             }
@@ -53,7 +50,7 @@ public class CascadeApplier {
          * computed, because they require access to the computed values of
          * properties.
          */
-        for (final CSSPseudoElementRuleSet pseudoRuleSet : pseudoRules) {
+        for (final CSSPseudoElementRuleSet pseudoRuleSet : stylesheet.getPseudoRules()) {
             if (pseudoRuleSet.shouldApply(styledElement)) {
                 pseudoRuleSet.apply(styledElement);
             }
@@ -62,7 +59,7 @@ public class CascadeApplier {
         for (final StyledContent child : styledElement.getChildren()) {
             if (child instanceof StyledElement) {
                 final StyledElement childElement = (StyledElement) child;
-                cascade(childElement, rules, pseudoRules);
+                cascade(childElement, stylesheet);
 //			} else if (child instanceof AnonymousStyledElement) {
 //				compute(child);
             }

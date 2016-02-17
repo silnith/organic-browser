@@ -10,18 +10,13 @@ public class DelimToken extends LexicalToken {
     private final char[] chars;
     
     public DelimToken(final char ch) {
-        super();
+        super(LexicalType.DELIM_TOKEN);
         this.chars = new char[] { ch };
     }
     
     public DelimToken(final char[] characters) {
-        super();
+        super(LexicalType.DELIM_TOKEN);
         this.chars = characters;
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.DELIM_TOKEN;
     }
     
     @Override

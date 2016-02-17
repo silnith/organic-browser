@@ -2,9 +2,17 @@ package org.silnith.css.model.data;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.token.ComponentValue;
+import org.silnith.browser.organic.parser.css3.lexical.token.FunctionToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.HashToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 
 
 /**
@@ -122,6 +130,48 @@ public class ColorParser {
         }
         
         throw new IllegalArgumentException("Invalid color: " + specifiedValue);
+    }
+    
+    public Color parse(final List<Token> specifiedValue) {
+        if (specifiedValue.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+        final Token token = specifiedValue.get(0);
+        switch (token.getType()) {
+        case COMPONENT_VALUE: {
+            final ComponentValue componentValue = (ComponentValue) token;
+            switch (componentValue.getComponentValueType()) {
+            case FUNCTION: {} break;
+            case SIMPLE_BLOCK: {} break;
+            default: {} break;
+            }
+        } break;
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case HASH_TOKEN: {
+                final HashToken hashToken = (HashToken) lexicalToken;
+                return parseInternal(hashToken.getStringValue());
+            } // break;
+            case IDENT_TOKEN: {
+                final IdentToken identToken = (IdentToken) lexicalToken;
+                return PREDEFINED_COLORS.get(identToken.getStringValue());
+                // transparent | inherit
+                // aqua, black, blue, fuchsia, gray, green, lime, maroon, navy, olive, orange, purple, red, silver, teal, white, and yellow
+            } // break;
+            case FUNCTION_TOKEN: {
+                final FunctionToken functionToken = (FunctionToken) lexicalToken;
+                functionToken.getStringValue();
+                throw new UnsupportedOperationException();
+            } // break;
+            default: {} break;
+            }
+        } break;
+        default: {
+            throw new IllegalArgumentException();
+        } // break;
+        }
+        return null;
     }
     
 }

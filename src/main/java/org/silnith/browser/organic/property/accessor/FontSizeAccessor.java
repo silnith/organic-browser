@@ -2,10 +2,12 @@ package org.silnith.browser.organic.property.accessor;
 
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
 import org.silnith.css.model.data.FontAbsoluteSize;
@@ -32,9 +34,9 @@ public class FontSizeAccessor extends PropertyAccessor<AbsoluteLength> {
         fontSizeTable.put(FontAbsoluteSize.XX_LARGE, new AbsoluteLength(20, AbsoluteUnit.PT));
     }
     
-    private final LengthParser lengthParser;
+    private final LengthParser<?> lengthParser;
     
-    public FontSizeAccessor(final LengthParser lengthParser) {
+    public FontSizeAccessor(final LengthParser<?> lengthParser) {
         super(PropertyName.FONT_SIZE, true);
         this.lengthParser = lengthParser;
     }
@@ -95,6 +97,11 @@ public class FontSizeAccessor extends PropertyAccessor<AbsoluteLength> {
         }
     }
     
+    @Override
+    protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public Set<PropertyName> getDependencies() {
         return Collections.emptySet();

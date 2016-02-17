@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class DashMatchToken extends LexicalToken {
     
     public DashMatchToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.DASH_MATCH_TOKEN;
+        super(LexicalType.DASH_MATCH_TOKEN);
     }
     
     @Override

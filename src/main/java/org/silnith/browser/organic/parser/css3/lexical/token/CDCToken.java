@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class CDCToken extends LexicalToken {
     
     public CDCToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.CDC_TOKEN;
+        super(LexicalType.CDC_TOKEN);
     }
     
     @Override

@@ -8,12 +8,7 @@ package org.silnith.browser.organic.parser.css3.lexical.token;
 public class LeftCurlyBracketToken extends LexicalToken {
     
     public LeftCurlyBracketToken() {
-        super();
-    }
-    
-    @Override
-    public LexicalType getLexicalType() {
-        return LexicalType.LEFT_BRACE_TOKEN;
+        super(LexicalType.LEFT_BRACE_TOKEN);
     }
     
     @Override
