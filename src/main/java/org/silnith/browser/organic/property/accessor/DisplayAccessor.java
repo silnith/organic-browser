@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.css.model.data.Display;
 import org.silnith.css.model.data.PropertyName;
 
@@ -39,7 +41,28 @@ public class DisplayAccessor extends PropertyAccessor<Display> {
     
     @Override
     protected Display parse(StyleData styleData, List<Token> specifiedValue) {
-        throw new UnsupportedOperationException();
+        if (specifiedValue.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+        final Token token = specifiedValue.get(0);
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case IDENT_TOKEN: {
+                final IdentToken identToken = (IdentToken) lexicalToken;
+                final Display display = Display.getFromValue(identToken.getStringValue());
+                if (display == null) {
+                    throw new IllegalArgumentException("Display value invalid: " + specifiedValue);
+                }
+                return display;
+            } // break;
+            default: {} break;
+            }
+        } break;
+        default: {} break;
+        }
+        throw new IllegalArgumentException();
     }
 
     @Override

@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -159,14 +161,16 @@ public class BrowserPane extends JPanel {
                 
                 try {
 //                    styleParser.parseStyleRules(download);
-                    final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
-                    stylesheetBuilder.buildStylesheet(document, url.toURI());
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
+
+                final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
+                final URI uri = url.toURI();
+                final Stylesheet stylesheet = stylesheetBuilder.buildStylesheet(document, uri);
                 
-                final Collection<CSSRule> cssRules = styleParser.parseStyleRules(document);
-                final Collection<CSSPseudoElementRuleSet> pseudoRules = styleParser.parsePseudoElementStyleRules(document);
+                final Collection<CSSRule> cssRules = stylesheet.getRules();
+                final Collection<CSSPseudoElementRuleSet> pseudoRules = stylesheet.getPseudoRules();
                 
                 final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
                 final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
@@ -203,6 +207,8 @@ public class BrowserPane extends JPanel {
             } catch (final InterruptedException e) {
                 e.printStackTrace();
                 return;
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
         }
         

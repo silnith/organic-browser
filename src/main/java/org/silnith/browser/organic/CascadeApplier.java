@@ -100,7 +100,8 @@ public class CascadeApplier {
                 // disjoint will iterate over the second parameter, so we want that to be the smaller collection
                 if (Collections.disjoint(uncomputedPropertyNames, dependencies)) {
                     iterator.remove();
-                    propertyAccessor.computeValue(styleData);
+//                    propertyAccessor.computeValue(styleData);
+                    propertyAccessor.computeParsedValue(styleData);
                 }
             }
             

@@ -27,11 +27,11 @@ import org.silnith.css.model.data.RelativeLength;
  */
 public abstract class BorderWidthAccessor extends PropertyAccessor<AbsoluteLength> {
     
-    private final LengthParser lengthParser;
+    private final LengthParser<?> lengthParser;
     
     private final PropertyAccessor<AbsoluteLength> fontSizeAccessor;
     
-    public BorderWidthAccessor(final PropertyName propertyName, final LengthParser lengthParser,
+    public BorderWidthAccessor(final PropertyName propertyName, final LengthParser<?> lengthParser,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor) {
         super(propertyName, false);
         this.lengthParser = lengthParser;
@@ -77,7 +77,33 @@ public abstract class BorderWidthAccessor extends PropertyAccessor<AbsoluteLengt
     
     @Override
     protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) {
-        throw new UnsupportedOperationException();
+        // TODO: check for keywords "thin", "medium", "thick"
+        final Length<?> length = lengthParser.parse(specifiedValue);
+        
+        final AbsoluteLength absoluteLength;
+        switch (length.getType()) {
+        case ABSOLUTE: {
+            absoluteLength = (AbsoluteLength) length;
+        }
+            break;
+        case RELATIVE: {
+            final RelativeLength relativeLength = (RelativeLength) length;
+            absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
+        }
+            break;
+        case PERCENTAGE: {
+            throw new IllegalArgumentException(
+                    "Border width values cannot be percentages: " + getPropertyName() + ": " + length);
+        } // break;
+        default:
+            throw new IllegalArgumentException();
+        }
+        
+        if (absoluteLength.getLength().floatValue() < 0) {
+            throw new IllegalArgumentException(
+                    "Border width values cannot be negative: " + getPropertyName() + ": " + absoluteLength);
+        }
+        return absoluteLength;
     }
 
     @Override

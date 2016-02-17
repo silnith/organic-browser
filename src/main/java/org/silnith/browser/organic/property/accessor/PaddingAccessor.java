@@ -68,7 +68,36 @@ public abstract class PaddingAccessor extends PropertyAccessor<Length<?>> {
     
     @Override
     protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) {
-        throw new UnsupportedOperationException();
+        final Length<?> length = lengthParser.parse(specifiedValue);
+        
+        final AbsoluteLength absoluteLength;
+        switch (length.getType()) {
+        case ABSOLUTE: {
+            absoluteLength = (AbsoluteLength) length;
+        }
+            break;
+        case RELATIVE: {
+            final RelativeLength relativeLength = (RelativeLength) length;
+            absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
+        }
+            break;
+        case PERCENTAGE: {
+            final PercentageLength percentageLength = (PercentageLength) length;
+            if (percentageLength.getLength().floatValue() < 0) {
+                throw new IllegalArgumentException(
+                        "Padding values cannot be negative: " + getPropertyName() + ": " + percentageLength);
+            }
+            return percentageLength;
+        } // break;
+        default:
+            throw new IllegalArgumentException();
+        }
+        
+        if (absoluteLength.getLength().floatValue() < 0) {
+            throw new IllegalArgumentException(
+                    "Padding values cannot be negative: " + getPropertyName() + ": " + absoluteLength);
+        }
+        return absoluteLength;
     }
 
     @Override

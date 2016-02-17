@@ -1,5 +1,11 @@
 package org.silnith.css.model.data;
 
+import java.util.List;
+
+import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
+
 /**
  * A parser for CSS absolute length values.  A length value is simply a CSS number with a unit suffix.
  * <p>
@@ -7,7 +13,7 @@ package org.silnith.css.model.data;
  * 
  * @author kent
  */
-public class AbsoluteLengthParser {
+public class AbsoluteLengthParser implements PropertyValueParser<AbsoluteLength> {
     
     private final CSSNumberParser cssNumberParser;
     
@@ -38,6 +44,33 @@ public class AbsoluteLengthParser {
             }
         }
         return null;
+    }
+
+    @Override
+    public AbsoluteLength parse(final List<Token> specifiedValue) {
+        if (specifiedValue.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+        final Token token = specifiedValue.get(0);
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case DIMENSION_TOKEN: {
+                final DimensionToken dimensionToken = (DimensionToken) lexicalToken;
+                for (final AbsoluteUnit unit : AbsoluteUnit.values()) {
+                    if (unit.getSuffix().equals(dimensionToken.getUnit())) {
+                        final Number numericValue = dimensionToken.getNumericValue();
+                        return new AbsoluteLength(numericValue.floatValue(), unit);
+                    }
+                }
+            } break;
+            default: {} break;
+            }
+        } break;
+        default: {} break;
+        }
+        throw new IllegalArgumentException();
     }
     
 }

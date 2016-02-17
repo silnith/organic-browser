@@ -165,6 +165,59 @@ public abstract class PropertyAccessor<T> {
         
         styleData.setComputedValue(propertyName, computedValue);
     }
+
+    /**
+     * Computes the property value for the given element.  The specified value
+     * must have already been set, if any.
+     * The algorithm is as follows:
+     * <ol>
+     * <li>If the property is specified explicitly for this element and is the
+     * string "inherit", then the property value is the computed value of the
+     * same property for the parent element.</li>
+     * <li>If the property is specified explicitly for this element and is not
+     * the string "inherit", {@link #parse} is called to convert the string
+     * value into the type {@code &lt;T&gt;}.</li>
+     * <li>If the property is not specified for this element but is inherited by
+     * default, then the property value is the computed value of the same
+     * property for the parent element.</li>
+     * <li>If the property is not specified for this element and is not
+     * inherited by default, then {@link #getInitialValue} is called to get the
+     * computed value.</li>
+     * </ol>
+     * <p>
+     * For inherited values, if the element is the root element then the value
+     * is the initial value.
+     * 
+     * @param styleData the styling information for the node being computed
+     */
+    public void computeParsedValue(final StyleData styleData) {
+//        assert !styleData.isPropertyComputed(propertyName);
+        
+        final T computedValue;
+        if (styleData.isPropertySpecified(getPropertyName())) {
+            if (styleData.getInherit(getPropertyName())) {
+                // inherit
+                computedValue = getParentValue(styleData);
+            } else {
+                // parse
+                final List<Token> specifiedValue = styleData.getParsedSpecifiedValue(getPropertyName());
+                
+                T parsedValue;
+                try {
+                    parsedValue = parse(styleData, specifiedValue);
+                } catch (final IllegalArgumentException e) {
+                    // log that the rule was invalid
+                    parsedValue = getValueWhenUnspecified(styleData);
+                }
+                computedValue = parsedValue;
+            }
+        } else {
+            // find the initial value
+            computedValue = getValueWhenUnspecified(styleData);
+        }
+        
+        styleData.setComputedValue(propertyName, computedValue);
+    }
     
     /**
      * Performs steps 3 and 4 of the algorithm defined for {@link #computeValue(StyleData)}.

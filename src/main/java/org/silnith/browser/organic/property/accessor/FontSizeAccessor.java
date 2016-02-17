@@ -8,6 +8,10 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.PercentageToken;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
 import org.silnith.css.model.data.FontAbsoluteSize;
@@ -99,7 +103,37 @@ public class FontSizeAccessor extends PropertyAccessor<AbsoluteLength> {
     
     @Override
     protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) {
-        throw new UnsupportedOperationException();
+        if (specifiedValue.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+        final Token token = specifiedValue.get(0);
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case IDENT_TOKEN: {
+                final IdentToken identToken = (IdentToken) lexicalToken;
+                final String ident = identToken.getStringValue();
+                final FontAbsoluteSize fontAbsoluteSize = getFontAbsoluteSize(ident);
+                if (fontAbsoluteSize != null) {
+                    return fontSizeTable.get(fontAbsoluteSize);
+                }
+            } break;
+            case PERCENTAGE_TOKEN: {
+                final PercentageToken percentageToken = (PercentageToken) lexicalToken;
+                percentageToken.getNumericValue();
+            } break;
+            case DIMENSION_TOKEN: {
+                final DimensionToken dimensionToken = (DimensionToken) lexicalToken;
+                dimensionToken.getNumericValue();
+                dimensionToken.getUnit();
+            } break;
+            default: {} break;
+            }
+        } break;
+        default: {} break;
+        }
+        throw new IllegalArgumentException();
     }
 
     @Override

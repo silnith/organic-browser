@@ -3,6 +3,8 @@ package org.silnith.css.model.data;
 import java.util.List;
 
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 
 /**
  * A parser for CSS relative length values.  A length value is simply a CSS number with a unit suffix.
@@ -43,7 +45,29 @@ public class RelativeLengthParser implements PropertyValueParser<RelativeLength>
 
     @Override
     public RelativeLength parse(final List<Token> specifiedValue) {
-        throw new UnsupportedOperationException();
+        if (specifiedValue.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+        final Token token = specifiedValue.get(0);
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case DIMENSION_TOKEN: {
+                final DimensionToken dimensionToken = (DimensionToken) lexicalToken;
+                for (final RelativeUnit unit : RelativeUnit.values()) {
+                    if (unit.getSuffix().equals(dimensionToken.getUnit())) {
+                        final Number numericValue = dimensionToken.getNumericValue();
+                        return new RelativeLength(numericValue.floatValue(), unit);
+                    }
+                }
+            } break;
+            default: {} break;
+            }
+        } break;
+        default: {} break;
+        }
+        throw new IllegalArgumentException();
     }
     
 }

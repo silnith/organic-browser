@@ -1,8 +1,10 @@
 package org.silnith.browser.organic;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.PropertyName;
@@ -59,6 +61,7 @@ public class StyleData {
     private final Map<PropertyName, Boolean> propertySpecified;
     
     private final Map<PropertyName, String> specifiedValues;
+    private final Map<PropertyName, List<Token>> parsedSpecifiedValues;
     
     /**
      * A map that records which properties have been computed and which have not.
@@ -74,6 +77,7 @@ public class StyleData {
         this.propertyInherited = new EnumMap<>(PropertyName.class);
         this.propertySpecified = new EnumMap<>(PropertyName.class);
         this.specifiedValues = new EnumMap<>(PropertyName.class);
+        this.parsedSpecifiedValues = new EnumMap<>(PropertyName.class);
         this.propertyComputed = new EnumMap<>(PropertyName.class);
         this.computedValue = new EnumMap<>(PropertyName.class);
         
@@ -101,7 +105,7 @@ public class StyleData {
      */
     public boolean getInherit(final PropertyName propertyName) {
         if ( !isPropertySpecified(propertyName)) {
-            throw new NullPointerException();
+            throw new IllegalStateException();
         }
         return propertyInherited.get(propertyName);
     }
@@ -130,6 +134,20 @@ public class StyleData {
         specifiedValues.put(propertyName, propertyValue);
         propertyInherited.put(propertyName, "inherit".equals(propertyValue));
     }
+
+    /**
+     * Specifies a value for the given property in this style data.  This marks
+     * the property as being specified, records the specified value, and checks
+     * whether the specified value is the special value "inherit".
+     * 
+     * @param propertyName
+     * @param propertyValue
+     */
+    public void setParsedSpecifiedValue(final PropertyName propertyName, final List<Token> propertyValue) {
+        propertySpecified.put(propertyName, true);
+        parsedSpecifiedValues.put(propertyName, propertyValue);
+        propertyInherited.put(propertyName, "inherit".equals(propertyValue));
+    }
     
     /**
      * Returns the specified value for the given property.  If the property is
@@ -140,9 +158,23 @@ public class StyleData {
      */
     public String getSpecifiedValue(final PropertyName propertyName) {
         if ( !isPropertySpecified(propertyName)) {
-            throw new NullPointerException();
+            throw new IllegalStateException();
         }
         return specifiedValues.get(propertyName);
+    }
+
+    /**
+     * Returns the specified value for the given property.  If the property is
+     * not specified, this throws a runtime exception.
+     * 
+     * @param propertyName
+     * @return
+     */
+    public List<Token> getParsedSpecifiedValue(final PropertyName propertyName) {
+        if ( !isPropertySpecified(propertyName)) {
+            throw new IllegalStateException();
+        }
+        return parsedSpecifiedValues.get(propertyName);
     }
     
     /**
@@ -176,7 +208,7 @@ public class StyleData {
      */
     public Object getComputedValue(final PropertyName propertyName) {
         if ( !isPropertyComputed(propertyName)) {
-            throw new NullPointerException();
+            throw new IllegalStateException();
         }
         return computedValue.get(propertyName);
     }

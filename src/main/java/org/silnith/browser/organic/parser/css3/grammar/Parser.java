@@ -249,7 +249,9 @@ public class Parser {
         Token value;
         do {
             value = consumeComponentValue();
+            listOfComponentValues.add(value);
         } while (value.getType() != Token.Type.EOF_TOKEN && !isLexicalToken(value, LexicalToken.LexicalType.EOF));
+        listOfComponentValues.remove(listOfComponentValues.size() - 1);
         return listOfComponentValues;
     }
     

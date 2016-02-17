@@ -78,7 +78,8 @@ public class CSSPseudoElementRuleSet {
                     final PropertyName propertyName = rule.getPropertyName();
                     final PropertyAccessor<?> propertyAccessor =
                             propertyAccessorFactory.getPropertyAccessor(propertyName);
-                    propertyAccessor.computeValue(beforeStyleData);
+//                    propertyAccessor.computeValue(beforeStyleData);
+                    propertyAccessor.computeParsedValue(beforeStyleData);
                 }
             }
             final Display beforeDisplay = displayAccessor.getComputedValue(beforeElement.getStyleData());

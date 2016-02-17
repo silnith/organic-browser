@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.css.model.data.BorderStyle;
 import org.silnith.css.model.data.PropertyName;
 
@@ -44,7 +46,29 @@ public abstract class BorderStyleAccessor extends PropertyAccessor<BorderStyle> 
     
     @Override
     protected BorderStyle parse(StyleData styleData, List<Token> specifiedValue) {
-        throw new UnsupportedOperationException();
+        if (specifiedValue.size() != 1) {
+            throw new IllegalArgumentException();
+        }
+        final Token token = specifiedValue.get(0);
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case IDENT_TOKEN: {
+                final IdentToken identToken = (IdentToken) lexicalToken;
+                final BorderStyle borderStyle = BorderStyle.getFromValue(identToken.getStringValue());
+                if (borderStyle == null) {
+                    throw new IllegalArgumentException(
+                            "Border style illegal value: " + getPropertyName() + ": " + specifiedValue);
+                }
+                return borderStyle;
+            } // break;
+            default: {} break;
+            }
+        } break;
+        default: {} break;
+        }
+        throw new IllegalArgumentException();
     }
 
     @Override
