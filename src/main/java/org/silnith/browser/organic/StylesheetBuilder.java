@@ -1,8 +1,12 @@
 package org.silnith.browser.organic;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -19,8 +23,6 @@ import org.silnith.browser.organic.parser.css3.grammar.token.QualifiedRuleNode;
 import org.silnith.browser.organic.parser.css3.grammar.token.Rule;
 import org.silnith.browser.organic.parser.css3.grammar.token.SimpleBlock;
 import org.silnith.browser.organic.parser.css3.lexical.Tokenizer;
-import org.silnith.browser.organic.property.accessor.PropertyAccessor;
-import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.PropertyName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -29,80 +31,87 @@ import org.w3c.dom.NodeList;
 
 public class StylesheetBuilder {
     
-    public Stylesheet buildStylesheet(final Document document, final URI baseURL) {
+    public Collection<Stylesheet> buildStylesheets(final Document document, final URI baseURL) {
         final Element htmlElement = document.getDocumentElement();
         final Element headElement = findHeadElement(htmlElement);
         final String defaultStyleType = findDefaultStylesheetLanguage(null, headElement);
         final Collection<ExternalStylesheetLink> externalStylesheetLinks = findLinkElements(headElement);
-        findStyleElements(headElement);
         
-        final List<ParsedCSSRule> parsedCSSRules = new ArrayList<>();
+        final List<Stylesheet> stylesheets = new ArrayList<>();
+        stylesheets.add(createDefaultStylesheet());
+//        stylesheets.add(createStaticStylesheet());
+        
         for (final ExternalStylesheetLink link : externalStylesheetLinks) {
             try {
-                final URI href = link.getHref();
-                System.out.println(href);
-                final URI resolvedURI = baseURL.resolve(href);
-                System.out.println(resolvedURI);
-                final URL url = resolvedURI.toURL();
-                final URLConnection openConnection = url.openConnection();
-                final String contentEncoding = openConnection.getContentEncoding();
-                
-                try (final InputStream inputStream = openConnection.getInputStream()) {
-                    final Reader reader;
-                    if (contentEncoding == null) {
-                        reader = new InputStreamReader(inputStream, "UTF-8");
-                    } else {
-                        reader = new InputStreamReader(inputStream, contentEncoding);
-                    }
-                    
-                    final Tokenizer cssTokenizer = new Tokenizer(reader);
-                    cssTokenizer.setAllowParseErrors(true);
-                    final Parser stylesheetParser = new Parser(cssTokenizer);
-                    stylesheetParser.prime();
-                    
-                    final List<Rule> rules = stylesheetParser.parseStylesheet();
-                    for (final Rule rule : rules) {
-                        if (rule instanceof QualifiedRuleNode) {
-                            final QualifiedRuleNode qualifiedRuleNode = (QualifiedRuleNode) rule;
-                            
-                            // parse as selector list
-                            final List<Token> prelude = qualifiedRuleNode.getPrelude();
-                            System.out.println("prelude=" + prelude);
-                            // parse as list of declarations
-                            final SimpleBlock block = qualifiedRuleNode.getBlock();
-                            final Parser declarationParser = new Parser(new TokenListStream(block.getValue()));
-                            declarationParser.prime();
-                            final List<Declaration> declarations = declarationParser.parseListOfDeclarations();
-                            
-                            for (final Declaration declaration : declarations) {
-                                if (declaration instanceof DeclarationNode) {
-                                    final DeclarationNode declarationNode = (DeclarationNode) declaration;
-                                    
-                                    final String name = declarationNode.getName();
-                                    final List<Token> value = declarationNode.getValue();
-                                    
-                                    System.out.println("name=" + name + ", value=" + value);
-                                    
-                                    // for each declaration, invoke a property-specific parse
-                                    final PropertyName propertyName = PropertyName.getPropertyName(name);
-                                    
-                                    final ParsedCSSRule parsedCSSRule = new ParsedCSSRule(prelude.toString(), propertyName, value);
-                                    parsedCSSRules.add(parsedCSSRule);
-                                }
-                            }
-                        }
-                    }
-                }
+                stylesheets.add(readStylesheet(baseURL, link));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
         }
         
-        for (final ParsedCSSRule rule : parsedCSSRules) {
-            System.out.println(rule);
-        }
+        stylesheets.addAll(findStyleElements(headElement));
         
-        return createStaticStylesheet();
+        return stylesheets;
+    }
+
+    private Stylesheet readStylesheet(final URI baseURL, final ExternalStylesheetLink link) throws MalformedURLException, IOException, UnsupportedEncodingException {
+        final URI href = link.getHref();
+        final URI resolvedURI = baseURL.resolve(href);
+        final URL url = resolvedURI.toURL();
+        final URLConnection openConnection = url.openConnection();
+        final String contentEncoding = openConnection.getContentEncoding();
+        
+        try (final InputStream inputStream = openConnection.getInputStream()) {
+            final Reader reader;
+            if (contentEncoding == null) {
+                reader = new InputStreamReader(inputStream, "UTF-8");
+            } else {
+                reader = new InputStreamReader(inputStream, contentEncoding);
+            }
+            
+            final List<CSSRule> parsedCSSRules = readStylesheetRules(reader);
+            final List<CSSPseudoElementRuleSet> pseudoElementRules = new ArrayList<>();
+            return new Stylesheet(parsedCSSRules, pseudoElementRules);
+        }
+    }
+
+    private List<CSSRule> readStylesheetRules(final Reader reader) throws IOException {
+        final Tokenizer cssTokenizer = new Tokenizer(reader);
+        cssTokenizer.setAllowParseErrors(true);
+        final Parser stylesheetParser = new Parser(cssTokenizer);
+        stylesheetParser.prime();
+        
+        final List<Rule> rules = stylesheetParser.parseStylesheet();
+        final List<CSSRule> parsedCSSRules = new ArrayList<>();
+        for (final Rule rule : rules) {
+            if (rule instanceof QualifiedRuleNode) {
+                final QualifiedRuleNode qualifiedRuleNode = (QualifiedRuleNode) rule;
+                
+                // parse as selector list
+                final List<Token> prelude = qualifiedRuleNode.getPrelude();
+                // parse as list of declarations
+                final SimpleBlock block = qualifiedRuleNode.getBlock();
+                final Parser declarationParser = new Parser(new TokenListStream(block.getValue()));
+                declarationParser.prime();
+                final List<Declaration> declarations = declarationParser.parseListOfDeclarations();
+                
+                for (final Declaration declaration : declarations) {
+                    if (declaration instanceof DeclarationNode) {
+                        final DeclarationNode declarationNode = (DeclarationNode) declaration;
+                        
+                        final String name = declarationNode.getName();
+                        final List<Token> value = declarationNode.getValue();
+                        
+                        // for each declaration, invoke a property-specific parse
+                        final PropertyName propertyName = PropertyName.getPropertyName(name);
+                        
+                        final ParsedCSSRule parsedCSSRule = new ParsedCSSRule(prelude.toString(), propertyName, value);
+                        parsedCSSRules.add(parsedCSSRule);
+                    }
+                }
+            }
+        }
+        return parsedCSSRules;
     }
 
     private Element findHeadElement(final Element htmlElement) {
@@ -196,7 +205,9 @@ public class StylesheetBuilder {
         return links;
     }
 
-    private void findStyleElements(final Element headElement) {
+    private Collection<Stylesheet> findStyleElements(final Element headElement) {
+        final List<Stylesheet> stylesheets = new ArrayList<>();
+        
         final NodeList childNodes = headElement.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             final Node childNode = childNodes.item(i);
@@ -210,18 +221,30 @@ public class StylesheetBuilder {
                     // the title attribute on a STYLE element does NOT identify it as an alternate stylesheet
                     final String title = element.getAttribute("title");
                     final String media = element.getAttribute("media");
+                    
+                    if (type.equals("text/css")) {
+                        final String stylesheetText = element.getTextContent();
+                        try (final StringReader reader = new StringReader(stylesheetText)) {
+                            stylesheets.add(new Stylesheet(readStylesheetRules(reader), new ArrayList<>()));
+                        } catch (final IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             } break;
             default: {} break;
             }
         }
+        
+        return stylesheets;
     }
-    
+
+    private static Stylesheet createDefaultStylesheet() {
+        return new Stylesheet(defaultHTMLRules(), new ArrayList<>());
+    }
+
     private static Stylesheet createStaticStylesheet() {
-        final Collection<CSSRule> styleList = createStyleList();
-//        final Collection<CSSRule> styleList = new ArrayList<>();
-        styleList.addAll(defaultHTMLRules());
-        return new Stylesheet(styleList, createGeneratedContentRules());
+        return new Stylesheet(createStyleList(), createGeneratedContentRules());
     }
 
     private static Collection<CSSRule> createStyleList() {

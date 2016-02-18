@@ -101,8 +101,8 @@ public class BrowserPane extends JPanel {
         private <T> T getResult(final String operation, final Callable<T> callable)
                 throws InterruptedException, ExecutionException {
             final TimedCallable<T> timedCallable = new TimedCallable<>(callable);
-//			final Future<T> future = EXECUTOR_SERVICE.submit(timedCallable);
-//			final T result = future.get();
+//            final Future<T> future = EXECUTOR_SERVICE.submit(timedCallable);
+//            final T result = future.get();
             final T result;
             try {
                 result = timedCallable.call();
@@ -154,30 +154,21 @@ public class BrowserPane extends JPanel {
                 final Parser parser = new Parser(download);
                 final Document document = getResult("Parse", parser);
                 
-                printNode(document);
+//                printNode(document);
                 
                 final Styler styler = new Styler(new StyleTreeBuilder(), document);
                 final StyledElement styledElement = getResult("Style", styler);
                 
-                try {
-//                    styleParser.parseStyleRules(download);
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
-
                 final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
                 final URI uri = url.toURI();
-                final Stylesheet stylesheet = stylesheetBuilder.buildStylesheet(document, uri);
-                
-                final Collection<CSSRule> cssRules = stylesheet.getRules();
-                final Collection<CSSPseudoElementRuleSet> pseudoRules = stylesheet.getPseudoRules();
+                final Collection<Stylesheet> stylesheets = stylesheetBuilder.buildStylesheets(document, uri);
                 
                 final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
                 final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
-                final Cascader cascader = new Cascader(cascadeApplier, styledElement, cssRules, pseudoRules);
+                final Cascader cascader = new Cascader(cascadeApplier, styledElement, stylesheets);
                 getResult("Cascade", cascader);
                 
-//				printNode(styledElement.createDOM(document));
+//                printNode(styledElement.createDOM(document));
                 
                 @SuppressWarnings("unchecked")
                 final PropertyAccessor<Display> displayAccessor =
@@ -194,7 +185,7 @@ public class BrowserPane extends JPanel {
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);
                 
-//				printNode(blockBox.createDOM(document));
+//                printNode(blockBox.createDOM(document));
                 
                 final BoxRenderer renderer = new BoxRenderer(blockBox);
                 scrollPane.getViewport().removeChangeListener(boxRenderer);
@@ -278,22 +269,21 @@ public class BrowserPane extends JPanel {
         
         private final StyledElement styledElement;
         
-        private final Collection<CSSRule> rules;
-        
-        private final Collection<CSSPseudoElementRuleSet> pseudoRules;
+        private final Collection<Stylesheet> stylesheets;
         
         public Cascader(final CascadeApplier cascadeApplier, final StyledElement styledElement,
-                final Collection<CSSRule> rules, final Collection<CSSPseudoElementRuleSet> pseudoRules) {
+                final Collection<Stylesheet> stylesheets) {
             super();
             this.cascadeApplier = cascadeApplier;
             this.styledElement = styledElement;
-            this.rules = rules;
-            this.pseudoRules = pseudoRules;
+            this.stylesheets = stylesheets;
         }
         
         @Override
         public void run() {
-            cascadeApplier.cascade(styledElement, new Stylesheet(rules, pseudoRules));
+            for (final Stylesheet stylesheet : stylesheets) {
+                cascadeApplier.cascade(styledElement, stylesheet);
+            }
         }
         
         @Override

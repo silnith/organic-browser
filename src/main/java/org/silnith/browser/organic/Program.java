@@ -2,6 +2,7 @@ package org.silnith.browser.organic;
 
 import java.awt.Dimension;
 import java.net.URI;
+import java.util.Collection;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -71,12 +72,14 @@ public class Program {
         final StyledElement styledElement = styleTreeBuilder.addStyleInformation(domDocument);
         
         final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
-        final Stylesheet stylesheet = stylesheetBuilder.buildStylesheet(domDocument, URI.create(""));
+        final Collection<Stylesheet> stylesheets = stylesheetBuilder.buildStylesheets(domDocument, URI.create(""));
         
         final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
         final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
         final long cascadeStartTime = System.currentTimeMillis();
-        cascadeApplier.cascade(styledElement, stylesheet);
+        for (final Stylesheet stylesheet : stylesheets) {
+            cascadeApplier.cascade(styledElement, stylesheet);
+        }
         final long cascadeEndTime = System.currentTimeMillis();
         System.out.println("Cascade time: " + (cascadeEndTime - cascadeStartTime));
         
