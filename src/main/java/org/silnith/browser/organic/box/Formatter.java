@@ -171,6 +171,7 @@ public class Formatter {
                 return null;
             } // break;
             default: {
+                System.out.println(display);
                 throw new UnsupportedOperationException();
             } // break;
             }

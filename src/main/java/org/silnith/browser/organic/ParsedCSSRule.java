@@ -3,6 +3,7 @@ package org.silnith.browser.organic;
 import java.util.List;
 
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.selector.Selector;
 import org.silnith.css.model.data.PropertyName;
 
 
@@ -18,14 +19,14 @@ import org.silnith.css.model.data.PropertyName;
  */
 public class ParsedCSSRule implements CSSRule {
     
-    private final String elementName;
+    private final Selector selector;
     
     private final PropertyName propertyName;
     
     private final List<Token> styleValue;
     
-    public ParsedCSSRule(final String elementName, final PropertyName propertyName, final List<Token> styleValue) {
-        this.elementName = elementName;
+    public ParsedCSSRule(final Selector selector, final PropertyName propertyName, final List<Token> styleValue) {
+        this.selector = selector;
         this.propertyName = propertyName;
         this.styleValue = styleValue;
     }
@@ -42,13 +43,12 @@ public class ParsedCSSRule implements CSSRule {
      * @return
      */
     public boolean shouldApply(final StyledElement styledElement) {
-        final String tagName = styledElement.getTagName();
-        
-        if (tagName.equalsIgnoreCase(elementName)) {
-            return true;
+        if (styledElement instanceof StyledDOMElement) {
+            final StyledDOMElement styledDOMElement = (StyledDOMElement) styledElement;
+            return selector.matches(styledDOMElement.getElement());
+        } else {
+            return false;
         }
-        
-        return false;
     }
     
     /**
@@ -70,7 +70,7 @@ public class ParsedCSSRule implements CSSRule {
     
     @Override
     public String toString() {
-        return elementName + " { " + propertyName.getKey() + " : " + styleValue + " }";
+        return selector + " { " + propertyName.getKey() + " : " + styleValue + " }";
     }
     
 }

@@ -154,7 +154,7 @@ public class BrowserPane extends JPanel {
                 final Parser parser = new Parser(download);
                 final Document document = getResult("Parse", parser);
                 
-//                printNode(document);
+                printNode(document);
                 
                 final Styler styler = new Styler(new StyleTreeBuilder(), document);
                 final StyledElement styledElement = getResult("Style", styler);
@@ -168,7 +168,7 @@ public class BrowserPane extends JPanel {
                 final Cascader cascader = new Cascader(cascadeApplier, styledElement, stylesheets);
                 getResult("Cascade", cascader);
                 
-//                printNode(styledElement.createDOM(document));
+                printNode(styledElement.createDOM(document));
                 
                 @SuppressWarnings("unchecked")
                 final PropertyAccessor<Display> displayAccessor =
@@ -185,7 +185,7 @@ public class BrowserPane extends JPanel {
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);
                 
-//                printNode(blockBox.createDOM(document));
+                printNode(blockBox.createDOM(document));
                 
                 final BoxRenderer renderer = new BoxRenderer(blockBox);
                 scrollPane.getViewport().removeChangeListener(boxRenderer);

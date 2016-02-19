@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.silnith.browser.organic.parser.css3.Token;
@@ -23,6 +24,8 @@ import org.silnith.browser.organic.parser.css3.grammar.token.QualifiedRuleNode;
 import org.silnith.browser.organic.parser.css3.grammar.token.Rule;
 import org.silnith.browser.organic.parser.css3.grammar.token.SimpleBlock;
 import org.silnith.browser.organic.parser.css3.lexical.Tokenizer;
+import org.silnith.browser.organic.parser.css3.selector.Selector;
+import org.silnith.browser.organic.parser.css3.selector.SelectorParser;
 import org.silnith.css.model.data.PropertyName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -69,6 +72,7 @@ public class StylesheetBuilder {
                 reader = new InputStreamReader(inputStream, contentEncoding);
             }
             
+            System.out.println(resolvedURI);
             final List<CSSRule> parsedCSSRules = readStylesheetRules(reader);
             final List<CSSPseudoElementRuleSet> pseudoElementRules = new ArrayList<>();
             return new Stylesheet(parsedCSSRules, pseudoElementRules);
@@ -89,29 +93,54 @@ public class StylesheetBuilder {
                 
                 // parse as selector list
                 final List<Token> prelude = qualifiedRuleNode.getPrelude();
-                // parse as list of declarations
-                final SimpleBlock block = qualifiedRuleNode.getBlock();
-                final Parser declarationParser = new Parser(new TokenListStream(block.getValue()));
-                declarationParser.prime();
-                final List<Declaration> declarations = declarationParser.parseListOfDeclarations();
-                
-                for (final Declaration declaration : declarations) {
-                    if (declaration instanceof DeclarationNode) {
-                        final DeclarationNode declarationNode = (DeclarationNode) declaration;
-                        
-                        final String name = declarationNode.getName();
-                        final List<Token> value = declarationNode.getValue();
-                        
-                        // for each declaration, invoke a property-specific parse
-                        final PropertyName propertyName = PropertyName.getPropertyName(name);
-                        
-                        final ParsedCSSRule parsedCSSRule = new ParsedCSSRule(prelude.toString(), propertyName, value);
-                        parsedCSSRules.add(parsedCSSRule);
+                System.out.println("prelude: " + join(prelude));
+                final SelectorParser selectorParser = new SelectorParser(new TokenListStream(prelude));
+                try {
+                    final Selector selector = selectorParser.parse();
+                    System.out.println("parsed selector: " + selector);
+                    // parse as list of declarations
+                    final SimpleBlock block = qualifiedRuleNode.getBlock();
+                    final Parser declarationParser = new Parser(new TokenListStream(block.getValue()));
+                    declarationParser.prime();
+                    final List<Declaration> declarations = declarationParser.parseListOfDeclarations();
+                    
+                    for (final Declaration declaration : declarations) {
+                        if (declaration instanceof DeclarationNode) {
+                            final DeclarationNode declarationNode = (DeclarationNode) declaration;
+                            
+                            final String name = declarationNode.getName();
+                            final List<Token> value = declarationNode.getValue();
+                            
+                            // for each declaration, invoke a property-specific parse
+                            final PropertyName propertyName = PropertyName.getPropertyName(name);
+                            
+                            final ParsedCSSRule parsedCSSRule = new ParsedCSSRule(selector, propertyName, value);
+                            parsedCSSRules.add(parsedCSSRule);
+                        }
                     }
+                } catch (final RuntimeException e) {
+                    e.printStackTrace(System.out);
                 }
             }
         }
         return parsedCSSRules;
+    }
+    
+    private String join(final List<Token> tokens) {
+        final StringBuilder builder = new StringBuilder();
+        for (final Token token : tokens) {
+            builder.append(token.toString());
+        }
+//        if (!tokens.isEmpty()) {
+//            final Iterator<Token> iterator = tokens.iterator();
+//            final Token token = iterator.next();
+//            builder.append(token.toString());
+//            while (iterator.hasNext()) {
+//                final Token next = iterator.next();
+//                builder.append(next.toString());
+//            }
+//        }
+        return builder.toString();
     }
 
     private Element findHeadElement(final Element htmlElement) {
@@ -223,6 +252,7 @@ public class StylesheetBuilder {
                     final String media = element.getAttribute("media");
                     
                     if (type.equals("text/css")) {
+                        System.out.println("inline");
                         final String stylesheetText = element.getTextContent();
                         try (final StringReader reader = new StringReader(stylesheetText)) {
                             stylesheets.add(new Stylesheet(readStylesheetRules(reader), new ArrayList<>()));

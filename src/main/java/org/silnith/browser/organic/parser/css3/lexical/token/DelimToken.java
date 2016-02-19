@@ -19,6 +19,10 @@ public class DelimToken extends LexicalToken {
         this.chars = characters;
     }
     
+    public String getChars() {
+        return String.valueOf(chars);
+    }
+
     @Override
     public String toString() {
         return "'" + String.valueOf(chars) + "'";
