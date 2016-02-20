@@ -282,6 +282,9 @@ public class BrowserPane extends JPanel {
         @Override
         public void run() {
             for (final Stylesheet stylesheet : stylesheets) {
+//                for (final CSSRule cssRule : stylesheet.getRules()) {
+//                    cssRule.apply(styledElement);
+//                }
                 cascadeApplier.cascade(styledElement, stylesheet);
             }
         }

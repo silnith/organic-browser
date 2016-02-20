@@ -215,7 +215,7 @@ public class StyleData {
     
     @Override
     public String toString() {
-        return "StyleData {specifiedValues: " + specifiedValues + ", computedValues: " + computedValue + "}";
+        return "StyleData {specifiedValues: " + specifiedValues + ", parsedSpecifiedValues: " + parsedSpecifiedValues + ", computedValues: " + computedValue + "}";
     }
     
 }

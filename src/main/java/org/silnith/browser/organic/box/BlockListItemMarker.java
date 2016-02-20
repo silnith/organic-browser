@@ -12,18 +12,5 @@ public class BlockListItemMarker extends AnonymousBlockBox {
         super(parentElement);
         this.addChild(new InlineListItemMarker(fontSizeAccessor, parentElement));
     }
-    
-//	@Override
-//	public Node createDOM(final Document document) {
-//		final Element node = document.createElement("BlockListItemMarker");
-//		for (final PropertyName propertyName : PropertyName.values()) {
-//			if (anonymousElementStyleData.isPropertyComputed(propertyName)) {
-//				node.setAttribute(propertyName.getKey(),
-//						String.valueOf(anonymousElementStyleData.getComputedValue(propertyName)));
-//			}
-//		}
-//		node.appendChild(inlineFormattingContextImpl.createDOM(document));
-//		return node;
-//	}
 
 }
