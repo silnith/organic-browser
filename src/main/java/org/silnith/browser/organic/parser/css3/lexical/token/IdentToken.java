@@ -13,7 +13,7 @@ public class IdentToken extends StringValueToken {
     
     @Override
     public String toString() {
-        return "ident(" + getStringValue() + ")";
+        return getStringValue();
     }
     
 }

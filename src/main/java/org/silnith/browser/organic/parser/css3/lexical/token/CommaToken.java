@@ -13,7 +13,7 @@ public class CommaToken extends LexicalToken {
     
     @Override
     public String toString() {
-        return ",";
+        return "','";
     }
     
 }

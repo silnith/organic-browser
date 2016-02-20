@@ -37,11 +37,11 @@ public class CascadeApplier {
      * @param stylesheet
      */
     public void cascade(final StyledElement styledElement, final Stylesheet stylesheet) {
-        for (final CSSRule cssRule : stylesheet.getRules()) {
-            if (cssRule.shouldApply(styledElement)) {
-                cssRule.apply(styledElement);
-            }
-        }
+//        for (final CSSRule cssRule : stylesheet.getRules()) {
+//            if (cssRule.shouldApply(styledElement)) {
+//                cssRule.apply(styledElement);
+//            }
+//        }
         
         compute(styledElement);
         

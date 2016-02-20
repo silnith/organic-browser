@@ -1,6 +1,8 @@
 package org.silnith.browser.organic.parser.css3.selector;
 
-import org.silnith.browser.organic.StyledContent;
+import java.util.Collection;
+
+import org.silnith.browser.organic.StyledDOMElement;
 import org.w3c.dom.Element;
 
 
@@ -23,6 +25,13 @@ public class SelectorImpl implements Selector {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public Collection<StyledDOMElement> select(Collection<StyledDOMElement> candidates) {
+        final Collection<StyledDOMElement> selected = sequenceOfSimpleSelectors.select(candidates);
+        final Collection<StyledDOMElement> combined = combinator.combine(selected);
+        return combined;
     }
 
     @Override

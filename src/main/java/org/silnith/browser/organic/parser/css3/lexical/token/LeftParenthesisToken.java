@@ -13,7 +13,7 @@ public class LeftParenthesisToken extends LexicalToken {
     
     @Override
     public String toString() {
-        return "(";
+        return "'('";
     }
     
 }

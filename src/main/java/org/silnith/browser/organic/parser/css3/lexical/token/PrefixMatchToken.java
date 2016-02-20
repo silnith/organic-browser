@@ -14,7 +14,7 @@ public class PrefixMatchToken extends LexicalToken {
     
     @Override
     public String toString() {
-        return "^=";
+        return "'^='";
     }
     
 }

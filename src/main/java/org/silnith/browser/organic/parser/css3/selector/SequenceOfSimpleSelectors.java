@@ -2,9 +2,11 @@ package org.silnith.browser.organic.parser.css3.selector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.silnith.browser.organic.StyledDOMElement;
 import org.w3c.dom.Element;
 
 
@@ -75,6 +77,15 @@ public class SequenceOfSimpleSelectors implements Selector {
             }
         }
         return true;
+    }
+
+    @Override
+    public Collection<StyledDOMElement> select(Collection<StyledDOMElement> candidates) {
+        Collection<StyledDOMElement> subject = candidates;
+        for (final SimpleSelector simpleSelector : selectors) {
+            subject = simpleSelector.select(subject);
+        }
+        return subject;
     }
 
     @Override

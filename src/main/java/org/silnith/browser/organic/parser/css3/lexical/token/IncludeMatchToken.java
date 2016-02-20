@@ -14,7 +14,7 @@ public class IncludeMatchToken extends LexicalToken {
     
     @Override
     public String toString() {
-        return "~=";
+        return "'~='";
     }
     
 }

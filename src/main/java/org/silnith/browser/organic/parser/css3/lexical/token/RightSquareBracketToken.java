@@ -13,7 +13,7 @@ public class RightSquareBracketToken extends LexicalToken {
     
     @Override
     public String toString() {
-        return "]";
+        return "']'";
     }
     
 }

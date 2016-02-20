@@ -1,9 +1,10 @@
-package org.silnith.browser.organic.parser.css3;
+package org.silnith.browser.organic.parser.css3.lexical;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.browser.organic.parser.css3.lexical.token.EOFToken;
 
 

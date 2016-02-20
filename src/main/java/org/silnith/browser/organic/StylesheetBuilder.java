@@ -16,13 +16,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.TokenListStream;
 import org.silnith.browser.organic.parser.css3.grammar.Parser;
 import org.silnith.browser.organic.parser.css3.grammar.token.Declaration;
 import org.silnith.browser.organic.parser.css3.grammar.token.DeclarationNode;
 import org.silnith.browser.organic.parser.css3.grammar.token.QualifiedRuleNode;
 import org.silnith.browser.organic.parser.css3.grammar.token.Rule;
 import org.silnith.browser.organic.parser.css3.grammar.token.SimpleBlock;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.Tokenizer;
 import org.silnith.browser.organic.parser.css3.selector.Selector;
 import org.silnith.browser.organic.parser.css3.selector.SelectorParser;

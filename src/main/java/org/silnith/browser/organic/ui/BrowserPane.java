@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -22,6 +23,8 @@ import org.silnith.browser.organic.CSSPseudoElementRuleSet;
 import org.silnith.browser.organic.CSSRule;
 import org.silnith.browser.organic.CascadeApplier;
 import org.silnith.browser.organic.StyleTreeBuilder;
+import org.silnith.browser.organic.StyledContent;
+import org.silnith.browser.organic.StyledDOMElement;
 import org.silnith.browser.organic.StyledElement;
 import org.silnith.browser.organic.Stylesheet;
 import org.silnith.browser.organic.StylesheetBuilder;
@@ -168,7 +171,7 @@ public class BrowserPane extends JPanel {
                 final Cascader cascader = new Cascader(cascadeApplier, styledElement, stylesheets);
                 getResult("Cascade", cascader);
                 
-                printNode(styledElement.createDOM(document));
+//                printNode(styledElement.createDOM(document));
                 
                 @SuppressWarnings("unchecked")
                 final PropertyAccessor<Display> displayAccessor =
@@ -185,7 +188,7 @@ public class BrowserPane extends JPanel {
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);
                 
-                printNode(blockBox.createDOM(document));
+//                printNode(blockBox.createDOM(document));
                 
                 final BoxRenderer renderer = new BoxRenderer(blockBox);
                 scrollPane.getViewport().removeChangeListener(boxRenderer);
@@ -281,12 +284,29 @@ public class BrowserPane extends JPanel {
         
         @Override
         public void run() {
+            final Collection<StyledDOMElement> allNodes = new HashSet<>();
+            final StyledDOMElement styledDOMElement = (StyledDOMElement) styledElement;
+            allNodes.add(styledDOMElement);
+            allNodes.addAll(getChildren(styledDOMElement));
             for (final Stylesheet stylesheet : stylesheets) {
-//                for (final CSSRule cssRule : stylesheet.getRules()) {
+                for (final CSSRule cssRule : stylesheet.getRules()) {
 //                    cssRule.apply(styledElement);
-//                }
+                    cssRule.apply(allNodes);
+                }
                 cascadeApplier.cascade(styledElement, stylesheet);
             }
+        }
+        
+        private Collection<StyledDOMElement> getChildren(final StyledDOMElement element) {
+            final Collection<StyledDOMElement> ret = new HashSet<>();
+            for (final StyledContent child : element.getChildren()) {
+                if (child instanceof StyledDOMElement) {
+                    final StyledDOMElement styledChild = (StyledDOMElement) child;
+                    ret.add(styledChild);
+                    ret.addAll(getChildren(styledChild));
+                }
+            }
+            return ret;
         }
         
         @Override

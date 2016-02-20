@@ -13,7 +13,7 @@ public class ColumnToken extends LexicalToken {
     
     @Override
     public String toString() {
-        return "||";
+        return "'||'";
     }
     
 }

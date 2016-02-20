@@ -66,7 +66,6 @@ import java.util.regex.Pattern;
 
 import org.silnith.browser.organic.network.Download;
 import org.silnith.browser.organic.parser.ParseErrorException;
-import org.silnith.browser.organic.parser.css3.TokenStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.AtKeywordToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.BadStringToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.BadURLToken;
@@ -106,6 +105,7 @@ import org.silnith.browser.organic.parser.css3.lexical.token.WhitespaceToken;
 /**
  * @see <a href="http://dev.w3.org/csswg/css-syntax/#tokenization">4
  *      Tokenization</a>
+ * @see <a href="https://www.w3.org/TR/css-syntax-3/">https://www.w3.org/TR/css-syntax-3/</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class Tokenizer implements TokenStream {

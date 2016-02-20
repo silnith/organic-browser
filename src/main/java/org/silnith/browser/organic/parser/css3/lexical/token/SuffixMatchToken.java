@@ -14,7 +14,7 @@ public class SuffixMatchToken extends LexicalToken {
     
     @Override
     public String toString() {
-        return "$=";
+        return "'$='";
     }
     
 }

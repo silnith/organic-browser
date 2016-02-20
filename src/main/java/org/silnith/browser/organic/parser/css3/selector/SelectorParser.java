@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.TokenStream;
+import org.silnith.browser.organic.parser.css3.lexical.TokenStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.ColonToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.DelimToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.HashToken;
@@ -46,16 +46,32 @@ public class SelectorParser {
     
     private Selector consumeSelector() throws IOException {
         final SequenceOfSimpleSelectors simpleSelectorSequence = consumeSimpleSelectorSequence();
-        Combinator combinator = null;
-        while (isCombinator(nextToken)) {
-            combinator = consumeCombinator();
-            consumeSimpleSelectorSequence();
-        }
-        if (combinator == null) {
-            return simpleSelectorSequence;
+        if (isCombinator(nextToken)) {
+            try {
+                final Combinator combinator = consumeCombinatorHelper();
+                return new SelectorImpl(simpleSelectorSequence, combinator);
+            } catch (final RuntimeException e) {
+                return simpleSelectorSequence;
+            }
         } else {
-            return new SelectorImpl(simpleSelectorSequence, combinator);
+            return simpleSelectorSequence;
         }
+    }
+    
+    private Combinator consumeCombinatorHelper() throws IOException {
+        final Combinator combinator = consumeCombinator();
+        final SequenceOfSimpleSelectors nextSequence = consumeSimpleSelectorSequence();
+        if (isCombinator(nextToken)) {
+            try {
+                final Combinator nextCombinator = consumeCombinatorHelper();
+                combinator.setNextSelector(new SelectorImpl(nextSequence, nextCombinator));
+            } catch (final RuntimeException e) {
+                combinator.setNextSelector(nextSequence);
+            }
+        } else {
+            combinator.setNextSelector(nextSequence);
+        }
+        return combinator;
     }
     
     private boolean isCombinator(final Token token) {
@@ -142,7 +158,7 @@ public class SelectorParser {
                 }
             } break;
             default: {
-                System.out.println(lexicalToken);
+//                System.out.println(lexicalToken);
                 throw new IllegalArgumentException();
             } // break;
             }

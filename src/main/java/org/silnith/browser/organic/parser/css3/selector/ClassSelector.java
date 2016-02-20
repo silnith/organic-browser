@@ -1,5 +1,10 @@
 package org.silnith.browser.organic.parser.css3.selector;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.silnith.browser.organic.StyledDOMElement;
 import org.w3c.dom.Element;
 
 
@@ -22,6 +27,19 @@ public class ClassSelector implements SimpleSelector {
             }
         }
         return false;
+    }
+
+    @Override
+    public Collection<StyledDOMElement> select(Collection<StyledDOMElement> candidates) {
+        final Collection<StyledDOMElement> subject = new HashSet<>();
+        for (final StyledDOMElement element : candidates) {
+            final String classes = element.getElement().getAttribute("class");
+            final String[] split = classes.split("\\s+");
+            if (Arrays.asList(split).contains(className)) {
+                subject.add(element);
+            }
+        }
+        return subject;
     }
 
     @Override

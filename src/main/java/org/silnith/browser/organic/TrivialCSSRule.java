@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.TokenListStream;
 import org.silnith.browser.organic.parser.css3.grammar.Parser;
 import org.silnith.browser.organic.parser.css3.grammar.token.Declaration;
 import org.silnith.browser.organic.parser.css3.grammar.token.DeclarationNode;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.css.model.data.PropertyName;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;

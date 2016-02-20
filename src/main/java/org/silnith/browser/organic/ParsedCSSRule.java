@@ -1,5 +1,6 @@
 package org.silnith.browser.organic;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.silnith.browser.organic.parser.css3.Token;
@@ -68,6 +69,14 @@ public class ParsedCSSRule implements CSSRule {
         styleData.setParsedSpecifiedValue(propertyName, styleValue);
     }
     
+    @Override
+    public void apply(Collection<StyledDOMElement> elements) {
+        final Collection<StyledDOMElement> subject = selector.select(elements);
+        for (final StyledDOMElement element : subject) {
+            apply(element);
+        }
+    }
+
     @Override
     public String toString() {
         return selector + " { " + propertyName.getKey() + " : " + styleValue + " }";

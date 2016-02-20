@@ -2,6 +2,7 @@ package org.silnith.browser.organic;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Collection;
 
 import org.silnith.browser.organic.parser.css3.grammar.Parser;
 import org.silnith.browser.organic.parser.css3.lexical.Tokenizer;
@@ -77,6 +78,15 @@ public class RawCSSRule implements CSSRule {
         }
     }
     
+    @Override
+    public void apply(Collection<StyledDOMElement> elements) {
+        for (final StyledDOMElement element : elements) {
+            if (shouldApply(element)) {
+                apply(element);
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return elementName + " { " + propertyName.getKey() + " : " + styleValue + " }";
