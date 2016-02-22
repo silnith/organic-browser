@@ -102,7 +102,6 @@ import org.silnith.browser.organic.parser.css3.lexical.token.TypedNumericValueTo
 import org.silnith.browser.organic.parser.css3.lexical.token.URLToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.UnicodeRangeToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.WhitespaceToken;
-import org.silnith.browser.organic.parser.util.UnicodeCodePoints;
 
 
 /**
@@ -243,11 +242,11 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * Push the {@link #getCurrentInputCodePoint() current input code point}
+     * Pushes the {@link #getCurrentInputCodePoint() current input code point}
      * back onto the front of the input stream,
-     * so that the next time you are instructed to consume the
-     * {@link #getNextInputCodePoint() next input code point}, it will instead
-     * reconsume the {@link #getCurrentInputCodePoint() current input code point}.
+     * so that the next time the {@link #getNextInputCodePoint() next input code point}
+     * is consumed, it will instead reconsume the
+     * {@link #getCurrentInputCodePoint() current input code point}.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point">reconsume the current input code point</a>
@@ -417,7 +416,7 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume a token from a stream of code points. It will return a single token of any type.
+     * Consumes a token from a stream of code points. This will return a single token of any type.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-token">4.3.1. Consume a token</a>
      */
@@ -660,8 +659,8 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume a numeric token from a stream of code points.
-     * It returns either a {@link NumberToken}, {@link PercentageToken}, or {@link DimensionToken}.
+     * Consumes a numeric token from a stream of code points.
+     * This returns either a {@link NumberToken}, {@link PercentageToken}, or {@link DimensionToken}.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-numeric-token">4.3.2. Consume a numeric token</a>
      */
@@ -681,8 +680,8 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume an ident-like token from a stream of code points.
-     * It returns an {@link IdentToken}, {@link FunctionToken}, {@link URLToken}, or {@link BadURLToken}.
+     * Consumes an ident-like token from a stream of code points.
+     * This returns an {@link IdentToken}, {@link FunctionToken}, {@link URLToken}, or {@link BadURLToken}.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-an-ident-like-token">4.3.3. Consume an ident-like token</a>
      */
@@ -704,7 +703,8 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume a string token from a stream of code points. It returns either a {@link StringToken} or {@link BadStringToken}.
+     * Consumes a string token from a stream of code points. This returns either
+     * a {@link StringToken} or {@link BadStringToken}.
      * <p>
      * This algorithm must be called with an ending code point, which denotes the code point that ends the string.
      * 
@@ -749,8 +749,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     *  This section describes how to consume a url token from a stream of code points.
-     *  It returns either a {@link URLToken} or a {@link BadURLToken}.
+     * Consumes a url token from a stream of code points.
+     * This returns either a {@link URLToken} or a {@link BadURLToken}.
+     * <p>
+     * This assumes that the initial "url(" has already been consumed.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-url-token">4.3.5. Consume a url token</a>
      */
@@ -849,7 +851,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume a unicode-range token. It returns a {@link UnicodeRangeToken}.
+     * Consumes a unicode-range token. This returns a {@link UnicodeRangeToken}.
+     * <p>
+     * This assumes that the initial "u+" has been consumed, and the next code
+     * point has been verified to be a {@link #isHexDigit(int) hex digit} or a {@link #QUESTION_MARK "?"}.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-unicode-range-token">4.3.6. Consume a unicode-range token</a>
      */
@@ -907,10 +912,12 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume an escaped code point.
-     * It assumes that the U+005C REVERSE SOLIDUS (\) has already been consumed
-     * and that the next input code point has already been verified to not be a
-     * newline. It will return a code point.
+     * Consumes an escaped code point.
+     * This will return a code point.
+     * <p>
+     * This assumes that the {@link #REVERSE_SOLIDUS U+005C REVERSE SOLIDUS (\)}
+     * has already been consumed and that the {@link #getNextInputCodePoint() next input code point}
+     * has already been verified to not be a {@link #isNewline(int) newline}.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-an-escaped-code-point">4.3.7. Consume an escaped code point</a>
      */
@@ -950,11 +957,11 @@ public class Tokenizer implements TokenStream {
     }
 
     /**
-     * This section describes how to check if two code points are a valid
-     * escape. The algorithm described here can be called explicitly with two
-     * code points, or can be called with the input stream itself. In the latter
-     * case, the two code points in question are the current input code point
-     * and the next input code point, in that order.
+     * Checks if two code points are a valid escape. This checks the input stream
+     * itself. The two code points checked are the {@link #getCurrentInputCodePoint() current input code point}
+     * and the {@link #getNextInputCodePoint() next input code point}, in that order.
+     * <p>
+     * This will not consume any additional code point.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-valid-escape">4.3.8. Check if two code points are a valid escape</a>
      */
@@ -963,11 +970,7 @@ public class Tokenizer implements TokenStream {
     }
 
     /**
-     * This section describes how to check if two code points are a valid
-     * escape. The algorithm described here can be called explicitly with two
-     * code points, or can be called with the input stream itself. In the latter
-     * case, the two code points in question are the current input code point
-     * and the next input code point, in that order.
+     * Checks if two code points are a valid escape.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-valid-escape">4.3.8. Check if two code points are a valid escape</a>
      */
@@ -982,11 +985,11 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to check if three code points would start an
-     * identifier. The algorithm described here can be called explicitly with
-     * three code points, or can be called with the input stream itself. In the
-     * latter case, the three code points in question are the current input code
-     * point and the next two input code points, in that order.
+     * Checks if three code points would start an identifier. This checks the input stream itself.
+     * The three code points in question are the {@link #getCurrentInputCodePoint() current input code point}
+     * and the {@link #getNextInputCodePoint() next two input code points}, in that order.
+     * <p>
+     * This will not consume any additional code points.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#would-start-an-identifier">4.3.9. Check if three code points would start an identifier</a>
      */
@@ -995,9 +998,7 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to check if three code points would start an identifier.
-     * The algorithm described here can be called explicitly with three code points,
-     * or can be called with the input stream itself. In the latter case, the three code points in question are the current input code point and the next two input code points, in that order.
+     * Checks if three code points would start an identifier.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#would-start-an-identifier">4.3.9. Check if three code points would start an identifier</a>
      */
@@ -1030,9 +1031,12 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to check if three code points would start a number.
-     * The algorithm described here can be called explicitly with three code points,
-     * or can be called with the input stream itself. In the latter case, the three code points in question are the current input code point and the next two input code points, in that order.
+     * Checks if three code points would start a number.
+     * This checks the input stream itself. The three code points in question are the
+     * {@link #getCurrentInputCodePoint() current input code point} and the
+     * {@link #getNextInputCodePoint() next two input code points}, in that order.
+     * <p>
+     * This will not consume any additional code points.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-number">4.3.10. Check if three code points would start a number</a>
      */
@@ -1041,9 +1045,7 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to check if three code points would start a number.
-     * The algorithm described here can be called explicitly with three code points,
-     * or can be called with the input stream itself. In the latter case, the three code points in question are the current input code point and the next two input code points, in that order.
+     * Checks if three code points would start a number.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-number">4.3.10. Check if three code points would start a number</a>
      */
@@ -1077,8 +1079,15 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume a name from a stream of code points.
-     * It returns a string containing the largest name that can be formed from adjacent code points in the stream, starting from the first.
+     * Consumes a name from the stream of code points.
+     * This returns a string containing the largest name that can be formed from
+     * adjacent code points in the stream, starting from the first.
+     * <p>
+     * This does not do the verification of the first few code points that are
+     * necessary to ensure the returned code points would constitute an
+     * {@link IdentToken}. If that is the intended use, ensure that the stream
+     * {@link #wouldStartIdentifier() starts with an identifier} before calling
+     * this.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-name">4.3.11. Consume a name</a>
      */
@@ -1102,8 +1111,13 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to consume a number from a stream of code points.
+     * Consumes a number from the stream of code points.
      * It returns a 3-tuple of a string representation, a numeric value, and a type flag which is either "integer" or "number".
+     * <p>
+     * This does not do the verification of the first few code points that are
+     * necessary to ensure a number can be obtained from the stream. Ensure that
+     * the stream {@link #wouldStartNumber() starts with a number} before
+     * calling this.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-number">4.3.12. Consume a number</a>
      */
@@ -1166,7 +1180,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * This section describes how to convert a string to a number. It returns a number.
+     * Converts a string to a number. This returns a number.
+     * <p>
+     * This does not do any verification to ensure that the string contains only
+     * a number. Ensure that the string contains only a valid CSS number before calling this.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#convert-a-string-to-a-number">4.3.13. Convert a string to a number</a>
      */
@@ -1221,10 +1238,10 @@ public class Tokenizer implements TokenStream {
     }
 
     /**
-     * This section describes how to consume the remnants of a bad url from a
-     * stream of code points, "cleaning up" after the tokenizer realizes that
+     * Consumes the remnants of a bad url from the stream of code points,
+     * "cleaning up" after the tokenizer realizes that
      * it’s in the middle of a {@link BadURLToken} rather than a {@link URLToken}.
-     * It returns nothing; its sole use is to consume enough of the input stream
+     * This returns nothing; its sole use is to consume enough of the input stream
      * to reach a recovery point where normal tokenizing can resume.
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-the-remnants-of-a-bad-url">4.3.14. Consume the remnants of a bad url</a>
@@ -1269,6 +1286,7 @@ public class Tokenizer implements TokenStream {
         }
         final Tokenizer tokenizer = new Tokenizer(reader);
         tokenizer.setAllowParseErrors(false);
+        tokenizer.prime();
         
         LexicalToken token;
         do {
