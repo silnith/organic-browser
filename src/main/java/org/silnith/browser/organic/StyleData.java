@@ -3,15 +3,14 @@ package org.silnith.browser.organic;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.browser.organic.parser.css3.grammar.Parser;
-import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.Tokenizer;
-import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.PropertyName;
@@ -63,16 +62,16 @@ public class StyleData {
     
     private final StyleData parentStyleData;
     
-    private final Map<PropertyName, Boolean> propertyInherited;
+    private final Set<PropertyName> propertyInherited;
     
-    private final Map<PropertyName, Boolean> propertySpecified;
+    private final Set<PropertyName> propertySpecified;
     
     private final Map<PropertyName, List<Token>> specifiedValues;
     
     /**
      * A map that records which properties have been computed and which have not.
      */
-    private final Map<PropertyName, Boolean> propertyComputed;
+    private final Set<PropertyName> propertyComputed;
     
     private final Map<PropertyName, Object> computedValue;
     
@@ -80,16 +79,11 @@ public class StyleData {
         super();
         this.parentStyleData = parentStyleData;
         
-        this.propertyInherited = new EnumMap<>(PropertyName.class);
-        this.propertySpecified = new EnumMap<>(PropertyName.class);
+        this.propertyInherited = EnumSet.noneOf(PropertyName.class);
+        this.propertySpecified = EnumSet.noneOf(PropertyName.class);
         this.specifiedValues = new EnumMap<>(PropertyName.class);
-        this.propertyComputed = new EnumMap<>(PropertyName.class);
+        this.propertyComputed = EnumSet.noneOf(PropertyName.class);
         this.computedValue = new EnumMap<>(PropertyName.class);
-        
-        for (final PropertyName propertyName : PropertyName.values()) {
-            this.propertySpecified.put(propertyName, false);
-            this.propertyComputed.put(propertyName, false);
-        }
     }
     
     /**
@@ -112,7 +106,7 @@ public class StyleData {
         if ( !isPropertySpecified(propertyName)) {
             throw new IllegalStateException();
         }
-        return propertyInherited.get(propertyName);
+        return propertyInherited.contains(propertyName);
     }
     
     /**
@@ -123,7 +117,7 @@ public class StyleData {
      * @return
      */
     public boolean isPropertySpecified(final PropertyName propertyName) {
-        return propertySpecified.get(propertyName);
+        return propertySpecified.contains(propertyName);
     }
     
     /**
@@ -144,8 +138,8 @@ public class StyleData {
     }
     
     public void setInherit(final PropertyName propertyName) {
-        propertySpecified.put(propertyName, true);
-        propertyInherited.put(propertyName, true);
+        propertySpecified.add(propertyName);
+        propertyInherited.add(propertyName);
     }
 
     /**
@@ -157,8 +151,7 @@ public class StyleData {
      * @param propertyValue
      */
     public void setParsedSpecifiedValue(final PropertyName propertyName, final List<Token> propertyValue) {
-        propertySpecified.put(propertyName, true);
-        propertyInherited.put(propertyName, false);
+        propertySpecified.add(propertyName);
         specifiedValues.put(propertyName, propertyValue);
     }
     
@@ -183,7 +176,7 @@ public class StyleData {
      * @return
      */
     public boolean isPropertyComputed(final PropertyName propertyName) {
-        return propertyComputed.get(propertyName);
+        return propertyComputed.contains(propertyName);
     }
     
     /**
@@ -194,7 +187,7 @@ public class StyleData {
      * @param value
      */
     public void setComputedValue(final PropertyName propertyName, final Object value) {
-        propertyComputed.put(propertyName, true);
+        propertyComputed.add(propertyName);
         computedValue.put(propertyName, value);
     }
     

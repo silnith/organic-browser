@@ -7,7 +7,7 @@ import org.silnith.css.model.data.PropertyName;
 
 public class MarginBottomAccessor extends MarginAccessor {
     
-    public MarginBottomAccessor(final LengthParser lengthParser,
+    public MarginBottomAccessor(final LengthParser<?> lengthParser,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor) {
         super(PropertyName.MARGIN_BOTTOM, lengthParser, fontSizeAccessor);
     }

@@ -59,7 +59,26 @@ public abstract class MarginAccessor extends PropertyAccessor<Length<?>> {
     
     @Override
     protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
-        return lengthParser.parse(specifiedValue);
+        // TODO: parse "auto"
+        final Length<?> length = lengthParser.parse(specifiedValue);
+        
+        final AbsoluteLength absoluteLength;
+        switch (length.getType()) {
+        case ABSOLUTE: {
+            absoluteLength = (AbsoluteLength) length;
+        } break;
+        case RELATIVE: {
+            final RelativeLength relativeLength = (RelativeLength) length;
+            absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
+        } break;
+        case PERCENTAGE: {
+            final PercentageLength percentageLength = (PercentageLength) length;
+            return percentageLength;
+        } // break;
+        default: throw new IllegalArgumentException();
+        }
+        
+        return absoluteLength;
     }
 
     @Override
