@@ -101,6 +101,7 @@ import org.silnith.browser.organic.parser.css3.lexical.token.TypedNumericValueTo
 import org.silnith.browser.organic.parser.css3.lexical.token.URLToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.UnicodeRangeToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.WhitespaceToken;
+import org.silnith.browser.organic.parser.util.UnicodeCodePoints;
 
 
 /**
@@ -123,27 +124,12 @@ public class Tokenizer implements TokenStream {
 
     private final Reader reader;
     
-    /**
-     * The last code point to have been consumed.
-     * 
-     * @see <a href="https://www.w3.org/TR/css-syntax-3/#current-input-code-point">current input code point</a>
-     */
     private int currentInputCodePoint;
     
-    /**
-     * The first code point in the input stream that has not yet been consumed.
-     * 
-     * @see <a href="https://www.w3.org/TR/css-syntax-3/#next-input-code-point">next input code point</a>
-     */
     private int nextInputCodePoint;
     
     private final int[] lookahead;
     
-    /**
-     * Push the current input code point back onto the front of the input stream, so that the next time you are instructed to consume the next input code point, it will instead reconsume the current input code point.
-     * 
-     * @see <a href="https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point">reconsume the current input code point</a>
-     */
     private boolean reconsumeCurrentInputCodePoint;
     
     private boolean allowParseErrors;
@@ -163,6 +149,9 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * Sets whether the tokenizer will attempt to recover from basic parse errors.
+     * 
+     * @param allowParseErrors whether to allow recovery from parse errors
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizing-and-parsing">3. Tokenizing and Parsing CSS</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#parse-error">parse errors</a>
      */
@@ -171,6 +160,9 @@ public class Tokenizer implements TokenStream {
     }
 
     /**
+     * Returns whether the tokenizer will attempt to recover from basic parse errors.
+     * 
+     * @return whether the tokenizer will attempt recovery from parse errors
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizing-and-parsing">3. Tokenizing and Parsing CSS</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#parse-error">parse errors</a>
      */
@@ -193,35 +185,70 @@ public class Tokenizer implements TokenStream {
         lookahead[0] = reader.read();
         lookahead[1] = reader.read();
         lookahead[2] = 0;
+        /*
+         * We only use three elements of look-ahead, kept in nextInputCodePoint,
+         * lookahead[0], and lookahead[1].  The additional element is for
+         * reconsume(), so we have a place to keep the last lookahead when
+         * everything gets pushed back one slot.
+         */
         
 //        Character.isHighSurrogate((char) currentInputCodePoint);
 //        Character.isSurrogate((char) currentInputCodePoint);
 //        Character.isSurrogatePair((char) currentInputCodePoint, (char) nextInputCodePoint);
 //        Character.toCodePoint((char) currentInputCodePoint, (char) nextInputCodePoint);
     }
+
+    /**
+     * The last code point to have been consumed.
+     * 
+     * @return the last code point consumed
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#current-input-code-point">current input code point</a>
+     */
+    public int getCurrentInputCodePoint() {
+        return currentInputCodePoint;
+    }
+
+    /**
+     * The first code point in the input stream that has not yet been consumed.
+     * 
+     * @return the next code point to be consumed
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#next-input-code-point">next input code point</a>
+     */
+    public int getNextInputCodePoint() {
+        return nextInputCodePoint;
+    }
     
     /**
+     * Consumes the next code point.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#next-input-code-point">next input code point</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#current-input-code-point">current input code point</a>
      */
-    protected int consume() throws IOException {
+    protected void consume() throws IOException {
         currentInputCodePoint = nextInputCodePoint;
         nextInputCodePoint = lookahead[0];
         lookahead[0] = lookahead[1];
         if (reconsumeCurrentInputCodePoint) {
             reconsumeCurrentInputCodePoint = false;
             lookahead[1] = lookahead[2];
+            lookahead[2] = 0;
         } else {
             lookahead[1] = reader.read();
         }
-        return currentInputCodePoint;
+        return;
     }
     
     /**
-     * Push the current input code point back onto the front of the input stream,
-     * so that the next time you are instructed to consume the next input code
-     * point, it will instead reconsume the current input code point.
+     * Push the {@link #getCurrentInputCodePoint() current input code point}
+     * back onto the front of the input stream,
+     * so that the next time you are instructed to consume the
+     * {@link #getNextInputCodePoint() next input code point}, it will instead
+     * reconsume the {@link #getCurrentInputCodePoint() current input code point}.
      * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point">reconsume the current input code point</a>
      */
     protected void reconsume() throws IOException {
@@ -237,6 +264,11 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A conceptual code point representing the end of the input stream.
+     * Whenever the input stream is empty, the
+     * {@link #getNextInputCodePoint() next input code point} is always an EOF code point.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#eof-code-point">EOF code point</a>
      */
     protected boolean isEOFCodePoint(final int ch) {
@@ -244,6 +276,9 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A code point between {@link #DIGIT_ZERO U+0030 DIGIT ZERO (0)} and {@link #DIGIT_NINE U+0039 DIGIT NINE (9)}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#digit">digit</a>
      */
     protected boolean isDigit(final int ch) {
@@ -251,6 +286,14 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A {@link #isDigit(int) digit}, or a code point between
+     * {@link #LATIN_CAPITAL_LETTER_A U+0041 LATIN CAPITAL LETTER A (A)}
+     * and {@link #LATIN_CAPITAL_LETTER_F U+0046 LATIN CAPITAL LETTER F (F)},
+     * or a code point between
+     * {@link #LATIN_SMALL_LETTER_A U+0061 LATIN SMALL LETTER A (a)} and
+     * {@link #LATIN_SMALL_LETTER_F U+0066 LATIN SMALL LETTER F (f)}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#hex-digit">hex digit</a>
      */
     protected boolean isHexDigit(final int ch) {
@@ -259,6 +302,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A code point between {@link #LATIN_CAPITAL_LETTER_A U+0041 LATIN CAPITAL LETTER A (A)}
+     * and {@link #LATIN_CAPITAL_LETTER_Z U+005A LATIN CAPITAL LETTER Z (Z)}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#uppercase-letter">uppercase letter</a>
      */
     protected boolean isUppercaseLetter(final int ch) {
@@ -266,6 +313,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A code point between {@link #LATIN_SMALL_LETTER_A U+0061 LATIN SMALL LETTER A (a)}
+     * and {@link #LATIN_SMALL_LETTER_Z U+007A LATIN SMALL LETTER Z (z)}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#lowercase-letter">lowercase letter</a>
      */
     protected boolean isLowercaseLetter(final int ch) {
@@ -273,6 +324,9 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * An {@link #isUppercaseLetter(int) uppercase letter} or a {@link #isLowercaseLetter(int) lowercase letter}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#letter">letter</a>
      */
     protected boolean isLetter(final int ch) {
@@ -280,6 +334,9 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A code point with a value equal to or greater than {@link #CONTROL U+0080 &lt;control&gt;}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#non-ascii-code-point">non-ASCII code point</a>
      */
     protected boolean isNonASCIICodePoint(final int ch) {
@@ -287,6 +344,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A {@link #isLetter(int) letter}, a {@link #isNonASCIICodePoint(int) non-ASCII code point},
+     * or {@link #LOW_LINE U+005F LOW LINE (_)}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#name-start-code-point">name-start code point</a>
      */
     protected boolean isNameStartCodePoint(final int ch) {
@@ -294,6 +355,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A {@link #isNameStartCodePoint(int) name-start code point}, a {@link #isDigit(int) digit},
+     * or {@link #HYPHEN_MINUS U+002D HYPHEN-MINUS (-)}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#name-code-point">name code point</a>
      */
     protected boolean isNameCodePoint(final int ch) {
@@ -301,6 +366,12 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A code point between {@link #NULL U+0000 NULL} and {@link #BACKSPACE U+0008 BACKSPACE},
+     * or {@link #LINE_TABULATION U+000B LINE TABULATION}, or a code point between
+     * {@link #SHIFT_OUT U+000E SHIFT OUT} and {@link #INFORMATION_SEPARATOR_ONE U+001F INFORMATION SEPARATOR ONE},
+     * or {@link #DELETE U+007F DELETE}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#non-printable-code-point">non-printable code point</a>
      */
     protected boolean isNonPrintableCodePoint(final int ch) {
@@ -309,6 +380,14 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * {@link #LINE_FEED U+000A LINE FEED}.
+     * <p>
+     * Note that {@link org.silnith.browser.organic.parser.util.UnicodeCodePoints#CARRIAGE_RETURN U+000D CARRIAGE RETURN}
+     * and {@link org.silnith.browser.organic.parser.util.UnicodeCodePoints#FORM_FEED U+000C FORM FEED}
+     * are not included in this definition, as they are converted to {@link #LINE_FEED U+000A LINE FEED} during preprocessing.
+     * 
+     * @see InputStreamPreprocessor
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#newline">newline</a>
      */
     protected boolean isNewline(final int ch) {
@@ -316,6 +395,10 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A {@link #isNewline(int) newline}, {@link #CHARACTER_TABULATION U+0009 CHARACTER TABULATION},
+     * or {@link #SPACE U+0020 SPACE}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#whitespace">whitespace</a>
      */
     protected boolean isWhitespace(final int ch) {
@@ -323,6 +406,9 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
+     * A code point between U+D800 and U+DFFF inclusive.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-definitions">4.2. Definitions</a>
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#surrogate-code-point">surrogate code point</a>
      */
     protected boolean isSurrogateCodePoint(final int ch) {
@@ -984,6 +1070,7 @@ public class Tokenizer implements TokenStream {
                 buf.append(consumeEscapedCodePoint());
             } else {
                 /*
+                 * TODO:
                  * This reconsume is not in the standard, but it appears necessary.
                  */
                 reconsume();

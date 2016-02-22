@@ -344,9 +344,9 @@ public class TokenizerTest {
 
         // This is solely so the assertion passes.
         tokenizer.consume();
-        final boolean validEscape = tokenizer.wouldStartIdentifier();
+        final boolean startIdentifier = tokenizer.wouldStartIdentifier();
         
-        assertTrue(validEscape);
+        assertTrue(startIdentifier);
     }
     
     @Test
@@ -354,9 +354,43 @@ public class TokenizerTest {
         tokenizer = new Tokenizer(new StringReader("abc"));
         tokenizer.prime();
 
-        final boolean validEscape = tokenizer.wouldStartIdentifier('a', 'b', 'c');
+        final boolean startIdentifier = tokenizer.wouldStartIdentifier('a', 'b', 'c');
         
-        assertTrue(validEscape);
+        assertTrue(startIdentifier);
+    }
+    
+    @Test
+    public void testWouldStartNumber() throws IOException {
+        tokenizer = new Tokenizer(new StringReader("123"));
+        tokenizer.prime();
+
+        // This is solely so the assertion passes.
+        tokenizer.consume();
+        final boolean startNumber = tokenizer.wouldStartIdentifier();
+        
+        assertTrue(startNumber);
+    }
+    
+    @Test
+    public void testWouldStartNumber_IntIntInt() throws IOException {
+        tokenizer = new Tokenizer(new StringReader("123"));
+        tokenizer.prime();
+
+        // This is solely so the assertion passes.
+        tokenizer.consume();
+        final boolean startNumber = tokenizer.wouldStartIdentifier('1', '2', '3');
+        
+        assertTrue(startNumber);
+    }
+    
+    @Test
+    public void testConsumeName() throws IOException {
+        tokenizer = new Tokenizer(new StringReader("foo"));
+        tokenizer.prime();
+        
+        final String name = tokenizer.consumeName();
+        
+        assertEquals("foo", name);
     }
     
     @Test
