@@ -7,7 +7,7 @@ import org.silnith.css.model.data.PropertyName;
 
 public class PaddingBottomAccessor extends PaddingAccessor {
     
-    public PaddingBottomAccessor(final LengthParser lengthParser,
+    public PaddingBottomAccessor(final LengthParser<?> lengthParser,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor) {
         super(PropertyName.PADDING_BOTTOM, lengthParser, fontSizeAccessor);
     }

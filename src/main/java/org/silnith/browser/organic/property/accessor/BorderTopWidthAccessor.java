@@ -13,7 +13,7 @@ import org.silnith.css.model.data.PropertyName;
  */
 public class BorderTopWidthAccessor extends BorderWidthAccessor {
     
-    public BorderTopWidthAccessor(final LengthParser lengthParser,
+    public BorderTopWidthAccessor(final LengthParser<?> lengthParser,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor) {
         super(PropertyName.BORDER_BOTTOM_WIDTH, lengthParser, fontSizeAccessor);
     }

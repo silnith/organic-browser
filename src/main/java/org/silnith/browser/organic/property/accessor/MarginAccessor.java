@@ -7,6 +7,10 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.Length;
 import org.silnith.css.model.data.LengthParser;
@@ -34,32 +38,26 @@ public abstract class MarginAccessor extends PropertyAccessor<Length<?>> {
     }
     
     @Override
-    protected Length<?> parse(final StyleData styleData, final String specifiedValue) {
-        // TODO: parse "auto"
-        final Length<?> length = lengthParser.parse(specifiedValue);
-        
-        final AbsoluteLength absoluteLength;
-        switch (length.getType()) {
-        case ABSOLUTE: {
-            absoluteLength = (AbsoluteLength) length;
+    protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+        final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
+        cssParser.prime();
+        final Token token = cssParser.parseComponentValue();
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case IDENT_TOKEN: {
+                final IdentToken identToken = (IdentToken) lexicalToken;
+                if (identToken.getStringValue().equals("auto")) {
+                    throw new UnsupportedOperationException("Margin value 'auto' has not been implemented yet.");
+                }
+            } break;
+            default: {} break;
+            }
         } break;
-        case RELATIVE: {
-            final RelativeLength relativeLength = (RelativeLength) length;
-            absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
-        } break;
-        case PERCENTAGE: {
-            final PercentageLength percentageLength = (PercentageLength) length;
-            return percentageLength;
-        } // break;
-        default: throw new IllegalArgumentException();
+        default: {} break;
         }
         
-        return absoluteLength;
-    }
-    
-    @Override
-    protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
-        // TODO: parse "auto"
         final Length<?> length = lengthParser.parse(specifiedValue);
         
         final AbsoluteLength absoluteLength;
@@ -75,7 +73,7 @@ public abstract class MarginAccessor extends PropertyAccessor<Length<?>> {
             final PercentageLength percentageLength = (PercentageLength) length;
             return percentageLength;
         } // break;
-        default: throw new IllegalArgumentException();
+        default: throw new IllegalArgumentException("Unknown length type: " + length.getType());
         }
         
         return absoluteLength;

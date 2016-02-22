@@ -7,7 +7,7 @@ import org.silnith.css.model.data.PropertyName;
 
 public class PaddingRightAccessor extends PaddingAccessor {
     
-    public PaddingRightAccessor(final LengthParser lengthParser,
+    public PaddingRightAccessor(final LengthParser<?> lengthParser,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor) {
         super(PropertyName.PADDING_RIGHT, lengthParser, fontSizeAccessor);
     }

@@ -1,11 +1,14 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.css.model.data.ListStylePosition;
@@ -24,16 +27,10 @@ public class ListStylePositionAccessor extends PropertyAccessor<ListStylePositio
     }
     
     @Override
-    protected ListStylePosition parse(final StyleData styleData, final String specifiedValue) {
-        return ListStylePosition.getFromValue(specifiedValue);
-    }
-    
-    @Override
-    protected ListStylePosition parse(StyleData styleData, List<Token> specifiedValue) {
-        if (specifiedValue.size() != 1) {
-            throw new IllegalArgumentException();
-        }
-        final Token token = specifiedValue.get(0);
+    protected ListStylePosition parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+        final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
+        cssParser.prime();
+        final Token token = cssParser.parseComponentValue();
         switch (token.getType()) {
         case LEXICAL_TOKEN: {
             final LexicalToken lexicalToken = (LexicalToken) token;
@@ -50,7 +47,7 @@ public class ListStylePositionAccessor extends PropertyAccessor<ListStylePositio
         } break;
         default: {} break;
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Unknown list style position: " + specifiedValue);
     }
 
     @Override

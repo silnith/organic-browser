@@ -27,11 +27,6 @@ public class ListStyleTypeAccessor extends PropertyAccessor<ListStyleType> {
     }
     
     @Override
-    protected ListStyleType parse(final StyleData styleData, final String specifiedValue) {
-        return ListStyleType.getFromValue(specifiedValue);
-    }
-    
-    @Override
     protected ListStyleType parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
         cssParser.prime();

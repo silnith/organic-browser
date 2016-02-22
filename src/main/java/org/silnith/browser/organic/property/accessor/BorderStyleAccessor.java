@@ -1,11 +1,14 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.css.model.data.BorderStyle;
@@ -35,21 +38,10 @@ public abstract class BorderStyleAccessor extends PropertyAccessor<BorderStyle> 
     }
     
     @Override
-    protected BorderStyle parse(final StyleData styleData, final String specifiedValue) {
-        final BorderStyle borderStyle = BorderStyle.getFromValue(specifiedValue);
-        if (borderStyle == null) {
-            throw new IllegalArgumentException(
-                    "Border style illegal value: " + getPropertyName() + ": " + specifiedValue);
-        }
-        return borderStyle;
-    }
-    
-    @Override
-    protected BorderStyle parse(StyleData styleData, List<Token> specifiedValue) {
-        if (specifiedValue.size() != 1) {
-            throw new IllegalArgumentException();
-        }
-        final Token token = specifiedValue.get(0);
+    protected BorderStyle parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+        final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
+        cssParser.prime();
+        final Token token = cssParser.parseComponentValue();
         switch (token.getType()) {
         case LEXICAL_TOKEN: {
             final LexicalToken lexicalToken = (LexicalToken) token;
@@ -68,7 +60,8 @@ public abstract class BorderStyleAccessor extends PropertyAccessor<BorderStyle> 
         } break;
         default: {} break;
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException(
+                "Border style illegal value: " + getPropertyName() + ": " + specifiedValue);
     }
 
     @Override

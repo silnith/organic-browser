@@ -1,11 +1,16 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.css.model.data.Position;
 import org.silnith.css.model.data.PropertyName;
 
@@ -29,18 +34,28 @@ public class PositionAccessor extends PropertyAccessor<Position> {
     }
     
     @Override
-    protected Position parse(final StyleData styleData, final String specifiedValue) {
-        final Position position = Position.getFromValue(specifiedValue);
-        if (position == null) {
-            throw new IllegalArgumentException(
-                    "Illegal value for property: " + getPropertyName() + ": " + specifiedValue);
+    protected Position parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+        final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
+        cssParser.prime();
+        final Token token = cssParser.parseComponentValue();
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case IDENT_TOKEN: {
+                final IdentToken identToken = (IdentToken) lexicalToken;
+                final Position position = Position.getFromValue(identToken.getStringValue());
+                if (position != null) {
+                    return position;
+                }
+            } break;
+            default: {} break;
+            }
+        } break;
+        default: {} break;
         }
-        return position;
-    }
-    
-    @Override
-    protected Position parse(StyleData styleData, List<Token> specifiedValue) {
-        throw new UnsupportedOperationException();
+        throw new IllegalArgumentException(
+                "Illegal value for property: " + getPropertyName() + ": " + specifiedValue);
     }
 
     @Override

@@ -34,15 +34,6 @@ public class DisplayAccessor extends PropertyAccessor<Display> {
     }
     
     @Override
-    protected Display parse(final StyleData styleData, final String specifiedValue) {
-        final Display display = Display.getFromValue(specifiedValue);
-        if (display == null) {
-            throw new IllegalArgumentException("Display value invalid: " + specifiedValue);
-        }
-        return display;
-    }
-    
-    @Override
     protected Display parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
         cssParser.prime();
@@ -54,17 +45,16 @@ public class DisplayAccessor extends PropertyAccessor<Display> {
             case IDENT_TOKEN: {
                 final IdentToken identToken = (IdentToken) lexicalToken;
                 final Display display = Display.getFromValue(identToken.getStringValue());
-                if (display == null) {
-                    throw new IllegalArgumentException("Display value invalid: " + specifiedValue);
+                if (display != null) {
+                    return display;
                 }
-                return display;
-            } // break;
+            } break;
             default: {} break;
             }
         } break;
         default: {} break;
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Display value invalid: " + specifiedValue);
     }
 
     @Override

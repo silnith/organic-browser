@@ -46,37 +46,6 @@ public abstract class BorderWidthAccessor extends PropertyAccessor<AbsoluteLengt
     }
     
     @Override
-    protected AbsoluteLength parse(final StyleData styleData, final String specifiedValue) {
-        // TODO: check for keywords "thin", "medium", "thick"
-        final Length<?> length = lengthParser.parse(specifiedValue);
-        
-        final AbsoluteLength absoluteLength;
-        switch (length.getType()) {
-        case ABSOLUTE: {
-            absoluteLength = (AbsoluteLength) length;
-        }
-            break;
-        case RELATIVE: {
-            final RelativeLength relativeLength = (RelativeLength) length;
-            absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
-        }
-            break;
-        case PERCENTAGE: {
-            throw new IllegalArgumentException(
-                    "Border width values cannot be percentages: " + getPropertyName() + ": " + length);
-        } // break;
-        default:
-            throw new IllegalArgumentException();
-        }
-        
-        if (absoluteLength.getLength().floatValue() < 0) {
-            throw new IllegalArgumentException(
-                    "Border width values cannot be negative: " + getPropertyName() + ": " + absoluteLength);
-        }
-        return absoluteLength;
-    }
-    
-    @Override
     protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         // TODO: check for keywords "thin", "medium", "thick"
         final Length<?> length = lengthParser.parse(specifiedValue);

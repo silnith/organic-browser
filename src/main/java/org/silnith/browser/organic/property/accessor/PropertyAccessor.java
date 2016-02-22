@@ -95,18 +95,6 @@ public abstract class PropertyAccessor<T> {
      * cannot be {@code null}.
      * 
      * @param styleData
-     * @param specifiedValue the value to parse
-     * @return the specified value parsed into a typed value
-     * @throws IllegalArgumentException if the specified value is invalid for
-     *         the property
-     */
-    protected abstract T parse(StyleData styleData, String specifiedValue);
-
-    /**
-     * Parses a specified value into the type {@code <T>}. The returned value
-     * cannot be {@code null}.
-     * 
-     * @param styleData
      * @param specifiedValue the parsed list of tokens
      * @return the specified value parsed into a typed value
      * @throws IllegalArgumentException if the specified value is invalid for

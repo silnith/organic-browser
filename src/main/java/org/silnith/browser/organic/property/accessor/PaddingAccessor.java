@@ -34,40 +34,6 @@ public abstract class PaddingAccessor extends PropertyAccessor<Length<?>> {
     }
     
     @Override
-    protected Length<?> parse(final StyleData styleData, final String specifiedValue) {
-        final Length<?> length = lengthParser.parse(specifiedValue);
-        
-        final AbsoluteLength absoluteLength;
-        switch (length.getType()) {
-        case ABSOLUTE: {
-            absoluteLength = (AbsoluteLength) length;
-        }
-            break;
-        case RELATIVE: {
-            final RelativeLength relativeLength = (RelativeLength) length;
-            absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
-        }
-            break;
-        case PERCENTAGE: {
-            final PercentageLength percentageLength = (PercentageLength) length;
-            if (percentageLength.getLength().floatValue() < 0) {
-                throw new IllegalArgumentException(
-                        "Padding values cannot be negative: " + getPropertyName() + ": " + percentageLength);
-            }
-            return percentageLength;
-        } // break;
-        default:
-            throw new IllegalArgumentException();
-        }
-        
-        if (absoluteLength.getLength().floatValue() < 0) {
-            throw new IllegalArgumentException(
-                    "Padding values cannot be negative: " + getPropertyName() + ": " + absoluteLength);
-        }
-        return absoluteLength;
-    }
-    
-    @Override
     protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         final Length<?> length = lengthParser.parse(specifiedValue);
         
@@ -75,13 +41,11 @@ public abstract class PaddingAccessor extends PropertyAccessor<Length<?>> {
         switch (length.getType()) {
         case ABSOLUTE: {
             absoluteLength = (AbsoluteLength) length;
-        }
-            break;
+        } break;
         case RELATIVE: {
             final RelativeLength relativeLength = (RelativeLength) length;
             absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
-        }
-            break;
+        } break;
         case PERCENTAGE: {
             final PercentageLength percentageLength = (PercentageLength) length;
             if (percentageLength.getLength().floatValue() < 0) {
@@ -90,8 +54,7 @@ public abstract class PaddingAccessor extends PropertyAccessor<Length<?>> {
             }
             return percentageLength;
         } // break;
-        default:
-            throw new IllegalArgumentException();
+        default: throw new IllegalArgumentException("Unknown length type: " + length.getType());
         }
         
         if (absoluteLength.getLength().floatValue() < 0) {

@@ -38,11 +38,6 @@ public abstract class PropertyThatDependsOnTheColorPropertyAccessor extends Prop
     }
     
     @Override
-    protected Color parse(final StyleData styleData, final String specifiedValue) {
-        return colorParser.parse(specifiedValue);
-    }
-    
-    @Override
     protected Color parse(final StyleData styleData, final List<Token> specifiedValue) throws IOException {
         return colorParser.parse(specifiedValue);
     }
