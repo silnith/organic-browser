@@ -238,7 +238,15 @@ public class Tokenizer implements TokenStream {
         } else {
             lookahead[1] = reader.read();
         }
-        return;
+        
+//        System.out.print("consumed: '");
+//        System.out.print((char) currentInputCodePoint);
+//        System.out.println("'");
+//        System.out.print("lookahead: '");
+//        System.out.print((char) nextInputCodePoint);
+//        System.out.print((char) lookahead[0]);
+//        System.out.print((char) lookahead[1]);
+//        System.out.println("'");
     }
     
     /**
@@ -261,6 +269,14 @@ public class Tokenizer implements TokenStream {
         currentInputCodePoint = 0;
         
         reconsumeCurrentInputCodePoint = true;
+        
+//        System.out.println("reconsume");
+//        System.out.print("lookahead: '");
+//        System.out.print((char) nextInputCodePoint);
+//        System.out.print((char) lookahead[0]);
+//        System.out.print((char) lookahead[1]);
+//        System.out.print((char) lookahead[2]);
+//        System.out.println("'");
     }
     
     /**
@@ -638,7 +654,7 @@ public class Tokenizer implements TokenStream {
         } // break;
         default: {
             if (isWhitespace(currentInputCodePoint)) {
-                while (isWhitespace(currentInputCodePoint)) {
+                while (isWhitespace(nextInputCodePoint)) {
                     consume();
                 }
                 return new WhitespaceToken();
