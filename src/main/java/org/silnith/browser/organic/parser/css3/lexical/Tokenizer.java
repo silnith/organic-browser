@@ -134,6 +134,8 @@ public class Tokenizer implements TokenStream {
     
     private boolean allowParseErrors;
     
+    private boolean primed;
+    
     /**
      * Constructs a new tokenizer using the given character reader.  Any reader
      * will work, it does not need to be wrapped in an {@link InputStreamPreprocessor}.
@@ -146,6 +148,7 @@ public class Tokenizer implements TokenStream {
         this.lookahead = new int[3];
         this.reconsumeCurrentInputCodePoint = false;
         this.allowParseErrors = false;
+        this.primed = false;
     }
     
     /**
@@ -175,11 +178,17 @@ public class Tokenizer implements TokenStream {
      */
     @Override
     public LexicalToken getNextToken() throws IOException {
+        if (!primed) {
+            prime();
+        }
         return consumeToken();
     }
     
     @PostConstruct
-    public void prime() throws IOException {
+    protected void prime() throws IOException {
+        if (primed) {
+            throw new IllegalStateException();
+        }
         currentInputCodePoint = 0;
         nextInputCodePoint = reader.read();
         lookahead[0] = reader.read();
@@ -191,6 +200,7 @@ public class Tokenizer implements TokenStream {
          * reconsume(), so we have a place to keep the last lookahead when
          * everything gets pushed back one slot.
          */
+        primed = true;
         
 //        Character.isHighSurrogate((char) currentInputCodePoint);
 //        Character.isSurrogate((char) currentInputCodePoint);
@@ -1302,7 +1312,6 @@ public class Tokenizer implements TokenStream {
         }
         final Tokenizer tokenizer = new Tokenizer(reader);
         tokenizer.setAllowParseErrors(false);
-        tokenizer.prime();
         
         LexicalToken token;
         do {

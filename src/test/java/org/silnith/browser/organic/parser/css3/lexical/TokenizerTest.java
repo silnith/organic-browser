@@ -13,7 +13,6 @@ import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.NumberToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.NumericValueToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.PercentageToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.StringToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.TypedNumericValueToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.URLToken;
@@ -198,7 +197,7 @@ public class TokenizerTest {
     
     @Test
     public void testConsumeToken_HashToken() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("#abcdef"));
+        tokenizer = new Tokenizer(new StringReader("#abcdef "));
         tokenizer.prime();
         
         final LexicalToken token = tokenizer.consumeToken();
@@ -206,11 +205,12 @@ public class TokenizerTest {
         assertEquals(LexicalToken.LexicalType.HASH_TOKEN, token.getLexicalType());
         final HashToken hashToken = (HashToken) token;
         assertEquals("abcdef", hashToken.getStringValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumericToken_IntegerPercentage() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("125%"));
+        tokenizer = new Tokenizer(new StringReader("125% "));
         tokenizer.prime();
         
         final NumericValueToken numericToken = tokenizer.consumeNumericToken();
@@ -218,11 +218,12 @@ public class TokenizerTest {
         assertEquals(LexicalToken.LexicalType.PERCENTAGE_TOKEN, numericToken.getLexicalType());
         assertEquals("125", numericToken.getStringValue());
         assertEquals(125d, numericToken.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeIdentLikeToken() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("foo"));
+        tokenizer = new Tokenizer(new StringReader("foo "));
         tokenizer.prime();
         
         final LexicalToken identLikeToken = tokenizer.consumeIdentLikeToken();
@@ -230,11 +231,12 @@ public class TokenizerTest {
         assertEquals(LexicalToken.LexicalType.IDENT_TOKEN, identLikeToken.getLexicalType());
         final IdentToken identToken = (IdentToken) identLikeToken;
         assertEquals("foo", identToken.getStringValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeIdentLikeToken_Function() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("foo(12)"));
+        tokenizer = new Tokenizer(new StringReader("foo(12) "));
         tokenizer.prime();
         
         final LexicalToken identLikeToken = tokenizer.consumeIdentLikeToken();
@@ -242,11 +244,12 @@ public class TokenizerTest {
         assertEquals(LexicalToken.LexicalType.FUNCTION_TOKEN, identLikeToken.getLexicalType());
         final FunctionToken functionToken = (FunctionToken) identLikeToken;
         assertEquals("foo", functionToken.getStringValue());
+        assertEquals('1', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeIdentLikeToken_URL() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("url(http://example.com/)"));
+        tokenizer = new Tokenizer(new StringReader("url(http://example.com/) "));
         tokenizer.prime();
         
         final LexicalToken identLikeToken = tokenizer.consumeIdentLikeToken();
@@ -254,11 +257,12 @@ public class TokenizerTest {
         assertEquals(LexicalToken.LexicalType.URL_TOKEN, identLikeToken.getLexicalType());
         final URLToken urlToken = (URLToken) identLikeToken;
         assertEquals("http://example.com/", urlToken.getStringValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeStringToken() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("\"foo bar baz\""));
+        tokenizer = new Tokenizer(new StringReader("\"foo bar baz\" "));
         tokenizer.prime();
         
         // This is solely so the assertion passes.
@@ -268,11 +272,12 @@ public class TokenizerTest {
         assertEquals(LexicalToken.LexicalType.STRING_TOKEN, token.getLexicalType());
         final StringToken stringToken = (StringToken) token;
         assertEquals("foo bar baz", stringToken.getStringValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeURLToken() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("url(http://example.com/)"));
+        tokenizer = new Tokenizer(new StringReader("url(http://example.com/) "));
         tokenizer.prime();
 
         // This is solely so the assertion passes.
@@ -285,11 +290,12 @@ public class TokenizerTest {
         assertEquals(LexicalToken.LexicalType.URL_TOKEN, token.getLexicalType());
         final URLToken urlToken = (URLToken) token;
         assertEquals("http://example.com/", urlToken.getStringValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeUnicodeRangeToken() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("u+0040"));
+        tokenizer = new Tokenizer(new StringReader("u+0040 "));
         tokenizer.prime();
 
         // This is solely so the assertion passes.
@@ -301,11 +307,12 @@ public class TokenizerTest {
         final UnicodeRangeToken unicodeRangeToken = (UnicodeRangeToken) token;
         assertEquals(0x40, unicodeRangeToken.getStart());
         assertEquals(0x40, unicodeRangeToken.getEnd());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeEscapedCodePoint() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("\\2018"));
+        tokenizer = new Tokenizer(new StringReader("\\2018 foo"));
         tokenizer.prime();
 
         // This is solely so the assertion passes.
@@ -313,6 +320,7 @@ public class TokenizerTest {
         final char[] escapedCodePoint = tokenizer.consumeEscapedCodePoint();
         
         assertArrayEquals(new char[] {'\u2018'}, escapedCodePoint);
+        assertEquals('f', tokenizer.getNextInputCodePoint());
     }
     
     @Test
@@ -366,7 +374,7 @@ public class TokenizerTest {
 
         // This is solely so the assertion passes.
         tokenizer.consume();
-        final boolean startNumber = tokenizer.wouldStartIdentifier();
+        final boolean startNumber = tokenizer.wouldStartNumber();
         
         assertTrue(startNumber);
     }
@@ -378,24 +386,25 @@ public class TokenizerTest {
 
         // This is solely so the assertion passes.
         tokenizer.consume();
-        final boolean startNumber = tokenizer.wouldStartIdentifier('1', '2', '3');
+        final boolean startNumber = tokenizer.wouldStartNumber('1', '2', '3');
         
         assertTrue(startNumber);
     }
     
     @Test
     public void testConsumeName() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("foo"));
+        tokenizer = new Tokenizer(new StringReader("foo "));
         tokenizer.prime();
         
         final String name = tokenizer.consumeName();
         
         assertEquals("foo", name);
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_Zero() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("0"));
+        tokenizer = new Tokenizer(new StringReader("0 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -404,11 +413,12 @@ public class TokenizerTest {
         assertEquals("0", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.INTEGER, number.getNumericType());
         assertEquals(Double.valueOf(0), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PositiveZero() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("+0"));
+        tokenizer = new Tokenizer(new StringReader("+0 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -417,12 +427,13 @@ public class TokenizerTest {
         assertEquals("+0", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.INTEGER, number.getNumericType());
         assertEquals(Double.valueOf(0), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     @Ignore
     public void testConsumeNumber_NegativeZero() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("-0"));
+        tokenizer = new Tokenizer(new StringReader("-0 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -431,11 +442,12 @@ public class TokenizerTest {
         assertEquals("-0", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.INTEGER, number.getNumericType());
         assertEquals(Double.valueOf(0), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PointZero() throws IOException {
-        tokenizer = new Tokenizer(new StringReader(".0"));
+        tokenizer = new Tokenizer(new StringReader(".0 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -444,11 +456,12 @@ public class TokenizerTest {
         assertEquals(".0", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(0), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_Fraction() throws IOException {
-        tokenizer = new Tokenizer(new StringReader(".125"));
+        tokenizer = new Tokenizer(new StringReader(".125 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -457,11 +470,12 @@ public class TokenizerTest {
         assertEquals(".125", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(0.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PositiveFraction() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("+.125"));
+        tokenizer = new Tokenizer(new StringReader("+.125 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -470,11 +484,12 @@ public class TokenizerTest {
         assertEquals("+.125", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(0.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NegativeFraction() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("-.125"));
+        tokenizer = new Tokenizer(new StringReader("-.125 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -483,11 +498,12 @@ public class TokenizerTest {
         assertEquals("-.125", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(-0.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_Integer() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("278"));
+        tokenizer = new Tokenizer(new StringReader("278 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -496,11 +512,12 @@ public class TokenizerTest {
         assertEquals("278", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.INTEGER, number.getNumericType());
         assertEquals(Double.valueOf(278), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PositiveInteger() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("+278"));
+        tokenizer = new Tokenizer(new StringReader("+278 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -509,11 +526,12 @@ public class TokenizerTest {
         assertEquals("+278", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.INTEGER, number.getNumericType());
         assertEquals(Double.valueOf(278), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NegativeInteger() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("-278"));
+        tokenizer = new Tokenizer(new StringReader("-278 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -522,11 +540,12 @@ public class TokenizerTest {
         assertEquals("-278", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.INTEGER, number.getNumericType());
         assertEquals(Double.valueOf(-278), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_Number() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("365.125"));
+        tokenizer = new Tokenizer(new StringReader("365.125 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -535,11 +554,12 @@ public class TokenizerTest {
         assertEquals("365.125", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(365.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PositiveNumber() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("+365.125"));
+        tokenizer = new Tokenizer(new StringReader("+365.125 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -548,11 +568,12 @@ public class TokenizerTest {
         assertEquals("+365.125", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(365.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NegativeNumber() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("-365.125"));
+        tokenizer = new Tokenizer(new StringReader("-365.125 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -561,11 +582,12 @@ public class TokenizerTest {
         assertEquals("-365.125", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(-365.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NumberExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("365.125e2"));
+        tokenizer = new Tokenizer(new StringReader("365.125e2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -574,11 +596,12 @@ public class TokenizerTest {
         assertEquals("365.125e2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(36512.5), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PositiveNumberExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("+365.125e2"));
+        tokenizer = new Tokenizer(new StringReader("+365.125e2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -587,11 +610,12 @@ public class TokenizerTest {
         assertEquals("+365.125e2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(36512.5), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NegativeNumberExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("-365.125e2"));
+        tokenizer = new Tokenizer(new StringReader("-365.125e2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -600,11 +624,12 @@ public class TokenizerTest {
         assertEquals("-365.125e2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(-36512.5), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NumberPositiveExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("365.125e+2"));
+        tokenizer = new Tokenizer(new StringReader("365.125e+2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -613,11 +638,12 @@ public class TokenizerTest {
         assertEquals("365.125e+2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(36512.5), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PositiveNumberPositiveExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("+365.125e+2"));
+        tokenizer = new Tokenizer(new StringReader("+365.125e+2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -626,11 +652,12 @@ public class TokenizerTest {
         assertEquals("+365.125e+2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(36512.5), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NegativeNumberPositiveExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("-365.125e+2"));
+        tokenizer = new Tokenizer(new StringReader("-365.125e+2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -639,11 +666,12 @@ public class TokenizerTest {
         assertEquals("-365.125e+2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(-36512.5), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NumberNegativeExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("312.5e-2"));
+        tokenizer = new Tokenizer(new StringReader("312.5e-2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -652,11 +680,12 @@ public class TokenizerTest {
         assertEquals("312.5e-2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(3.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_PositiveNumberNegativeExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("+312.5e-2"));
+        tokenizer = new Tokenizer(new StringReader("+312.5e-2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -665,11 +694,12 @@ public class TokenizerTest {
         assertEquals("+312.5e-2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(+3.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
     @Test
     public void testConsumeNumber_NegativeNumberNegativeExponent() throws IOException {
-        tokenizer = new Tokenizer(new StringReader("-312.5e-2"));
+        tokenizer = new Tokenizer(new StringReader("-312.5e-2 "));
         tokenizer.prime();
         
         final NumberToken number = tokenizer.consumeNumber();
@@ -678,6 +708,7 @@ public class TokenizerTest {
         assertEquals("-312.5e-2", number.getStringValue());
         assertEquals(TypedNumericValueToken.NumericType.NUMBER, number.getNumericType());
         assertEquals(Double.valueOf(-3.125), number.getNumericValue());
+        assertEquals(' ', tokenizer.getNextInputCodePoint());
     }
     
 }

@@ -232,7 +232,7 @@ public class Parser {
             return value;
         } else {
             // syntax error
-            throw new ParseErrorException();
+            throw new ParseErrorException("Unexpected token: " + nextInputToken);
         }
     }
     

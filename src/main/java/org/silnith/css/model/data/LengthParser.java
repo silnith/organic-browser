@@ -60,17 +60,7 @@ public class LengthParser<T extends Unit> implements PropertyValueParser<Length<
     public Length<T> parse(List<Token> specifiedValue) throws IOException {
         final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
         cssParser.prime();
-        final List<Token> componentValue = cssParser.parseListOfComponentValues();
-        switch (componentValue.size()) {
-        case 1: {
-            final Token token = componentValue.get(0);
-            return parseOneToken(token);
-        } // break;
-        case 2: {
-            return parseTwoTokens(componentValue.get(0), componentValue.get(1));
-        } // break;
-        }
-        throw new IllegalArgumentException("Unrecognized length value: " + componentValue);
+        return parseOneToken(cssParser.parseComponentValue());
     }
 
     private Length<T> parseOneToken(final Token token) {
@@ -99,30 +89,18 @@ public class LengthParser<T extends Unit> implements PropertyValueParser<Length<
                     }
                 }
             } break;
+            case NUMBER_TOKEN: {
+                final NumberToken numberToken = (NumberToken) lexicalToken;
+                if (numberToken.getNumericValue().floatValue() == 0f) {
+                    return (Length<T>) new AbsoluteLength(0f, AbsoluteUnit.PT);
+                }
+            } break;
             default: {} break;
             }
         } break;
         default: {} break;
         }
         throw new IllegalArgumentException("Unrecognized length value: " + token);
-    }
-    
-    private Length<T> parseTwoTokens(final Token firstToken, final Token secondToken) {
-        final float number = parseNumber(firstToken);
-        final Unit unit = parseUnit(secondToken);
-        if (unit instanceof AbsoluteUnit) {
-            final AbsoluteUnit absoluteUnit = (AbsoluteUnit) unit;
-            return (Length<T>) new AbsoluteLength(number, absoluteUnit);
-        }
-        if (unit instanceof RelativeUnit) {
-            final RelativeUnit relativeUnit = (RelativeUnit) unit;
-            return (Length<T>) new RelativeLength(number, relativeUnit);
-        }
-        if (unit instanceof PercentageUnit) {
-            final PercentageUnit percentageUnit = (PercentageUnit) unit;
-            return (Length<T>) new PercentageLength(number);
-        }
-        throw new IllegalArgumentException("Unrecognized length value: " + firstToken + secondToken);
     }
     
     private float parseNumber(final Token token) {

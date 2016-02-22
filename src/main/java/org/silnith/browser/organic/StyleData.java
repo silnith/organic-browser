@@ -1,10 +1,15 @@
 package org.silnith.browser.organic;
 
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.PropertyName;
@@ -146,7 +151,25 @@ public class StyleData {
     public void setParsedSpecifiedValue(final PropertyName propertyName, final List<Token> propertyValue) {
         propertySpecified.put(propertyName, true);
         parsedSpecifiedValues.put(propertyName, propertyValue);
-        propertyInherited.put(propertyName, "inherit".equals(propertyValue));
+        propertyInherited.put(propertyName, false);
+        try {
+            final Parser cssParser = new Parser(new TokenListStream(propertyValue));
+            cssParser.prime();
+            final Token token = cssParser.parseComponentValue();
+            if (token.getType() == Token.Type.LEXICAL_TOKEN) {
+                final LexicalToken lexicalToken = (LexicalToken) token;
+                if (lexicalToken.getLexicalType() == LexicalToken.LexicalType.IDENT_TOKEN) {
+                    final IdentToken identToken = (IdentToken) lexicalToken;
+                    if ("inherit".equals(identToken.getStringValue())) {
+                        propertyInherited.put(propertyName, true);
+                    }
+                }
+            }
+        } catch (final IOException e) {
+            // do nothing
+        } catch (final RuntimeException e) {
+            // do nothing
+        }
     }
     
     /**

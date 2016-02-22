@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.css.model.data.AbsoluteLength;
@@ -81,32 +83,32 @@ public class FontSizeAccessor extends PropertyAccessor<AbsoluteLength> {
 
     @Override
     protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+        final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
+        cssParser.prime();
+        final Token token = cssParser.parseComponentValue();
         /*
          * Font sizes less than 9 pixels per em unit should be restricted.
          */
-        if (specifiedValue.size() == 1) {
-            final Token token = specifiedValue.get(0);
-            switch (token.getType()) {
-            case LEXICAL_TOKEN: {
-                final LexicalToken lexicalToken = (LexicalToken) token;
-                switch (lexicalToken.getLexicalType()) {
-                case IDENT_TOKEN: {
-                    final IdentToken identToken = (IdentToken) lexicalToken;
-                    final String ident = identToken.getStringValue();
-                    final FontAbsoluteSize fontAbsoluteSize = getFontAbsoluteSize(ident);
-                    if (fontAbsoluteSize != null) {
-                        return fontSizeTable.get(fontAbsoluteSize);
-                    }
-                    final FontRelativeSize fontRelativeSize = getFontRelativeSize(ident);
-                    if (fontRelativeSize != null) {
-                        throw new UnsupportedOperationException("Font sizes 'smaller' and 'larger' not yet implemented.");
-                    }
-                } break;
-                default: {} break;
+        switch (token.getType()) {
+        case LEXICAL_TOKEN: {
+            final LexicalToken lexicalToken = (LexicalToken) token;
+            switch (lexicalToken.getLexicalType()) {
+            case IDENT_TOKEN: {
+                final IdentToken identToken = (IdentToken) lexicalToken;
+                final String ident = identToken.getStringValue();
+                final FontAbsoluteSize fontAbsoluteSize = getFontAbsoluteSize(ident);
+                if (fontAbsoluteSize != null) {
+                    return fontSizeTable.get(fontAbsoluteSize);
+                }
+                final FontRelativeSize fontRelativeSize = getFontRelativeSize(ident);
+                if (fontRelativeSize != null) {
+                    throw new UnsupportedOperationException("Font sizes 'smaller' and 'larger' not yet implemented.");
                 }
             } break;
             default: {} break;
             }
+        } break;
+        default: {} break;
         }
         final Length<?> length = lengthParser.parse(specifiedValue);
         final AbsoluteLength absoluteLength = resolveLength(styleData, length);

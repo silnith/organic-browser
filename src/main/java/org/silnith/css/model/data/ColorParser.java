@@ -1,6 +1,7 @@
 package org.silnith.css.model.data;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
 import org.silnith.browser.organic.parser.css3.grammar.token.ComponentValue;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.FunctionToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.HashToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
@@ -132,8 +135,10 @@ public class ColorParser {
         throw new IllegalArgumentException("Invalid color: " + specifiedValue);
     }
     
-    public Color parse(final List<Token> specifiedValue) {
-        final Token token = specifiedValue.get(0);
+    public Color parse(final List<Token> specifiedValue) throws IOException {
+        final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
+        cssParser.prime();
+        final Token token = cssParser.parseComponentValue();
         switch (token.getType()) {
         case LEXICAL_TOKEN: {
             final LexicalToken lexicalToken = (LexicalToken) token;

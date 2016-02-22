@@ -1,6 +1,7 @@
 package org.silnith.browser.organic.property.accessor;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +43,7 @@ public abstract class PropertyThatDependsOnTheColorPropertyAccessor extends Prop
     }
     
     @Override
-    protected Color parse(final StyleData styleData, final List<Token> specifiedValue) {
+    protected Color parse(final StyleData styleData, final List<Token> specifiedValue) throws IOException {
         return colorParser.parse(specifiedValue);
     }
 
