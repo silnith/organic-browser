@@ -1,5 +1,6 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +68,7 @@ public abstract class PaddingAccessor extends PropertyAccessor<Length<?>> {
     }
     
     @Override
-    protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) {
+    protected Length<?> parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         final Length<?> length = lengthParser.parse(specifiedValue);
         
         final AbsoluteLength absoluteLength;

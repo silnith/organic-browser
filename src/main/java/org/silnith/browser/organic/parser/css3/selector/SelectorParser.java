@@ -148,9 +148,9 @@ public class SelectorParser {
             } break;
             case DELIM_TOKEN: {
                 final DelimToken delimToken = (DelimToken) lexicalToken;
-                if (delimToken.getChars().equals(".")) {
+                if (delimToken.getChar().equals(".")) {
                     firstSelector = new UniversalSelector();
-                } else if (delimToken.getChars().equals("*")) {
+                } else if (delimToken.getChar().equals("*")) {
                     firstSelector = new UniversalSelector();
                     nextToken = tokenStream.getNextToken();
                 } else {
@@ -228,7 +228,7 @@ public class SelectorParser {
             } // break;
             case DELIM_TOKEN: {
                 final DelimToken delimToken = (DelimToken) lexicalToken;
-                if (delimToken.getChars().equals(".")) {
+                if (delimToken.getChar().equals(".")) {
                     nextToken = tokenStream.getNextToken();
                     return new ClassSelector(consumeElementName());
                 }
@@ -266,7 +266,7 @@ public class SelectorParser {
             } // break;
             case DELIM_TOKEN: {
                 final DelimToken delimToken = (DelimToken) lexicalToken;
-                if (delimToken.getChars().equals(".")) {
+                if (delimToken.getChar().equals(".")) {
                     return true;
                 }
             } break;

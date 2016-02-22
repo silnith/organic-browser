@@ -49,20 +49,20 @@ import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.RIGHT_PA
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.RIGHT_SQUARE_BRACKET;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SEMICOLON;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SHIFT_OUT;
-import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SOLIDUS;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SPACE;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.TILDE;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.VERTICAL_LINE;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PushbackReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import javax.annotation.PostConstruct;
 
 import org.silnith.browser.organic.network.Download;
 import org.silnith.browser.organic.parser.ParseErrorException;
@@ -87,6 +87,7 @@ import org.silnith.browser.organic.parser.css3.lexical.token.LeftParenthesisToke
 import org.silnith.browser.organic.parser.css3.lexical.token.LeftSquareBracketToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.NumberToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.NumericValueToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.PercentageToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.PrefixMatchToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.RightCurlyBracketToken;
@@ -103,112 +104,154 @@ import org.silnith.browser.organic.parser.css3.lexical.token.WhitespaceToken;
 
 
 /**
- * @see <a href="http://dev.w3.org/csswg/css-syntax/#tokenization">4
- *      Tokenization</a>
- * @see <a href="https://www.w3.org/TR/css-syntax-3/">https://www.w3.org/TR/css-syntax-3/</a>
+ * Produces a stream of tokens from an input source of code points.
+ * 
+ * @see <a href="https://www.w3.org/TR/css-syntax-3/">CSS Syntax Module Level 3</a>
+ * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenization">4. Tokenization</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class Tokenizer implements TokenStream {
     
-    private static final int MAX_READAHEAD = 3;
-    
     private static final int EOF = -1;
     
-    private final PushbackReader pushbackReader;
+    /**
+     * The greatest code point defined by Unicode: U+10FFFF.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#maximum-allowed-code-point">maximum allowed code point</a>
+     */
+    private static final int MAXIMUM_ALLOWED_CODE_POINT = 0x10FFFF;
+
+    private final Reader reader;
+    
+    /**
+     * The last code point to have been consumed.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#current-input-code-point">current input code point</a>
+     */
+    private int currentInputCodePoint;
+    
+    /**
+     * The first code point in the input stream that has not yet been consumed.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#next-input-code-point">next input code point</a>
+     */
+    private int nextInputCodePoint;
+    
+    private final int[] lookahead;
+    
+    /**
+     * Push the current input code point back onto the front of the input stream, so that the next time you are instructed to consume the next input code point, it will instead reconsume the current input code point.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point">reconsume the current input code point</a>
+     */
+    private boolean reconsumeCurrentInputCodePoint;
     
     private boolean allowParseErrors;
     
+    /**
+     * Constructs a new tokenizer using the given character reader.  Any reader
+     * will work, it does not need to be wrapped in an {@link InputStreamPreprocessor}.
+     * 
+     * @param reader the character stream to tokenize
+     */
     public Tokenizer(final Reader reader) {
         super();
-        this.pushbackReader = new PushbackReader(new InputStreamPreprocessor(reader), MAX_READAHEAD);
+        this.reader = new InputStreamPreprocessor(reader);
+        this.lookahead = new int[3];
+        this.reconsumeCurrentInputCodePoint = false;
         this.allowParseErrors = false;
     }
     
     /**
-     * @param allowParseErrors
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#parse-error">parse
-     *      error</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizing-and-parsing">3. Tokenizing and Parsing CSS</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#parse-error">parse errors</a>
      */
     public void setAllowParseErrors(final boolean allowParseErrors) {
         this.allowParseErrors = allowParseErrors;
     }
-    
+
     /**
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#parse-error">parse
-     *      error</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizing-and-parsing">3. Tokenizing and Parsing CSS</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#parse-error">parse errors</a>
      */
     public boolean isAllowParseErrors() {
         return allowParseErrors;
     }
     
     /**
-     * @return
-     * @throws IOException
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#tokenizer-algorithms">4
-     *      .3 Tokenizer Algorithms</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#tokenizer-algorithms">4.3. Tokenizer Algorithms</a>
      */
     @Override
     public LexicalToken getNextToken() throws IOException {
         return consumeToken();
     }
     
-    protected int consume() throws IOException {
-        return pushbackReader.read();
+    @PostConstruct
+    public void prime() throws IOException {
+        currentInputCodePoint = 0;
+        nextInputCodePoint = reader.read();
+        lookahead[0] = reader.read();
+        lookahead[1] = reader.read();
+        lookahead[2] = 0;
+        
+//        Character.isHighSurrogate((char) currentInputCodePoint);
+//        Character.isSurrogate((char) currentInputCodePoint);
+//        Character.isSurrogatePair((char) currentInputCodePoint, (char) nextInputCodePoint);
+//        Character.toCodePoint((char) currentInputCodePoint, (char) nextInputCodePoint);
     }
     
     /**
-     * @param character
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#reconsume-the-current-input-code-point">
-     *      reconsume the current input code point</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#next-input-code-point">next input code point</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#current-input-code-point">current input code point</a>
      */
-    protected void reconsume(final int character) throws IOException {
-        pushbackReader.unread(character);
-    }
-    
-    protected int peek() throws IOException {
-        final int character = pushbackReader.read();
-        if (character == EOF) {
-            return EOF;
+    protected int consume() throws IOException {
+        currentInputCodePoint = nextInputCodePoint;
+        nextInputCodePoint = lookahead[0];
+        lookahead[0] = lookahead[1];
+        if (reconsumeCurrentInputCodePoint) {
+            reconsumeCurrentInputCodePoint = false;
+            lookahead[1] = lookahead[2];
+        } else {
+            lookahead[1] = reader.read();
         }
-        pushbackReader.unread(character);
-        return character;
-    }
-    
-    protected int peek(final char[] buf) throws IOException {
-        final int numRead = pushbackReader.read(buf);
-        if (numRead == EOF) {
-            return EOF;
-        }
-        pushbackReader.unread(buf, 0, numRead);
-        return numRead;
+        return currentInputCodePoint;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href=""></a>
+     * Push the current input code point back onto the front of the input stream,
+     * so that the next time you are instructed to consume the next input code
+     * point, it will instead reconsume the current input code point.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#reconsume-the-current-input-code-point">reconsume the current input code point</a>
+     */
+    protected void reconsume() throws IOException {
+        assert !reconsumeCurrentInputCodePoint;
+        
+        lookahead[2] = lookahead[1];
+        lookahead[1] = lookahead[0];
+        lookahead[0] = nextInputCodePoint;
+        nextInputCodePoint = currentInputCodePoint;
+        currentInputCodePoint = 0;
+        
+        reconsumeCurrentInputCodePoint = true;
+    }
+    
+    /**
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#eof-code-point">EOF code point</a>
      */
     protected boolean isEOFCodePoint(final int ch) {
         return ch == EOF;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#digit">digit</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#digit">digit</a>
      */
     protected boolean isDigit(final int ch) {
         return ch >= DIGIT_ZERO && ch <= DIGIT_NINE;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#hex-digit">hex
-     *      digit</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#hex-digit">hex digit</a>
      */
     protected boolean isHexDigit(final int ch) {
         return isDigit(ch) || ch >= LATIN_CAPITAL_LETTER_A && ch <= LATIN_CAPITAL_LETTER_F
@@ -216,70 +259,49 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#uppercase-letter">
-     *      uppercase letter</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#uppercase-letter">uppercase letter</a>
      */
     protected boolean isUppercaseLetter(final int ch) {
         return ch >= LATIN_CAPITAL_LETTER_A && ch <= LATIN_CAPITAL_LETTER_Z;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#lowercase-letter">
-     *      lowercase letter</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#lowercase-letter">lowercase letter</a>
      */
     protected boolean isLowercaseLetter(final int ch) {
         return ch >= LATIN_SMALL_LETTER_A && ch <= LATIN_SMALL_LETTER_Z;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#letter">letter</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#letter">letter</a>
      */
     protected boolean isLetter(final int ch) {
         return isUppercaseLetter(ch) || isLowercaseLetter(ch);
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#non-ascii-code-point">
-     *      non-ASCII code point</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#non-ascii-code-point">non-ASCII code point</a>
      */
     protected boolean isNonASCIICodePoint(final int ch) {
         return ch >= CONTROL;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#name-start-code-point">
-     *      name-start code point</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#name-start-code-point">name-start code point</a>
      */
     protected boolean isNameStartCodePoint(final int ch) {
         return isLetter(ch) || isNonASCIICodePoint(ch) || ch == LOW_LINE;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#name-code-point">name
-     *      code point</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#name-code-point">name code point</a>
      */
     protected boolean isNameCodePoint(final int ch) {
         return isNameStartCodePoint(ch) || isDigit(ch) || ch == HYPHEN_MINUS;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#non-printable-code-point">non-
-     *      printable code point</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#non-printable-code-point">non-printable code point</a>
      */
     protected boolean isNonPrintableCodePoint(final int ch) {
         return ch >= NULL && ch <= BACKSPACE || ch == LINE_TABULATION
@@ -287,74 +309,65 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#newline">newline</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#newline">newline</a>
      */
     protected boolean isNewline(final int ch) {
         return ch == LINE_FEED;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#whitespace">whitespace
-     *      </a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#whitespace">whitespace</a>
      */
     protected boolean isWhitespace(final int ch) {
         return isNewline(ch) || ch == CHARACTER_TABULATION || ch == SPACE;
     }
     
     /**
-     * @param ch
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#surrogate-code-point">
-     *      surrogate code point</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#surrogate-code-point">surrogate code point</a>
      */
     protected boolean isSurrogateCodePoint(final int ch) {
         return ch >= '\uD800' && ch <= '\uDFFF';
     }
     
     /**
-     * @return
-     * @throws IOException
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#consume-a-token">4.3.1
-     *      Consume a token</a>
+     * This section describes how to consume a token from a stream of code points. It will return a single token of any type.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-token">4.3.1. Consume a token</a>
      */
     protected LexicalToken consumeToken() throws IOException {
-        consumeComments();
-        int ch = consume();
-        switch (ch) {
-        case LINE_FEED: // fall through
-        case CHARACTER_TABULATION: // fall through
-        case SPACE: {
-            consumeWhitespace();
-            return new WhitespaceToken();
-        } // break;
+        consume();
+        switch (currentInputCodePoint) {
+//        case LINE_FEED: // fall through
+//        case CHARACTER_TABULATION: // fall through
+//        case SPACE: {
+//            consumeWhitespace();
+//            return new WhitespaceToken();
+//        } // break;
         case QUOTATION_MARK: {
             return consumeStringToken(QUOTATION_MARK);
         } // break;
         case NUMBER_SIGN: {
-            final char[] buf = new char[3];
-            final int numPeeked = peek(buf);
-            if (numPeeked >= 1 && isNameCodePoint(buf[0])
-                    || numPeeked >= 2 && startsValidEscapeSequence(buf[0], buf[1])) {
+            if (isNameCodePoint(nextInputCodePoint) || isValidEscape(nextInputCodePoint, lookahead[0])) {
                 final HashToken hashToken = new HashToken();
-                if (numPeeked >= 3 && startsIdentifier(buf[0], buf[1], buf[2])) {
+                if (wouldStartIdentifier(nextInputCodePoint, lookahead[0], lookahead[1])) {
                     hashToken.setTypeFlag(HashToken.TypeFlag.ID);
                 }
-                hashToken.setStringValue(consumeName());
+                final String name = consumeName();
+                hashToken.setStringValue(name);
                 return hashToken;
             } else {
+                assert currentInputCodePoint == NUMBER_SIGN;
+                
                 return new DelimToken(NUMBER_SIGN);
             }
         } // break;
         case DOLLAR_SIGN: {
-            ch = peek();
-            if (ch == EQUALS_SIGN) {
+            if (nextInputCodePoint == EQUALS_SIGN) {
                 consume();
                 return new SuffixMatchToken();
             } else {
+                assert currentInputCodePoint == DOLLAR_SIGN;
+                
                 return new DelimToken(DOLLAR_SIGN);
             }
         } // break;
@@ -368,18 +381,22 @@ public class Tokenizer implements TokenStream {
             return new RightParenthesisToken();
         } // break;
         case ASTERISK: {
-            ch = peek();
-            if (ch == EQUALS_SIGN) {
+            if (nextInputCodePoint == EQUALS_SIGN) {
+                consume();
                 return new SubstringMatchToken();
             } else {
+                assert currentInputCodePoint == ASTERISK;
+                
                 return new DelimToken(ASTERISK);
             }
         } // break;
         case PLUS_SIGN: {
-            if (startsNumber(PLUS_SIGN)) {
-                reconsume(PLUS_SIGN);
+            if (wouldStartNumber()) {
+                reconsume();
                 return consumeNumericToken();
             } else {
+                assert currentInputCodePoint == PLUS_SIGN;
+                
                 return new DelimToken(PLUS_SIGN);
             }
         } // break;
@@ -387,27 +404,29 @@ public class Tokenizer implements TokenStream {
             return new CommaToken();
         } // break;
         case HYPHEN_MINUS: {
-            if (startsNumber(HYPHEN_MINUS)) {
-                reconsume(HYPHEN_MINUS);
+            if (wouldStartNumber()) {
+                reconsume();
                 return consumeNumericToken();
-            } else if (startsIdentifier(HYPHEN_MINUS)) {
-                reconsume(HYPHEN_MINUS);
+            } else if (wouldStartIdentifier()) {
+                reconsume();
                 return consumeIdentLikeToken();
+            } else if (nextInputCodePoint == HYPHEN_MINUS && lookahead[0] == GREATER_THAN_SIGN) {
+                consume();
+                consume();
+                return new CDCToken();
             } else {
-                final char[] buf = new char[2];
-                final int numRead = peek(buf);
-                if (numRead >= 2 && buf[0] == HYPHEN_MINUS && buf[1] == GREATER_THAN_SIGN) {
-                    return new CDCToken();
-                } else {
-                    return new DelimToken(HYPHEN_MINUS);
-                }
+                assert currentInputCodePoint == HYPHEN_MINUS;
+                
+                return new DelimToken(HYPHEN_MINUS);
             }
         } // break;
         case FULL_STOP: {
-            if (startsNumber(FULL_STOP)) {
-                reconsume(FULL_STOP);
+            if (wouldStartNumber()) {
+                reconsume();
                 return consumeNumericToken();
             } else {
+                assert currentInputCodePoint == FULL_STOP;
+                
                 return new DelimToken(FULL_STOP);
             }
         } // break;
@@ -418,23 +437,26 @@ public class Tokenizer implements TokenStream {
             return new SemicolonToken();
         } // break;
         case LESS_THAN_SIGN: {
-            final char[] buf = new char[3];
-            final int numRead = peek(buf);
-            if (numRead >= 3 && buf[0] == EXCLAMATION_MARK && buf[1] == HYPHEN_MINUS && buf[2] == HYPHEN_MINUS) {
+            if (nextInputCodePoint == EXCLAMATION_MARK && lookahead[0] == HYPHEN_MINUS && lookahead[1] == HYPHEN_MINUS) {
                 consume();
                 consume();
                 consume();
                 return new CDOToken();
             } else {
+                assert currentInputCodePoint == LESS_THAN_SIGN;
+                
                 return new DelimToken(LESS_THAN_SIGN);
             }
         } // break;
         case COMMERCIAL_AT: {
-            if (startsIdentifier(COMMERCIAL_AT)) {
+            if (wouldStartIdentifier(nextInputCodePoint, lookahead[0], lookahead[1])) {
+                final String name = consumeName();
                 final AtKeywordToken atKeywordToken = new AtKeywordToken();
-                atKeywordToken.setStringValue(consumeName());
+                atKeywordToken.setStringValue(name);
                 return atKeywordToken;
             } else {
+                assert currentInputCodePoint == COMMERCIAL_AT;
+                
                 return new DelimToken(COMMERCIAL_AT);
             }
         } // break;
@@ -442,8 +464,8 @@ public class Tokenizer implements TokenStream {
             return new LeftSquareBracketToken();
         } // break;
         case REVERSE_SOLIDUS: {
-            if (startsValidEscapeSequence(REVERSE_SOLIDUS)) {
-                reconsume(REVERSE_SOLIDUS);
+            if (isValidEscape()) {
+                reconsume();
                 return consumeIdentLikeToken();
             } else {
                 if (isAllowParseErrors()) {
@@ -457,9 +479,12 @@ public class Tokenizer implements TokenStream {
             return new RightSquareBracketToken();
         } // break;
         case CIRCUMFLEX_ACCENT: {
-            if (peek() == EQUALS_SIGN) {
+            if (nextInputCodePoint == EQUALS_SIGN) {
+                consume();
                 return new PrefixMatchToken();
             } else {
+                assert currentInputCodePoint == CIRCUMFLEX_ACCENT;
+                
                 return new DelimToken(CIRCUMFLEX_ACCENT);
             }
         } // break;
@@ -469,36 +494,36 @@ public class Tokenizer implements TokenStream {
         case RIGHT_CURLY_BRACKET: {
             return new RightCurlyBracketToken();
         } // break;
-        case LATIN_CAPITAL_LETTER_U:
+        case LATIN_CAPITAL_LETTER_U: // fall through
         case LATIN_SMALL_LETTER_U: {
-            final char[] buf = new char[2];
-            final int numRead = peek(buf);
-            if (numRead >= 2 && buf[0] == PLUS_SIGN && (isHexDigit(buf[1]) || buf[1] == QUESTION_MARK)) {
+            if (nextInputCodePoint == PLUS_SIGN && (isHexDigit(lookahead[0]) || lookahead[0] == QUESTION_MARK)) {
                 consume();
                 return consumeUnicodeRangeToken();
             } else {
-                reconsume(ch);
+                reconsume();
                 return consumeIdentLikeToken();
             }
         } // break;
         case VERTICAL_LINE: {
-            ch = peek();
-            if (ch == EQUALS_SIGN) {
+            if (nextInputCodePoint == EQUALS_SIGN) {
                 consume();
                 return new DashMatchToken();
-            } else if (ch == VERTICAL_LINE) {
+            } else if (nextInputCodePoint == VERTICAL_LINE) {
                 consume();
                 return new ColumnToken();
             } else {
+                assert currentInputCodePoint == VERTICAL_LINE;
+                
                 return new DelimToken(VERTICAL_LINE);
             }
         } // break;
         case TILDE: {
-            ch = peek();
-            if (ch == EQUALS_SIGN) {
+            if (nextInputCodePoint == EQUALS_SIGN) {
                 consume();
                 return new IncludeMatchToken();
             } else {
+                assert currentInputCodePoint == TILDE;
+                
                 return new DelimToken(TILDE);
             }
         } // break;
@@ -506,484 +531,59 @@ public class Tokenizer implements TokenStream {
             return new EOFToken();
         } // break;
         default: {
-            if (isDigit(ch)) {
-                reconsume(ch);
+            // Copied from above.  Keep or ditch?
+            if (isWhitespace(currentInputCodePoint)) {
+                while (isWhitespace(currentInputCodePoint)) {
+                    consume();
+                }
+                return new WhitespaceToken();
+            }
+            if (isDigit(currentInputCodePoint)) {
+                reconsume();
                 return consumeNumericToken();
-            } else if (isNameStartCodePoint(ch)) {
-                reconsume(ch);
+            } else if (isNameStartCodePoint(currentInputCodePoint)) {
+                reconsume();
                 return consumeIdentLikeToken();
             } else {
-                return new DelimToken((char) ch);
+                return new DelimToken((char) currentInputCodePoint);
             }
         } // break;
         }
     }
     
     /**
-     * @throws IOException
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#consume-comments">4.3.2
-     *      Consume comments</a>
+     * This section describes how to consume a numeric token from a stream of code points.
+     * It returns either a {@link NumberToken}, {@link PercentageToken}, or {@link DimensionToken}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-numeric-token">4.3.2. Consume a numeric token</a>
      */
-    protected void consumeComments() throws IOException {
-        final char[] nextTwo = new char[2];
-        int numRead = peek(nextTwo);
-        while (numRead == 2) {
-            if (nextTwo[0] == SOLIDUS && nextTwo[1] == ASTERISK) {
-                consume(); // the solidus
-                consume(); // the asterisk
-                do {
-                    int ch;
-                    do {
-                        ch = consume();
-                        if (ch == EOF) {
-                            return;
-                        }
-                    } while (ch != ASTERISK);
-                } while (peek() != SOLIDUS);
-                consume();
-            } else {
-                return;
-            }
-            numRead = peek(nextTwo);
-        }
-    }
-    
-    /**
-     * @param ch
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#consume-a-string-token">4.3.5
-     *      Consume a string token</a>
-     */
-    protected LexicalToken consumeStringToken(final int ch) throws IOException {
-        return consumeStringToken(ch, (char) ch);
-    }
-    
-    /**
-     * @param ch
-     * @param endingCodePoint
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#consume-a-string-token">4.3.5
-     *      Consume a string token</a>
-     */
-    protected LexicalToken consumeStringToken(int ch, final char endingCodePoint) throws IOException {
-        final StringToken token = new StringToken();
-        do {
-            ch = consume();
-            switch (ch) {
-            case EOF: {
-                return token;
-            } // break;
-            case LINE_FEED: {
-                if (isAllowParseErrors()) {
-                    reconsume(ch);
-                    return new BadStringToken();
-                } else {
-                    throw new ParseErrorException("Newline in string.");
-                }
-            } // break;
-            case REVERSE_SOLIDUS: {
-                final int nextInputCodePoint = peek();
-                switch (nextInputCodePoint) {
-                case EOF: {
-                    // do nothing
-                }
-                    break;
-                case LINE_FEED: {
-                    consume();
-                }
-                    break;
-                default: {
-                    if (startsValidEscapeSequence(ch, nextInputCodePoint)) {
-                        token.append(consumeEscapedCodePoint());
-                    } else {
-                        token.append((char) ch);
-                    }
-                }
-                    break;
-                }
-                return null;
-            } // break;
-            default: {
-                if (ch == endingCodePoint) {
-                    return token;
-                } else {
-                    token.append((char) ch);
-                }
-            } // break;
-            }
-        } while (true);
-    }
-    
-    /**
-     * @return
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#starts-with-a-valid-escape">4.3
-     *      .9 Check if two code points are a valid escape</a>
-     */
-    protected boolean startsValidEscapeSequence(final int firstCharacter, final int secondCharacter) {
-        if (firstCharacter != REVERSE_SOLIDUS) {
-            return false;
-        } else if (secondCharacter == LINE_FEED) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
-    /**
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#starts-with-a-valid-escape">4.3
-     *      .9 Check if two code points are a valid escape</a>
-     */
-    protected boolean startsValidEscapeSequence(final int consumedCharacter) throws IOException {
-        return startsValidEscapeSequence(consumedCharacter, peek());
-    }
-    
-    /**
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#consume-an-escaped-code-point">
-     *      4.3.8 Consume an escaped code point</a>
-     */
-    protected char[] consumeEscapedCodePoint() throws IOException {
-        // assume REVERSE_SOLIDUS has already been consumed
-        int ch = consume();
-        if (ch == EOF) {
-            return Character.toChars(REPLACEMENT_CHARACTER);
-        } else if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F') {
-            final StringBuilder buf = new StringBuilder();
-            do {
-                buf.append(ch);
-                ch = consume();
-            } while ((ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F') && buf.length() < 6);
-            if (ch == LINE_FEED || ch == CHARACTER_TABULATION || ch == SPACE) {
-                // do nothing
-            } else {
-                reconsume(ch);
-            }
-            final int val = Integer.parseInt(buf.toString(), 16);
-            if (val == 0) {
-                return Character.toChars(REPLACEMENT_CHARACTER);
-            }
-            final char[] chars = Character.toChars(val);
-            if (chars.length == 1 && Character.isSurrogate(chars[0])) {
-                return Character.toChars(REPLACEMENT_CHARACTER);
-            }
-            return chars;
-        } else {
-            return Character.toChars(ch);
-        }
-    }
-    
-    /**
-     * @param firstCodePoint
-     * @param secondCodePoint
-     * @param thirdCodePoint
-     * @return
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#would-start-an-identifier">4.3.
-     *      10 Check if three code points would start an identifier</a>
-     */
-    protected boolean startsIdentifier(final int firstCodePoint, final int secondCodePoint, final int thirdCodePoint) {
-        if (firstCodePoint == HYPHEN_MINUS) {
-            if (isNameStartCodePoint(secondCodePoint) || secondCodePoint == HYPHEN_MINUS
-                    || startsValidEscapeSequence(secondCodePoint, thirdCodePoint)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (isNameStartCodePoint(firstCodePoint)) {
-            return true;
-        } else if (firstCodePoint == REVERSE_SOLIDUS) {
-            if (startsValidEscapeSequence(firstCodePoint, secondCodePoint)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * @param consumedCodePoint
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#would-start-an-identifier">4.3.
-     *      10 Check if three code points would start an identifier</a>
-     */
-    protected boolean startsIdentifier(final int consumedCodePoint) throws IOException {
-        final int char2 = consume();
-        if (char2 == EOF) {
-            return false;
-        }
-        final int char3 = consume();
-        if (char3 == EOF) {
-            reconsume(char2);
-            return false;
-        }
-        reconsume(char3);
-        reconsume(char2);
-        return startsIdentifier(consumedCodePoint, char2, char3);
-    }
-    
-    /**
-     * @return
-     * @throws IOException
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#consume-a-name">4.3.12
-     *      Consume a name</a>
-     */
-    protected String consumeName() throws IOException {
-        final StringBuilder buf = new StringBuilder();
-        do {
-            final int ch = consume();
-            if (isNameCodePoint(ch)) {
-                buf.append((char) ch);
-            } else if (startsValidEscapeSequence(ch)) {
-                buf.append(consumeEscapedCodePoint());
-            } else if (ch == EOF) {
-                return buf.toString();
-            } else {
-                reconsume(ch);
-                return buf.toString();
-            }
-        } while (true);
-    }
-    
-    /**
-     * @param firstCodePoint
-     * @param secondCodePoint
-     * @param thirdCodePoint
-     * @return
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#starts-with-a-number">4
-     *      .3.11 Check if three code points would start a number</a>
-     */
-    protected boolean startsNumber(final int firstCodePoint, final int secondCodePoint, final int thirdCodePoint) {
-        if (firstCodePoint == PLUS_SIGN || firstCodePoint == HYPHEN_MINUS) {
-            if (isDigit(secondCodePoint)) {
-                return true;
-            } else if (secondCodePoint == FULL_STOP && isDigit(thirdCodePoint)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (firstCodePoint == FULL_STOP) {
-            if (isDigit(secondCodePoint)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (isDigit(firstCodePoint)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * @param consumedCharacter
-     * @return
-     * @throws IOException
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#starts-with-a-number">4
-     *      .3.11 Check if three code points would start a number</a>
-     */
-    protected boolean startsNumber(final int consumedCharacter) throws IOException {
-        final int char2 = consume();
-        if (char2 == EOF) {
-            return false;
-        }
-        final int char3 = consume();
-        if (char3 == EOF) {
-            reconsume(char2);
-            return false;
-        }
-        reconsume(char3);
-        reconsume(char2);
-        return startsNumber(consumedCharacter, char2, char3);
-    }
-    
-    /**
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#consume-a-numeric-token">4.3.3
-     *      Consume a numeric token</a>
-     */
-    protected LexicalToken consumeNumericToken() throws IOException {
+    protected NumericValueToken consumeNumericToken() throws IOException {
         final NumberToken numberToken = consumeNumber();
-        final char[] buf = new char[3];
-        final int numRead = peek(buf);
-        if (numRead >= 3 && startsIdentifier(buf[0], buf[1], buf[2])) {
-            final DimensionToken dimensionToken = new DimensionToken();
-            dimensionToken.setNumericType(numberToken.getNumericType());
-            dimensionToken.setNumericValue(numberToken.getNumericValue());
-            dimensionToken.setStringValue(numberToken.getStringValue());
+        if (wouldStartIdentifier(nextInputCodePoint, lookahead[0], lookahead[1])) {
+            final DimensionToken dimensionToken = new DimensionToken(numberToken);
             final String unit = consumeName();
             dimensionToken.setUnit(unit);
             return dimensionToken;
-        } else if (numRead >= 1 && buf[0] == PERCENTAGE_SIGN) {
+        } else if (nextInputCodePoint == PERCENTAGE_SIGN) {
             consume();
-            final PercentageToken percentageToken = new PercentageToken();
-            percentageToken.setNumericValue(numberToken.getNumericValue());
-            percentageToken.setStringValue(numberToken.getStringValue());
-            return percentageToken;
+            return new PercentageToken(numberToken);
         } else {
             return numberToken;
         }
     }
     
     /**
-     * @return
-     * @throws IOException
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#consume-a-number">4.3.
-     *      13 Consume a number</a>
-     */
-    protected NumberToken consumeNumber() throws IOException {
-        final NumberToken numberToken = new NumberToken();
-        final StringBuilder repr = new StringBuilder();
-        numberToken.setNumericType(TypedNumericValueToken.NumericType.INTEGER);
-        int ch = peek();
-        if (ch == PLUS_SIGN || ch == HYPHEN_MINUS) {
-            repr.append((char) consume());
-        }
-        ch = peek();
-        while (isDigit(ch)) {
-            repr.append((char) consume());
-            ch = peek();
-        }
-        final char[] buf = new char[3];
-        int numRead = peek(buf);
-        if (numRead >= 2 && buf[0] == FULL_STOP && isDigit(buf[1])) {
-            repr.append((char) consume());
-            ch = consume();
-            while (isDigit(ch)) {
-                repr.append((char) ch);
-                ch = consume();
-            }
-            reconsume(ch);
-            numberToken.setNumericType(TypedNumericValueToken.NumericType.NUMBER);
-        }
-        numRead = peek(buf);
-        if (buf[0] == LATIN_CAPITAL_LETTER_E || buf[0] == LATIN_SMALL_LETTER_E) {
-            if ((numRead >= 2 && isDigit(buf[1])
-                    || (numRead >= 3 && isDigit(buf[2]) && (buf[1] == PLUS_SIGN || buf[1] == HYPHEN_MINUS)))) {
-                ch = consume();
-                repr.append((char) ch);
-                ch = consume();
-                repr.append((char) ch);
-                ch = consume();
-                while (isDigit(ch)) {
-                    repr.append((char) ch);
-                    ch = consume();
-                }
-                reconsume(ch);
-                numberToken.setNumericType(TypedNumericValueToken.NumericType.NUMBER);
-            }
-        }
-        numberToken.setStringValue(repr.toString());
-        final Number number = convertStringToNumber(repr.toString());
-        numberToken.setNumericValue(number);
-        return numberToken;
-    }
-    
-    private static final Pattern NUMBER_PATTERN =
-            Pattern.compile("(\\+|-)?([0-9]*)(\\.)?([0-9]*)(e|E)?(\\+|-)?([0-9]*)");
-            
-    /**
-     * Converts a string into a number using exactly the algorithm specified in
-     * the CSS specification.
-     * <p>
-     * Yes, I know Java already has libraries to convert strings into numbers.
-     * However, this implementation is intended to be reference-quality, and as
-     * such I am going out of my way to precisely implement the specifications
-     * as written. Any novice programmer should be able to read the
-     * specification and read my source code and confirm that their behavior
-     * match.
+     * This section describes how to consume an ident-like token from a stream of code points.
+     * It returns an {@link IdentToken}, {@link FunctionToken}, {@link URLToken}, or {@link BadURLToken}.
      * 
-     * @param str the string to convert
-     * @return the number
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#convert-a-string-to-a-number">4
-     *      .3.14 Convert a string to a number</a>
-     */
-    protected Number convertStringToNumber(final String str) {
-        final Matcher matcher = NUMBER_PATTERN.matcher(str);
-        if (matcher.matches()) {
-            final String sign = matcher.group(1);
-            final String integerPart = matcher.group(2);
-            @SuppressWarnings("unused")
-            final String decimalPoint = matcher.group(3);
-            final String fractionalPart = matcher.group(4);
-            @SuppressWarnings("unused")
-            final String exponentIndicator = matcher.group(5);
-            final String exponentSign = matcher.group(6);
-            final String exponent = matcher.group(7);
-            
-            final int s;
-            if (sign != null && sign.equals("-")) {
-                s = -1;
-            } else {
-                s = 1;
-            }
-            final int i;
-            if (integerPart != null && !integerPart.isEmpty()) {
-                i = Integer.parseInt(integerPart);
-            } else {
-                i = 0;
-            }
-            // decimal point
-            final int f;
-            final int d;
-            if (fractionalPart != null && !fractionalPart.isEmpty()) {
-                f = Integer.parseInt(fractionalPart);
-                d = fractionalPart.length();
-            } else {
-                f = 0;
-                d = 0;
-            }
-            // exponent indicator
-            final int t;
-            if (exponentSign != null && exponentSign.equals("-")) {
-                t = -1;
-            } else {
-                t = 1;
-            }
-            final int e;
-            if (exponent != null && !exponent.isEmpty()) {
-                e = Integer.parseInt(exponent);
-            } else {
-                e = 0;
-            }
-            
-            final double value = s * (i + f * Math.pow(10, -d)) * Math.pow(10, t * e);
-            
-            return Double.valueOf(value);
-        } else {
-            return Double.valueOf(0);
-        }
-    }
-    
-    /**
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#consume-an-ident-like-token">4.
-     *      3.4 Consume an ident-like token</a>
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-an-ident-like-token">4.3.3. Consume an ident-like token</a>
      */
     protected LexicalToken consumeIdentLikeToken() throws IOException {
         final String name = consumeName();
-        final int ch = peek();
-        if (name.toLowerCase(Locale.ENGLISH).equals("url") && ch == LEFT_PARENTHESIS) {
+        if (name.toLowerCase(Locale.ENGLISH).equals("url") && nextInputCodePoint == LEFT_PARENTHESIS) {
             consume();
             return consumeURLToken();
-        } else if (ch == LEFT_PARENTHESIS) {
+        } else if (nextInputCodePoint == LEFT_PARENTHESIS) {
             consume();
             final FunctionToken functionToken = new FunctionToken();
             functionToken.setStringValue(name);
@@ -996,148 +596,548 @@ public class Tokenizer implements TokenStream {
     }
     
     /**
-     * @return
-     * @throws IOException
-     * @see <a href="http://dev.w3.org/csswg/css-syntax/#consume-a-url-token">4.
-     *      3.6 Consume a url token</a>
+     * This section describes how to consume a string token from a stream of code points. It returns either a {@link StringToken} or {@link BadStringToken}.
+     * <p>
+     * This algorithm must be called with an ending code point, which denotes the code point that ends the string.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-string-token">4.3.4. Consume a string token</a>
+     */
+    protected LexicalToken consumeStringToken(final int endingCodePoint) throws IOException {
+        assert currentInputCodePoint == endingCodePoint;
+        
+        final StringToken stringToken = new StringToken();
+        do {
+            consume();
+            switch (currentInputCodePoint) {
+            case EOF: {
+                return stringToken;
+            } // break;
+            case REVERSE_SOLIDUS: {
+                if (nextInputCodePoint == EOF) {
+                    // do nothing
+                } else if (isNewline(nextInputCodePoint)) {
+                    consume();
+                } else if (isValidEscape()) {
+                    final char[] escapedCodePoint = consumeEscapedCodePoint();
+                    stringToken.append(escapedCodePoint);
+                }
+            } break;
+            default: {
+                if (currentInputCodePoint == endingCodePoint) {
+                    return stringToken;
+                } else if (isNewline(currentInputCodePoint)) {
+                    if (isAllowParseErrors()) {
+                        reconsume();
+                        return new BadStringToken();
+                    } else {
+                        throw new ParseErrorException("Newline in string.");
+                    }
+                } else {
+                    stringToken.append((char) currentInputCodePoint);
+                }
+            } break;
+            }
+        } while (true);
+    }
+    
+    /**
+     *  This section describes how to consume a url token from a stream of code points.
+     *  It returns either a {@link URLToken} or a {@link BadURLToken}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-url-token">4.3.5. Consume a url token</a>
      */
     protected LexicalToken consumeURLToken() throws IOException {
+        assert currentInputCodePoint == LEFT_PARENTHESIS;
+        
         final URLToken urlToken = new URLToken();
-        consumeWhitespace();
-        int ch = peek();
-        if (ch == EOF) {
+        while (isWhitespace(nextInputCodePoint)) {
+            consume();
+        }
+        if (nextInputCodePoint == EOF) {
             return urlToken;
         }
-        if (ch == QUOTATION_MARK || ch == APOSTROPHE) {
+        if (nextInputCodePoint == QUOTATION_MARK || nextInputCodePoint == APOSTROPHE) {
+            /*
+             * This consume() is missing from the specification, but it clearly belongs here.
+             */
             consume();
-            final LexicalToken token = consumeStringToken(ch);
-            if (token.getLexicalType() == LexicalToken.LexicalType.BAD_STRING_TOKEN) {
-                consumeRemainsOfBadURL();
+            final LexicalToken stringToken = consumeStringToken(currentInputCodePoint);
+            if (stringToken instanceof BadStringToken) {
+                consumeRemnantsOfBadURL();
                 return new BadURLToken();
             }
-            assert token.getLexicalType() == LexicalToken.LexicalType.STRING_TOKEN;
-            final StringToken stringToken = (StringToken) token;
-            urlToken.setStringValue(stringToken.getStringValue());
-            consumeWhitespace();
-            ch = consume();
-            if (ch == RIGHT_PARENTHESIS || ch == EOF) {
+            assert stringToken instanceof StringToken;
+            
+            final StringToken strTok = (StringToken) stringToken;
+            urlToken.setStringValue(strTok.getStringValue());
+            while (isWhitespace(nextInputCodePoint)) {
+                consume();
+            }
+            if (nextInputCodePoint == RIGHT_PARENTHESIS || nextInputCodePoint == EOF) {
+                consume();
                 return urlToken;
             } else {
-                consumeRemainsOfBadURL();
+                consumeRemnantsOfBadURL();
                 return new BadURLToken();
             }
         }
-        ch = consume();
-        while (ch != RIGHT_PARENTHESIS && ch != EOF) {
-            if (isWhitespace(ch)) {
-                consumeWhitespace();
-                ch = peek();
-                if (ch == RIGHT_PARENTHESIS || ch == EOF) {
-                    consume();
-                    return urlToken;
-                } else {
-                    consumeRemainsOfBadURL();
-                    return new BadURLToken();
-                }
-            } else if (ch == QUOTATION_MARK || ch == APOSTROPHE || ch == LEFT_PARENTHESIS
-                    || isNonPrintableCodePoint(ch)) {
+        do {
+            consume();
+            switch (currentInputCodePoint) {
+            case RIGHT_PARENTHESIS: // fall through
+            case EOF: {
+                return urlToken;
+            } // break;
+            case QUOTATION_MARK: // fall through
+            case APOSTROPHE: // fall through
+            case LEFT_PARENTHESIS: {
                 if (isAllowParseErrors()) {
-                    consumeRemainsOfBadURL();
+                    consumeRemnantsOfBadURL();
                     return new BadURLToken();
                 } else {
-                    throw new ParseErrorException("Illegal character parsing URL token: " + (char) ch);
+                    throw new ParseErrorException("Bad URL.");
                 }
-            } else if (ch == REVERSE_SOLIDUS) {
-                if (startsValidEscapeSequence(ch)) {
-                    urlToken.append(consumeEscapedCodePoint());
+            } // break;
+            case REVERSE_SOLIDUS: {
+                if (isValidEscape()) {
+                    final char[] escapedCodePoint = consumeEscapedCodePoint();
+                    urlToken.append(escapedCodePoint);
                 } else {
                     if (isAllowParseErrors()) {
-                        consumeRemainsOfBadURL();
+                        consumeRemnantsOfBadURL();
                         return new BadURLToken();
                     } else {
-                        throw new ParseErrorException();
+                        throw new ParseErrorException("Bad URL.");
                     }
                 }
-            } else {
-                urlToken.append((char) ch);
+            } break;
+            default: {
+                if (isWhitespace(currentInputCodePoint)) {
+                    while (isWhitespace(nextInputCodePoint)) {
+                        consume();
+                    }
+                    if (nextInputCodePoint == RIGHT_PARENTHESIS || nextInputCodePoint == EOF) {
+                        consume();
+                        return urlToken;
+                    } else {
+                        consumeRemnantsOfBadURL();
+                        return new BadURLToken();
+                    }
+                }
+                if (isNonPrintableCodePoint(currentInputCodePoint)) {
+                    if (isAllowParseErrors()) {
+                        consumeRemnantsOfBadURL();
+                        return new BadURLToken();
+                    } else {
+                        throw new ParseErrorException("Bad URL.");
+                    }
+                } else {
+//                    Character.toChars(currentInputCodePoint);
+                    urlToken.append((char) currentInputCodePoint);
+                }
+            } break;
             }
-            ch = consume();
-        }
-        return urlToken;
+        } while (true);
     }
     
     /**
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#consume-the-remnants-of-a-bad-url">
-     *      4.3.15 Consume the remnants of a bad url</a>
+     * This section describes how to consume a unicode-range token. It returns a {@link UnicodeRangeToken}.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-unicode-range-token">4.3.6. Consume a unicode-range token</a>
      */
-    protected void consumeRemainsOfBadURL() throws IOException {
-        int ch = consume();
-        while (ch != RIGHT_PARENTHESIS && ch != EOF) {
-            if (startsValidEscapeSequence(ch)) {
-                consumeEscapedCodePoint();
-            }
-            ch = consume();
+    protected UnicodeRangeToken consumeUnicodeRangeToken() throws IOException {
+        assert currentInputCodePoint == PLUS_SIGN;
+        assert isHexDigit(nextInputCodePoint) || nextInputCodePoint == QUESTION_MARK;
+        
+        final StringBuilder consumedStartBuf = new StringBuilder();
+        int digitsConsumed = 0;
+        while (isHexDigit(nextInputCodePoint) && digitsConsumed < 6) {
+            consume();
+            consumedStartBuf.append((char) currentInputCodePoint);
+            digitsConsumed++;
         }
-    }
-    
-    /**
-     * @return
-     * @throws IOException
-     * @see <a href=
-     *      "http://dev.w3.org/csswg/css-syntax/#consume-a-unicode-range-token">
-     *      4.3.7 Consume a unicode-range token</a>
-     */
-    protected LexicalToken consumeUnicodeRangeToken() throws IOException {
-        final StringBuilder startBuf = new StringBuilder();
-        final StringBuilder endBuf = new StringBuilder();
-        boolean containedQuestionMarks = false;
-        int ch = consume();
-        while (isHexDigit(ch) && startBuf.length() < 6) {
-            startBuf.append((char) ch);
-            endBuf.append((char) ch);
-            ch = consume();
+        boolean containsQuestionMarks = false;
+        while (nextInputCodePoint == QUESTION_MARK && digitsConsumed < 6) {
+            consume();
+            consumedStartBuf.append((char) currentInputCodePoint);
+            digitsConsumed++;
+            containsQuestionMarks = true;
         }
-        while (ch == QUESTION_MARK && startBuf.length() < 6) {
-            containedQuestionMarks = true;
-            startBuf.append(DIGIT_ZERO);
-            endBuf.append(LATIN_CAPITAL_LETTER_F);
-            ch = consume();
-        }
-        if (containedQuestionMarks) {
+        final String consumedValue = consumedStartBuf.toString();
+        final int startRange;
+        final int endRange;
+        if (containsQuestionMarks) {
+            final String lower = consumedValue.replace(QUESTION_MARK, DIGIT_ZERO);
+            final String upper = consumedValue.replace(QUESTION_MARK, LATIN_CAPITAL_LETTER_F);
+            startRange = Integer.parseInt(lower, 16);
+            endRange = Integer.parseInt(upper, 16);
             final UnicodeRangeToken unicodeRangeToken = new UnicodeRangeToken();
-            unicodeRangeToken.setStart(Integer.parseInt(startBuf.toString(), 16));
-            unicodeRangeToken.setEnd(Integer.parseInt(endBuf.toString(), 16));
+            unicodeRangeToken.setStart(startRange);
+            unicodeRangeToken.setEnd(endRange);
             return unicodeRangeToken;
-        }
-        final int start = Integer.parseInt(startBuf.toString(), 16);
-        final int end;
-        final int p = peek();
-        if (ch == HYPHEN_MINUS && isHexDigit(p)) {
-            endBuf.setLength(0);
-            ch = consume();
-            while (isHexDigit(ch) && endBuf.length() < 6) {
-                endBuf.append((char) ch);
-                ch = consume();
-            }
-            end = Integer.parseInt(endBuf.toString(), 16);
         } else {
-            end = start;
+            startRange = Integer.parseInt(consumedValue, 16);
         }
-        reconsume(ch);
+        if (nextInputCodePoint == HYPHEN_MINUS && isHexDigit(lookahead[0])) {
+            consume();
+            final StringBuilder consumedEndBuffer = new StringBuilder();
+            digitsConsumed = 0;
+            while (isHexDigit(nextInputCodePoint) && digitsConsumed < 6) {
+                consume();
+                consumedEndBuffer.append((char) currentInputCodePoint);
+                digitsConsumed++;
+            }
+            endRange = Integer.parseInt(consumedEndBuffer.toString(), 16);
+        } else {
+            endRange = startRange;
+        }
+        
         final UnicodeRangeToken unicodeRangeToken = new UnicodeRangeToken();
-        unicodeRangeToken.setStart(start);
-        unicodeRangeToken.setEnd(end);
+        unicodeRangeToken.setStart(startRange);
+        unicodeRangeToken.setEnd(endRange);
         return unicodeRangeToken;
     }
     
-    protected void consumeWhitespace() throws IOException {
-        int ch;
+    /**
+     * This section describes how to consume an escaped code point.
+     * It assumes that the U+005C REVERSE SOLIDUS (\) has already been consumed
+     * and that the next input code point has already been verified to not be a
+     * newline. It will return a code point.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-an-escaped-code-point">4.3.7. Consume an escaped code point</a>
+     */
+    protected char[] consumeEscapedCodePoint() throws IOException {
+        assert currentInputCodePoint == REVERSE_SOLIDUS;
+        assert !isNewline(nextInputCodePoint);
+        
+        consume();
+        switch (currentInputCodePoint) {
+        case EOF: {
+            return Character.toChars(REPLACEMENT_CHARACTER);
+        } // break;
+        default: {
+            if (isHexDigit(currentInputCodePoint)) {
+                final StringBuilder buf = new StringBuilder();
+                buf.append((char) currentInputCodePoint);
+                int digitsConsumed = 0;
+                while (isHexDigit(nextInputCodePoint) && digitsConsumed < 5) {
+                    consume();
+                    buf.append((char) currentInputCodePoint);
+                    digitsConsumed++;
+                }
+                if (isWhitespace(nextInputCodePoint)) {
+                    consume();
+                }
+                final int codePoint = Integer.parseInt(buf.toString(), 16);
+                if (codePoint == 0 || isSurrogateCodePoint(codePoint) || codePoint > MAXIMUM_ALLOWED_CODE_POINT) {
+                    return Character.toChars(REPLACEMENT_CHARACTER);
+                } else {
+                    return Character.toChars(codePoint);
+                }
+            } else {
+                return Character.toChars(currentInputCodePoint);
+            }
+        } // break;
+        }
+    }
+
+    /**
+     * This section describes how to check if two code points are a valid
+     * escape. The algorithm described here can be called explicitly with two
+     * code points, or can be called with the input stream itself. In the latter
+     * case, the two code points in question are the current input code point
+     * and the next input code point, in that order.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-valid-escape">4.3.8. Check if two code points are a valid escape</a>
+     */
+    protected boolean isValidEscape() {
+        return isValidEscape(currentInputCodePoint, nextInputCodePoint);
+    }
+
+    /**
+     * This section describes how to check if two code points are a valid
+     * escape. The algorithm described here can be called explicitly with two
+     * code points, or can be called with the input stream itself. In the latter
+     * case, the two code points in question are the current input code point
+     * and the next input code point, in that order.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-valid-escape">4.3.8. Check if two code points are a valid escape</a>
+     */
+    protected boolean isValidEscape(final int firstCodePoint, final int secondCodePoint) {
+        if (firstCodePoint != REVERSE_SOLIDUS) {
+            return false;
+        } else if (isNewline(secondCodePoint)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * This section describes how to check if three code points would start an
+     * identifier. The algorithm described here can be called explicitly with
+     * three code points, or can be called with the input stream itself. In the
+     * latter case, the three code points in question are the current input code
+     * point and the next two input code points, in that order.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#would-start-an-identifier">4.3.9. Check if three code points would start an identifier</a>
+     */
+    protected boolean wouldStartIdentifier() {
+        return wouldStartIdentifier(currentInputCodePoint, nextInputCodePoint, lookahead[0]);
+    }
+    
+    /**
+     * This section describes how to check if three code points would start an identifier.
+     * The algorithm described here can be called explicitly with three code points,
+     * or can be called with the input stream itself. In the latter case, the three code points in question are the current input code point and the next two input code points, in that order.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#would-start-an-identifier">4.3.9. Check if three code points would start an identifier</a>
+     */
+    protected boolean wouldStartIdentifier(final int firstCodePoint, final int secondCodePoint, final int thirdCodePoint) {
+        switch (firstCodePoint) {
+        case HYPHEN_MINUS: {
+            if (isNameStartCodePoint(secondCodePoint)) {
+                return true;
+            }
+            if (isValidEscape(secondCodePoint, thirdCodePoint)) {
+                return true;
+            }
+            return false;
+        } // break;
+        case REVERSE_SOLIDUS: {
+            if (isValidEscape(firstCodePoint, secondCodePoint)) {
+                return true;
+            } else {
+                return false;
+            }
+        } // break;
+        default: {
+            if (isNameStartCodePoint(firstCodePoint)) {
+                return true;
+            } else {
+                return false;
+            }
+        } // break;
+        }
+    }
+    
+    /**
+     * This section describes how to check if three code points would start a number.
+     * The algorithm described here can be called explicitly with three code points,
+     * or can be called with the input stream itself. In the latter case, the three code points in question are the current input code point and the next two input code points, in that order.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-number">4.3.10. Check if three code points would start a number</a>
+     */
+    protected boolean wouldStartNumber() {
+        return wouldStartNumber(currentInputCodePoint, nextInputCodePoint, lookahead[0]);
+    }
+    
+    /**
+     * This section describes how to check if three code points would start a number.
+     * The algorithm described here can be called explicitly with three code points,
+     * or can be called with the input stream itself. In the latter case, the three code points in question are the current input code point and the next two input code points, in that order.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#starts-with-a-number">4.3.10. Check if three code points would start a number</a>
+     */
+    protected boolean wouldStartNumber(final int codePoint1, final int codePoint2, final int codePoint3) {
+        switch (codePoint1) {
+        case PLUS_SIGN: // fall through
+        case HYPHEN_MINUS: {
+            if (isDigit(codePoint2)) {
+                return true;
+            }
+            if (codePoint2 == FULL_STOP && isDigit(codePoint3)) {
+                return true;
+            }
+            return false;
+        } // break;
+        case FULL_STOP: {
+            if (isDigit(codePoint2)) {
+                return true;
+            } else {
+                return false;
+            }
+        } // break;
+        default: {
+            if (isDigit(codePoint1)) {
+                return true;
+            } else {
+                return false;
+            }
+        } // break;
+        }
+    }
+    
+    /**
+     * This section describes how to consume a name from a stream of code points.
+     * It returns a string containing the largest name that can be formed from adjacent code points in the stream, starting from the first.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-name">4.3.11. Consume a name</a>
+     */
+    protected String consumeName() throws IOException {
+        final StringBuilder buf = new StringBuilder();
         do {
-            ch = consume();
-        } while (isWhitespace(ch));
-        reconsume(ch);
+            consume();
+            if (isNameCodePoint(currentInputCodePoint)) {
+                buf.append((char) currentInputCodePoint);
+            } else if (isValidEscape()) {
+                buf.append(consumeEscapedCodePoint());
+            } else {
+                /*
+                 * This reconsume is not in the standard, but it appears necessary.
+                 */
+                reconsume();
+                return buf.toString();
+            }
+        } while (true);
+    }
+    
+    /**
+     * This section describes how to consume a number from a stream of code points.
+     * It returns a 3-tuple of a string representation, a numeric value, and a type flag which is either "integer" or "number".
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-a-number">4.3.12. Consume a number</a>
+     */
+    protected NumberToken consumeNumber() throws IOException {
+        final StringBuilder rep = new StringBuilder();
+        TypedNumericValueToken.NumericType type = TypedNumericValueToken.NumericType.INTEGER;
+        if (nextInputCodePoint == PLUS_SIGN || nextInputCodePoint == HYPHEN_MINUS) {
+            consume();
+            rep.append((char) currentInputCodePoint);
+        }
+        while (isDigit(nextInputCodePoint)) {
+            consume();
+            rep.append((char) currentInputCodePoint);
+        }
+        if (nextInputCodePoint == FULL_STOP && isDigit(lookahead[0])) {
+            consume();
+            rep.append((char) currentInputCodePoint);
+            consume();
+            rep.append((char) currentInputCodePoint);
+            type = TypedNumericValueToken.NumericType.NUMBER;
+            while (isDigit(nextInputCodePoint)) {
+                consume();
+                rep.append((char) currentInputCodePoint);
+            }
+        }
+        final boolean nextInputCodePointIsE = nextInputCodePoint == LATIN_CAPITAL_LETTER_E || nextInputCodePoint == LATIN_SMALL_LETTER_E;
+        if (nextInputCodePointIsE && isDigit(lookahead[0])) {
+            consume();
+            rep.append((char) currentInputCodePoint);
+            consume();
+            rep.append((char) currentInputCodePoint);
+            type = TypedNumericValueToken.NumericType.NUMBER;
+            while (isDigit(nextInputCodePoint)) {
+                consume();
+                rep.append((char) currentInputCodePoint);
+            }
+        } else if (nextInputCodePointIsE && (lookahead[0] == HYPHEN_MINUS || lookahead[0] == PLUS_SIGN) && isDigit(lookahead[1])) {
+            consume();
+            rep.append((char) currentInputCodePoint);
+            consume();
+            rep.append((char) currentInputCodePoint);
+            consume();
+            rep.append((char) currentInputCodePoint);
+            type = TypedNumericValueToken.NumericType.NUMBER;
+            while (isDigit(nextInputCodePoint)) {
+                consume();
+                rep.append((char) currentInputCodePoint);
+            }
+        }
+        
+        final String repr = rep.toString();
+        
+        final Number value = convertStringToNumber(repr);
+        
+        final NumberToken numberToken = new NumberToken();
+        numberToken.setStringValue(repr);
+        numberToken.setNumericType(type);
+        numberToken.setNumericValue(value);
+        return numberToken;
+    }
+    
+    /**
+     * This section describes how to convert a string to a number. It returns a number.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#convert-a-string-to-a-number">4.3.13. Convert a string to a number</a>
+     */
+    protected Number convertStringToNumber(final String string) {
+        final CharacterIterator characterIterator = new StringCharacterIterator(string);
+        char ch = characterIterator.first();
+        final int s;
+        if (ch == PLUS_SIGN) {
+            s = 1;
+            ch = characterIterator.next();
+        } else if (ch == HYPHEN_MINUS) {
+            s = -1;
+            ch = characterIterator.next();
+        } else {
+            s = 1;
+        }
+        long i = 0;
+        while (isDigit(ch)) {
+            i = 10L * i + Character.digit(ch, 10);
+            ch = characterIterator.next();
+        }
+        if (ch == FULL_STOP) {
+            ch = characterIterator.next();
+        }
+        long f = 0;
+        int d = 0;
+        while (isDigit(ch)) {
+            f = 10L * f + Character.digit(ch, 10);
+            d++;
+            ch = characterIterator.next();
+        }
+        if (ch == LATIN_CAPITAL_LETTER_E || ch == LATIN_SMALL_LETTER_E) {
+            ch = characterIterator.next();
+        }
+        final int t;
+        if (ch == PLUS_SIGN) {
+            t = 1;
+            ch = characterIterator.next();
+        } else if (ch == HYPHEN_MINUS) {
+            t = -1;
+            ch = characterIterator.next();
+        } else {
+            t = 1;
+        }
+        long e = 0;
+        while (isDigit(ch)) {
+            e = 10 * e + Character.digit(ch, 10);
+            ch = characterIterator.next();
+        }
+        
+        return Double.valueOf(s * (i + f * Math.pow(10, -d)) * Math.pow(10, t * e));
+    }
+
+    /**
+     * This section describes how to consume the remnants of a bad url from a
+     * stream of code points, "cleaning up" after the tokenizer realizes that
+     * it’s in the middle of a {@link BadURLToken} rather than a {@link URLToken}.
+     * It returns nothing; its sole use is to consume enough of the input stream
+     * to reach a recovery point where normal tokenizing can resume.
+     * 
+     * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-the-remnants-of-a-bad-url">4.3.14. Consume the remnants of a bad url</a>
+     */
+    protected void consumeRemnantsOfBadURL() throws IOException {
+        do {
+            consume();
+            switch (currentInputCodePoint) {
+            case RIGHT_PARENTHESIS: // fall through
+            case EOF: {
+                return;
+            } // break;
+            default: {
+                if (isValidEscape()) {
+                    consumeEscapedCodePoint();
+                }
+                /*
+                 * Do nothing.
+                 */
+            } break;
+            }
+        } while (true);
     }
     
     public static void main(final String[] args) throws IOException {

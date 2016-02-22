@@ -1,5 +1,6 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -8,10 +9,8 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.PercentageToken;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
 import org.silnith.css.model.data.FontAbsoluteSize;
@@ -73,67 +72,72 @@ public class FontSizeAccessor extends PropertyAccessor<AbsoluteLength> {
             } else {
                 final Length<?> length = lengthParser.parse(specifiedValue);
                 
-                final AbsoluteLength absoluteLength;
-                switch (length.getType()) {
-                case ABSOLUTE: {
-                    absoluteLength = (AbsoluteLength) length;
-                }
-                    break;
-                case RELATIVE: {
-                    final RelativeLength relativeLength = (RelativeLength) length;
-                    absoluteLength = relativeLength.resolve(getParentValue(styleData));
-                }
-                    break;
-                case PERCENTAGE: {
-                    final PercentageLength percentageLength = (PercentageLength) length;
-                    absoluteLength = percentageLength.resolve(getParentValue(styleData));
-                }
-                    break;
-                default:
-                    throw new IllegalArgumentException();
-                }
+                final AbsoluteLength absoluteLength = resolveLength(styleData, length);
                 
-                if (absoluteLength.getLength().floatValue() < 0) {
-                    throw new IllegalArgumentException("Font sizes cannot be negative: " + absoluteLength);
-                }
                 return absoluteLength;
             }
         }
     }
-    
+
     @Override
-    protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) {
-        if (specifiedValue.size() != 1) {
-            throw new IllegalArgumentException();
-        }
-        final Token token = specifiedValue.get(0);
-        switch (token.getType()) {
-        case LEXICAL_TOKEN: {
-            final LexicalToken lexicalToken = (LexicalToken) token;
-            switch (lexicalToken.getLexicalType()) {
-            case IDENT_TOKEN: {
-                final IdentToken identToken = (IdentToken) lexicalToken;
-                final String ident = identToken.getStringValue();
-                final FontAbsoluteSize fontAbsoluteSize = getFontAbsoluteSize(ident);
-                if (fontAbsoluteSize != null) {
-                    return fontSizeTable.get(fontAbsoluteSize);
+    protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+        /*
+         * Font sizes less than 9 pixels per em unit should be restricted.
+         */
+        if (specifiedValue.size() == 1) {
+            final Token token = specifiedValue.get(0);
+            switch (token.getType()) {
+            case LEXICAL_TOKEN: {
+                final LexicalToken lexicalToken = (LexicalToken) token;
+                switch (lexicalToken.getLexicalType()) {
+                case IDENT_TOKEN: {
+                    final IdentToken identToken = (IdentToken) lexicalToken;
+                    final String ident = identToken.getStringValue();
+                    final FontAbsoluteSize fontAbsoluteSize = getFontAbsoluteSize(ident);
+                    if (fontAbsoluteSize != null) {
+                        return fontSizeTable.get(fontAbsoluteSize);
+                    }
+                    final FontRelativeSize fontRelativeSize = getFontRelativeSize(ident);
+                    if (fontRelativeSize != null) {
+                        throw new UnsupportedOperationException("Font sizes 'smaller' and 'larger' not yet implemented.");
+                    }
+                } break;
+                default: {} break;
                 }
-            } break;
-            case PERCENTAGE_TOKEN: {
-                final PercentageToken percentageToken = (PercentageToken) lexicalToken;
-                percentageToken.getNumericValue();
-            } break;
-            case DIMENSION_TOKEN: {
-                final DimensionToken dimensionToken = (DimensionToken) lexicalToken;
-                dimensionToken.getNumericValue();
-                dimensionToken.getUnit();
             } break;
             default: {} break;
             }
-        } break;
-        default: {} break;
         }
-        throw new IllegalArgumentException();
+        final Length<?> length = lengthParser.parse(specifiedValue);
+        final AbsoluteLength absoluteLength = resolveLength(styleData, length);
+        return absoluteLength;
+    }
+
+    private AbsoluteLength resolveLength(final StyleData styleData, final Length<?> length) {
+        final AbsoluteLength absoluteLength;
+        switch (length.getType()) {
+        case ABSOLUTE: {
+            absoluteLength = (AbsoluteLength) length;
+        }
+            break;
+        case RELATIVE: {
+            final RelativeLength relativeLength = (RelativeLength) length;
+            absoluteLength = relativeLength.resolve(getParentValue(styleData));
+        }
+            break;
+        case PERCENTAGE: {
+            final PercentageLength percentageLength = (PercentageLength) length;
+            absoluteLength = percentageLength.resolve(getParentValue(styleData));
+        }
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+        
+        if (absoluteLength.getLength().floatValue() < 0) {
+            throw new IllegalArgumentException("Font sizes cannot be negative: " + absoluteLength);
+        }
+        return absoluteLength;
     }
 
     @Override

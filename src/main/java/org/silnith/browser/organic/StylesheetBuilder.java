@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -42,7 +43,12 @@ public class StylesheetBuilder {
         
         final List<Stylesheet> stylesheets = new ArrayList<>();
         stylesheets.add(createDefaultStylesheet());
-//        stylesheets.add(createStaticStylesheet());
+//        try {
+//            stylesheets.add(new Stylesheet(defaultHTMLStylesheet(), new ArrayList<>()));
+//        } catch (final IOException e) {
+//            e.printStackTrace();
+//        }
+        stylesheets.add(createStaticStylesheet());
         
         for (final ExternalStylesheetLink link : externalStylesheetLinks) {
             try {
@@ -464,6 +470,10 @@ public class StylesheetBuilder {
         pseudoRules.add(new CSSPseudoElementRuleSet("p", null, "yomama", beforeRules, afterRules));
         
         return pseudoRules;
+    }
+    
+    private Collection<CSSRule> defaultHTMLStylesheet() throws IOException {
+        return readStylesheetRules(new InputStreamReader(StylesheetBuilder.class.getResourceAsStream("html4.css"), Charset.forName("UTF-8")));
     }
 
     private static Collection<CSSRule> defaultHTMLRules() {

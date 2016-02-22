@@ -77,6 +77,11 @@ public class Parser {
         }
     }
     
+    protected boolean isEOFToken(final Token token) {
+        return token.getType() == Token.Type.EOF_TOKEN
+                || isLexicalToken(token, LexicalToken.LexicalType.EOF);
+    }
+
     /**
      * @throws IOException
      * @see <a href=
@@ -141,8 +146,7 @@ public class Parser {
             consumeNextInputToken();
         }
         final Rule rule;
-        if (nextInputToken.getType() == Token.Type.EOF_TOKEN
-                || isLexicalToken(nextInputToken, LexicalToken.LexicalType.EOF)) {
+        if (isEOFToken(nextInputToken)) {
             // syntax error
             throw new ParseErrorException();
         } else if (isLexicalToken(nextInputToken, LexicalToken.LexicalType.AT_KEYWORD_TOKEN)) {
@@ -157,15 +161,14 @@ public class Parser {
         while (isLexicalToken(nextInputToken, LexicalToken.LexicalType.WHITESPACE_TOKEN)) {
             consumeNextInputToken();
         }
-        if (nextInputToken.getType() == Token.Type.EOF_TOKEN
-                || isLexicalToken(nextInputToken, LexicalToken.LexicalType.EOF)) {
+        if (isEOFToken(nextInputToken)) {
             return rule;
         } else {
             // syntax error
             throw new ParseErrorException();
         }
     }
-    
+
     /**
      * "Parse a declaration" is used in @supports conditions.
      * 
@@ -217,8 +220,7 @@ public class Parser {
         while (isLexicalToken(nextInputToken, LexicalToken.LexicalType.WHITESPACE_TOKEN)) {
             consumeNextInputToken();
         }
-        if (nextInputToken.getType() == Token.Type.EOF_TOKEN
-                || isLexicalToken(nextInputToken, LexicalToken.LexicalType.EOF)) {
+        if (isEOFToken(nextInputToken)) {
             // syntax error
             throw new ParseErrorException();
         }

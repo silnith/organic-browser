@@ -133,19 +133,8 @@ public class ColorParser {
     }
     
     public Color parse(final List<Token> specifiedValue) {
-        if (specifiedValue.size() != 1) {
-            throw new IllegalArgumentException();
-        }
         final Token token = specifiedValue.get(0);
         switch (token.getType()) {
-        case COMPONENT_VALUE: {
-            final ComponentValue componentValue = (ComponentValue) token;
-            switch (componentValue.getComponentValueType()) {
-            case FUNCTION: {} break;
-            case SIMPLE_BLOCK: {} break;
-            default: {} break;
-            }
-        } break;
         case LEXICAL_TOKEN: {
             final LexicalToken lexicalToken = (LexicalToken) token;
             switch (lexicalToken.getLexicalType()) {
@@ -167,11 +156,9 @@ public class ColorParser {
             default: {} break;
             }
         } break;
-        default: {
-            throw new IllegalArgumentException();
-        } // break;
+        default: {} break;
         }
-        return null;
+        throw new IllegalArgumentException("Unrecognized color value: " + specifiedValue);
     }
     
 }

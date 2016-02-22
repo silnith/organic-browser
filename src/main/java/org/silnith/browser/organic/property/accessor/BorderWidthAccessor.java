@@ -1,5 +1,6 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -76,7 +77,7 @@ public abstract class BorderWidthAccessor extends PropertyAccessor<AbsoluteLengt
     }
     
     @Override
-    protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) {
+    protected AbsoluteLength parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         // TODO: check for keywords "thin", "medium", "thick"
         final Length<?> length = lengthParser.parse(specifiedValue);
         

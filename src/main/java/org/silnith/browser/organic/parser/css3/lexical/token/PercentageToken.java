@@ -11,9 +11,15 @@ public class PercentageToken extends NumericValueToken {
         super(LexicalType.PERCENTAGE_TOKEN);
     }
     
+    public PercentageToken(final NumericValueToken numberToken) {
+        super(LexicalType.PERCENTAGE_TOKEN);
+        this.setStringValue(numberToken.getStringValue());
+        this.setNumericValue(numberToken.getNumericValue());
+    }
+    
     @Override
     public String toString() {
-        return getStringValue() + "=" + getNumericValue() + "%";
+        return getNumericValue() + "%";
     }
     
 }

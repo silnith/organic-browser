@@ -29,7 +29,7 @@ import org.silnith.browser.organic.StyledElement;
 import org.silnith.browser.organic.Stylesheet;
 import org.silnith.browser.organic.StylesheetBuilder;
 import org.silnith.browser.organic.box.BlockLevelBox;
-import org.silnith.browser.organic.box.Formatter;
+import org.silnith.browser.organic.box.BoxFormatter;
 import org.silnith.browser.organic.network.Download;
 import org.silnith.browser.organic.network.DownloadManager;
 import org.silnith.browser.organic.parser.DocumentParser;
@@ -184,7 +184,7 @@ public class BrowserPane extends JPanel {
                 final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
                         (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
                                 PropertyName.LIST_STYLE_POSITION);
-                final Formatter formatter = new Formatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
+                final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);
                 
@@ -293,8 +293,8 @@ public class BrowserPane extends JPanel {
 //                    cssRule.apply(styledElement);
                     cssRule.apply(allNodes);
                 }
-                cascadeApplier.cascade(styledElement, stylesheet);
             }
+            cascadeApplier.cascade(styledElement);
         }
         
         private Collection<StyledDOMElement> getChildren(final StyledDOMElement element) {
@@ -319,11 +319,11 @@ public class BrowserPane extends JPanel {
     
     private class Formatter2 implements Callable<BlockLevelBox> {
         
-        private final Formatter formatter;
+        private final BoxFormatter formatter;
         
         private final StyledElement styledElement;
         
-        public Formatter2(final Formatter formatter, final StyledElement styledElement) {
+        public Formatter2(final BoxFormatter formatter, final StyledElement styledElement) {
             super();
             this.styledElement = styledElement;
             this.formatter = formatter;

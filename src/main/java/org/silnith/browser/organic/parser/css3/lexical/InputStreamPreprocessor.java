@@ -11,8 +11,11 @@ import java.io.Reader;
 
 
 /**
- * @see <a href="http://dev.w3.org/csswg/css-syntax/#input-preprocessing">3.3
- *      Preprocessing the input stream</a>
+ * Preprocesses the input stream of Unicode code points (Java characters) to
+ * consolidate CR+LF pairs and replace NULL characters.
+ * 
+ * @see <a href="https://www.w3.org/TR/css-syntax-3/">CSS Syntax Module Level 3</a>
+ * @see <a href="https://www.w3.org/TR/css-syntax-3/#input-preprocessing">3.3. Preprocessing the input stream</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class InputStreamPreprocessor extends Reader {

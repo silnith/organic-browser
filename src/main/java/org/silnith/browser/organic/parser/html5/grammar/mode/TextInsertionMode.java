@@ -12,8 +12,8 @@ import org.w3c.dom.Element;
 
 /**
  * @see <a href=
- *      "http://www.whatwg.org/specs/web-apps/current-work/multipage/tree-construction.html#parsing-main-incdata">
- *      12.2.5.4.8 The "text" insertion mode</a>
+ *      "https://www.w3.org/TR/html5/syntax.html#parsing-main-incdata">
+ *     8.2.5.4.8 The "text" insertion mode</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class TextInsertionMode extends InsertionMode {

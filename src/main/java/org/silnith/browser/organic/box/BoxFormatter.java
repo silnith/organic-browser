@@ -19,7 +19,7 @@ import org.silnith.css.model.data.ListStylePosition;
  * 
  * @author kent
  */
-public class Formatter {
+public class BoxFormatter {
     
     private final PropertyAccessor<Display> displayAccessor;
     
@@ -27,7 +27,7 @@ public class Formatter {
     
     private final PropertyAccessor<ListStylePosition> listStylePositionAccessor;
     
-    public Formatter(final PropertyAccessor<Display> displayAccessor,
+    public BoxFormatter(final PropertyAccessor<Display> displayAccessor,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
             final PropertyAccessor<ListStylePosition> listStylePositionAccessor) {
         super();
@@ -171,8 +171,7 @@ public class Formatter {
                 return null;
             } // break;
             default: {
-                System.out.println(display);
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Cannot format a " + display + " box inside of an inline formatting context.");
             } // break;
             }
         } else if (styledContent instanceof StyledText) {

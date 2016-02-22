@@ -10,7 +10,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
 import org.silnith.browser.organic.box.BlockLevelBox;
-import org.silnith.browser.organic.box.Formatter;
+import org.silnith.browser.organic.box.BoxFormatter;
 import org.silnith.browser.organic.network.Download;
 import org.silnith.browser.organic.parser.FileParser;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
@@ -78,7 +78,7 @@ public class Program {
         final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
         final long cascadeStartTime = System.currentTimeMillis();
         for (final Stylesheet stylesheet : stylesheets) {
-            cascadeApplier.cascade(styledElement, stylesheet);
+//            cascadeApplier.cascade(styledElement, stylesheet);
         }
         final long cascadeEndTime = System.currentTimeMillis();
         System.out.println("Cascade time: " + (cascadeEndTime - cascadeStartTime));
@@ -98,7 +98,7 @@ public class Program {
         final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
                 (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
                         PropertyName.LIST_STYLE_POSITION);
-        final Formatter formatter = new Formatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
+        final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
         final BlockLevelBox blockBox = formatter.createBlockBox(styledElement);
         
         // debug output of the formatting information

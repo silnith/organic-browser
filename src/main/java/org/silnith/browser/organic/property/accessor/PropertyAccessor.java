@@ -1,5 +1,6 @@
 package org.silnith.browser.organic.property.accessor;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -111,7 +112,7 @@ public abstract class PropertyAccessor<T> {
      * @throws IllegalArgumentException if the specified value is invalid for
      *         the property
      */
-    protected abstract T parse(StyleData styleData, List<Token> specifiedValue);
+    protected abstract T parse(StyleData styleData, List<Token> specifiedValue) throws IOException;
     
     /**
      * Computes the property value for the given element.  The specified value
@@ -205,8 +206,12 @@ public abstract class PropertyAccessor<T> {
                 T parsedValue;
                 try {
                     parsedValue = parse(styleData, specifiedValue);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    parsedValue = getValueWhenUnspecified(styleData);
                 } catch (final IllegalArgumentException e) {
                     // log that the rule was invalid
+                    e.printStackTrace();
                     parsedValue = getValueWhenUnspecified(styleData);
                 }
                 computedValue = parsedValue;

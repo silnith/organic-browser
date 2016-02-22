@@ -14,6 +14,14 @@ public class DimensionToken extends TypedNumericValueToken {
         this.unit = new StringBuilder();
     }
     
+    public DimensionToken(final TypedNumericValueToken numberToken) {
+        super(LexicalType.DIMENSION_TOKEN);
+        this.unit = new StringBuilder();
+        this.setStringValue(numberToken.getStringValue());
+        this.setNumericValue(numberToken.getNumericValue());
+        this.setNumericType(numberToken.getNumericType());
+    }
+    
     public void setUnit(final String unit) {
         this.unit.setLength(0);
         this.unit.append(unit);
@@ -25,7 +33,11 @@ public class DimensionToken extends TypedNumericValueToken {
     
     @Override
     public String toString() {
-        return getStringValue() + "[" + getNumericType() + "]=" + getNumericValue() + getUnit();
+        switch (getNumericType()) {
+        case INTEGER: return String.valueOf(getNumericValue().longValue()) + getUnit();
+        case NUMBER: return String.valueOf(getNumericValue().doubleValue()) + getUnit();
+        default: return getStringValue() + "[" + getNumericType() + "]=" + getNumericValue() + getUnit();
+        }
     }
     
 }

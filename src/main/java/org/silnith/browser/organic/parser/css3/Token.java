@@ -11,6 +11,10 @@ public abstract class Token {
          * @see org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken
          */
         LEXICAL_TOKEN,
+        /**
+         * Not currently used.
+         */
+        @Deprecated
         EOF_TOKEN
     }
     

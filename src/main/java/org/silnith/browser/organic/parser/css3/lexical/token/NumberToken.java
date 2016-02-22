@@ -13,7 +13,11 @@ public class NumberToken extends TypedNumericValueToken {
     
     @Override
     public String toString() {
-        return getStringValue() + "[" + getNumericType() + "]=" + getNumericValue();
+        switch (getNumericType()) {
+        case INTEGER: return String.valueOf(getNumericValue().longValue());
+        case NUMBER: return String.valueOf(getNumericValue().doubleValue());
+        default: return getStringValue() + "[" + getNumericType() + "]=" + getNumericValue();
+        }
     }
     
 }

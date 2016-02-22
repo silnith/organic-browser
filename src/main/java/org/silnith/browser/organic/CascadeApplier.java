@@ -34,9 +34,8 @@ public class CascadeApplier {
      * the rules to all children.
      * 
      * @param styledElement
-     * @param stylesheet
      */
-    public void cascade(final StyledElement styledElement, final Stylesheet stylesheet) {
+    public void cascade(final StyledElement styledElement) {
 //        for (final CSSRule cssRule : stylesheet.getRules()) {
 //            if (cssRule.shouldApply(styledElement)) {
 //                cssRule.apply(styledElement);
@@ -50,16 +49,16 @@ public class CascadeApplier {
          * computed, because they require access to the computed values of
          * properties.
          */
-        for (final CSSPseudoElementRuleSet pseudoRuleSet : stylesheet.getPseudoRules()) {
-            if (pseudoRuleSet.shouldApply(styledElement)) {
-                pseudoRuleSet.apply(styledElement);
-            }
-        }
+//        for (final CSSPseudoElementRuleSet pseudoRuleSet : stylesheet.getPseudoRules()) {
+//            if (pseudoRuleSet.shouldApply(styledElement)) {
+//                pseudoRuleSet.apply(styledElement);
+//            }
+//        }
         
         for (final StyledContent child : styledElement.getChildren()) {
             if (child instanceof StyledElement) {
                 final StyledElement childElement = (StyledElement) child;
-                cascade(childElement, stylesheet);
+                cascade(childElement);
 //			} else if (child instanceof AnonymousStyledElement) {
 //				compute(child);
             }

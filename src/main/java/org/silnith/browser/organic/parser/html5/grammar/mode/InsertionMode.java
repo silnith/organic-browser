@@ -877,7 +877,18 @@ public abstract class InsertionMode {
     protected void insertComment(final CommentToken commentToken, final InsertionPosition position) {
         final String data = commentToken.getContent();
         final InsertionPosition adjustedInsertionLocation = position;
-        final Document ownerDocument = adjustedInsertionLocation.getContainingNode().getOwnerDocument();
+        final Node containingNode = adjustedInsertionLocation.getContainingNode();
+        final Document ownerDocument;
+        if (containingNode.getNodeType() == Node.DOCUMENT_NODE) {
+            /*
+             * This is against the "spec", but it appears the "owner document"
+             * of the document itself is null, so special-casing this for the
+             * case where websites put comments before any markup.
+             */
+            ownerDocument = (Document) containingNode;
+        } else {
+            ownerDocument = containingNode.getOwnerDocument();
+        }
         final Comment commentNode = ownerDocument.createComment(data);
         adjustedInsertionLocation.insert(commentNode);
         
