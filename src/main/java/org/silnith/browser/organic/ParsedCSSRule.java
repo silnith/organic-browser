@@ -26,60 +26,65 @@ public class ParsedCSSRule implements CSSRule {
     
     private final List<Token> styleValue;
     
-    public ParsedCSSRule(final Selector selector, final PropertyName propertyName, final List<Token> styleValue) {
+    private final boolean inherit;
+    
+    private final boolean important;
+    
+    public ParsedCSSRule(final Selector selector, final PropertyName propertyName, final List<Token> styleValue, final boolean important) {
         this.selector = selector;
         this.propertyName = propertyName;
         this.styleValue = styleValue;
+        this.inherit = false;
+        this.important = important;
+    }
+    
+    public ParsedCSSRule(final Selector selector, final PropertyName propertyName, final boolean important) {
+        this.selector = selector;
+        this.propertyName = propertyName;
+        this.styleValue = null;
+        this.inherit = true;
+        this.important = important;
     }
     
     public PropertyName getPropertyName() {
         return propertyName;
     }
     
-    /**
-     * Checks whether the CSS rule will apply to the given element.
-     * If {code true}, then {@link #apply(StyledContent)} should be called.
-     * 
-     * @param styledElement
-     * @return
-     */
-    public boolean shouldApply(final StyledElement styledElement) {
-        if (styledElement instanceof StyledDOMElement) {
-            final StyledDOMElement styledDOMElement = (StyledDOMElement) styledElement;
-            return selector.matches(styledDOMElement.getElement());
-        } else {
-            return false;
-        }
+    public boolean isImportant() {
+        return important;
     }
-    
-    /**
-     * Sets the specified value for the element according to the CSS rule.
-     * This should only be called if {@link #shouldApply(StyledElement)} returns
-     * {@code true}.
-     * <p>
-     * Note that this only applies the rule to the provided element by setting
-     * the specified value.  It does not resolve the computed value nor does it
-     * apply the cascade logic.
-     * 
-     * @param styledElement
-     */
-    public void apply(final StyledContent styledElement) {
-        final StyleData styleData = styledElement.getStyleData();
-        
-        styleData.setParsedSpecifiedValue(propertyName, styleValue);
+
+    public boolean isInherit() {
+        return inherit;
     }
-    
+
     @Override
     public void apply(Collection<StyledDOMElement> elements) {
         final Collection<StyledDOMElement> subject = selector.select(elements);
         for (final StyledDOMElement element : subject) {
-            apply(element);
+            final StyleData styleData = element.getStyleData();
+            
+            if (inherit) {
+                styleData.setInherit(propertyName);
+            } else {
+                styleData.setParsedSpecifiedValue(propertyName, styleValue);
+            }
         }
     }
 
     @Override
     public String toString() {
-        return selector + " { " + propertyName.getKey() + " : " + styleValue + " }";
+        final String impStr;
+        if (important) {
+            impStr = " ! important";
+        } else {
+            impStr = "";
+        }
+        if (inherit) {
+            return selector + " { " + propertyName.getKey() + " : inherit" + impStr + " }";
+        } else {
+            return selector + " { " + propertyName.getKey() + " : " + styleValue + impStr + " }";
+        }
     }
     
 }

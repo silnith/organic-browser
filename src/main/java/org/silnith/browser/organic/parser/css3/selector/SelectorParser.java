@@ -158,7 +158,6 @@ public class SelectorParser {
                 }
             } break;
             default: {
-//                System.out.println(lexicalToken);
                 throw new IllegalArgumentException();
             } // break;
             }
@@ -174,27 +173,6 @@ public class SelectorParser {
         }
         return new SequenceOfSimpleSelectors(selectors);
     }
-    
-//    private SimpleSelector consumeSimpleSelectorSequenceFirstElement() throws IOException {
-//        switch (nextToken.getType()) {
-//        case LEXICAL_TOKEN: {
-//            final LexicalToken lexicalToken = (LexicalToken) nextToken;
-//            switch (lexicalToken.getLexicalType()) {
-//            case IDENT_TOKEN: {
-//                final IdentToken identToken = (IdentToken) lexicalToken;
-//                if (isStar(identToken)) {
-//                    return consumeUniversal();
-//                } else {
-//                    return consumeTypeSelector();
-//                }
-//            } // break;
-//            default: {} break;
-//            }
-//        } break;
-//        default: {} break;
-//        }
-//        throw new IllegalArgumentException();
-//    }
     
     private SimpleSelector consumeSimpleSelectorSequenceElement() throws IOException {
         switch (nextToken.getType()) {

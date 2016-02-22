@@ -9,10 +9,6 @@ public interface CSSRule {
     
     PropertyName getPropertyName();
     
-    boolean shouldApply(StyledElement styledElement);
-    
-    void apply(StyledContent styledElement);
-    
     void apply(Collection<StyledDOMElement> elements);
     
 }

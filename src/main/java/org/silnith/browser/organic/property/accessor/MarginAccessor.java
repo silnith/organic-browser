@@ -17,11 +17,11 @@ import org.silnith.css.model.data.RelativeLength;
 
 public abstract class MarginAccessor extends PropertyAccessor<Length<?>> {
     
-    private final LengthParser lengthParser;
+    private final LengthParser<?> lengthParser;
     
     private final PropertyAccessor<AbsoluteLength> fontSizeAccessor;
     
-    public MarginAccessor(final PropertyName propertyName, final LengthParser lengthParser,
+    public MarginAccessor(final PropertyName propertyName, final LengthParser<?> lengthParser,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor) {
         super(propertyName, false);
         this.lengthParser = lengthParser;
@@ -42,19 +42,16 @@ public abstract class MarginAccessor extends PropertyAccessor<Length<?>> {
         switch (length.getType()) {
         case ABSOLUTE: {
             absoluteLength = (AbsoluteLength) length;
-        }
-            break;
+        } break;
         case RELATIVE: {
             final RelativeLength relativeLength = (RelativeLength) length;
             absoluteLength = relativeLength.resolve(fontSizeAccessor.getComputedValue(styleData));
-        }
-            break;
+        } break;
         case PERCENTAGE: {
             final PercentageLength percentageLength = (PercentageLength) length;
             return percentageLength;
         } // break;
-        default:
-            throw new IllegalArgumentException();
+        default: throw new IllegalArgumentException();
         }
         
         return absoluteLength;

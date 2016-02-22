@@ -11,6 +11,7 @@ import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.NumberToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.PercentageToken;
 
 /**
  * A parser for CSS length values.  A CSS length value is simply a CSS number
@@ -82,13 +83,12 @@ public class LengthParser<T extends Unit> implements PropertyValueParser<Length<
                         return (Length<T>) new RelativeLength(numericValue.floatValue(), unit);
                     }
                 }
-                for (final PercentageUnit unit : PercentageUnit.values()) {
-                    if (unit.getSuffix().equals(dimensionToken.getUnit())) {
-                        final Number numericValue = dimensionToken.getNumericValue();
-                        return (Length<T>) new PercentageLength(numericValue.floatValue());
-                    }
-                }
             } break;
+            case PERCENTAGE_TOKEN: {
+                final PercentageToken percentageToken = (PercentageToken) lexicalToken;
+                final Number numericValue = percentageToken.getNumericValue();
+                return (Length<T>) new PercentageLength(numericValue.floatValue());
+            } // break;
             case NUMBER_TOKEN: {
                 final NumberToken numberToken = (NumberToken) lexicalToken;
                 if (numberToken.getNumericValue().floatValue() == 0f) {
@@ -103,53 +103,4 @@ public class LengthParser<T extends Unit> implements PropertyValueParser<Length<
         throw new IllegalArgumentException("Unrecognized length value: " + token);
     }
     
-    private float parseNumber(final Token token) {
-        switch (token.getType()) {
-        case LEXICAL_TOKEN: {
-            final LexicalToken lexicalToken = (LexicalToken) token;
-            switch (lexicalToken.getLexicalType()) {
-            case NUMBER_TOKEN: {
-                final NumberToken numberToken = (NumberToken) lexicalToken;
-                return numberToken.getNumericValue().floatValue();
-            } // break;
-            default: {} break;
-            }
-        } break;
-        default: {} break;
-        }
-        throw new IllegalArgumentException("Unknown number: " + token);
-    }
-    
-    
-    private Unit parseUnit(final Token token) {
-        switch (token.getType()) {
-        case LEXICAL_TOKEN: {
-            final LexicalToken lexicalToken = (LexicalToken) token;
-            switch (lexicalToken.getLexicalType()) {
-            case IDENT_TOKEN: {
-                final IdentToken identToken = (IdentToken) lexicalToken;
-                final String identifier = identToken.getStringValue();
-                for (final AbsoluteUnit absoluteUnit : AbsoluteUnit.values()) {
-                    if (identifier.equals(absoluteUnit.getSuffix())) {
-                        return absoluteUnit;
-                    }
-                }
-                for (final RelativeUnit relativeUnit : RelativeUnit.values()) {
-                    if (identifier.equals(relativeUnit.getSuffix())) {
-                        return relativeUnit;
-                    }
-                }
-                for (final PercentageUnit percentageUnit : PercentageUnit.values()) {
-                    if (identifier.equals(percentageUnit.getSuffix())) {
-                        return percentageUnit;
-                    }
-                }
-            } break;
-            default: {} break;
-            }
-        } break;
-        default: {} break;
-        }
-        throw new IllegalArgumentException("Unknown length unit: " + token);
-    }
 }

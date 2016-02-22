@@ -290,7 +290,6 @@ public class BrowserPane extends JPanel {
             allNodes.addAll(getChildren(styledDOMElement));
             for (final Stylesheet stylesheet : stylesheets) {
                 for (final CSSRule cssRule : stylesheet.getRules()) {
-//                    cssRule.apply(styledElement);
                     cssRule.apply(allNodes);
                 }
             }

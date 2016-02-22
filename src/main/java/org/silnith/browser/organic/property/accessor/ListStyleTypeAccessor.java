@@ -53,7 +53,7 @@ public class ListStyleTypeAccessor extends PropertyAccessor<ListStyleType> {
         } break;
         default: {} break;
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Unknown list style type: " + specifiedValue);
     }
 
     @Override

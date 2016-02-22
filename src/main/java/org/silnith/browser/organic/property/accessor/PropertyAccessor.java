@@ -25,7 +25,7 @@ public abstract class PropertyAccessor<T> {
     
     private final PropertyName propertyName;
     
-    private final boolean inherited;
+    private final boolean inheritedByDefault;
     
     /**
      * Constructs a new {@code PropertyAccessor} with the given
@@ -35,14 +35,14 @@ public abstract class PropertyAccessor<T> {
      * simply what the default is for unspecified properties.
      * 
      * @param propertyName the name of the property
-     * @param inherited whether the property is inherited by default
+     * @param inheritedByDefault whether the property is inherited by default
      */
-    public PropertyAccessor(final PropertyName propertyName, final boolean inherited) {
+    public PropertyAccessor(final PropertyName propertyName, final boolean inheritedByDefault) {
         if (propertyName == null) {
             throw new NullPointerException();
         }
         this.propertyName = propertyName;
-        this.inherited = inherited;
+        this.inheritedByDefault = inheritedByDefault;
     }
     
     /**
@@ -55,7 +55,7 @@ public abstract class PropertyAccessor<T> {
     }
     
     public final boolean isInheritedByDefault() {
-        return inherited;
+        return inheritedByDefault;
     }
     
     /**
@@ -138,70 +138,17 @@ public abstract class PropertyAccessor<T> {
      * 
      * @param styleData the styling information for the node being computed
      */
-    public void computeValue(final StyleData styleData) {
-//        assert !styleData.isPropertyComputed(propertyName);
-        
-        final T computedValue;
-        if (styleData.isPropertySpecified(getPropertyName())) {
-            if (styleData.getInherit(getPropertyName())) {
-                // inherit
-                computedValue = getParentValue(styleData);
-            } else {
-                // parse
-                final String specifiedValue = styleData.getSpecifiedValue(getPropertyName());
-                
-                T parsedValue;
-                try {
-                    parsedValue = parse(styleData, specifiedValue);
-                } catch (final IllegalArgumentException e) {
-                    // log that the rule was invalid
-                    parsedValue = getValueWhenUnspecified(styleData);
-                }
-                computedValue = parsedValue;
-            }
-        } else {
-            // find the initial value
-            computedValue = getValueWhenUnspecified(styleData);
-        }
-        
-        styleData.setComputedValue(propertyName, computedValue);
-    }
-
-    /**
-     * Computes the property value for the given element.  The specified value
-     * must have already been set, if any.
-     * The algorithm is as follows:
-     * <ol>
-     * <li>If the property is specified explicitly for this element and is the
-     * string "inherit", then the property value is the computed value of the
-     * same property for the parent element.</li>
-     * <li>If the property is specified explicitly for this element and is not
-     * the string "inherit", {@link #parse} is called to convert the string
-     * value into the type {@code &lt;T&gt;}.</li>
-     * <li>If the property is not specified for this element but is inherited by
-     * default, then the property value is the computed value of the same
-     * property for the parent element.</li>
-     * <li>If the property is not specified for this element and is not
-     * inherited by default, then {@link #getInitialValue} is called to get the
-     * computed value.</li>
-     * </ol>
-     * <p>
-     * For inherited values, if the element is the root element then the value
-     * is the initial value.
-     * 
-     * @param styleData the styling information for the node being computed
-     */
     public void computeParsedValue(final StyleData styleData) {
 //        assert !styleData.isPropertyComputed(propertyName);
         
         final T computedValue;
         if (styleData.isPropertySpecified(getPropertyName())) {
-            if (styleData.getInherit(getPropertyName())) {
+            if (styleData.isInherit(getPropertyName())) {
                 // inherit
                 computedValue = getParentValue(styleData);
             } else {
                 // parse
-                final List<Token> specifiedValue = styleData.getParsedSpecifiedValue(getPropertyName());
+                final List<Token> specifiedValue = styleData.getSpecifiedValue(getPropertyName());
                 
                 T parsedValue;
                 try {
@@ -225,13 +172,13 @@ public abstract class PropertyAccessor<T> {
     }
     
     /**
-     * Performs steps 3 and 4 of the algorithm defined for {@link #computeValue(StyleData)}.
+     * Performs steps 3 and 4 of the algorithm defined for {@link #computeParsedValue(StyleData)}.
      * 
      * @param styleData the styling information for the node being computed
      * @return the computed value
      */
     private T getValueWhenUnspecified(final StyleData styleData) {
-        if (inherited) {
+        if (inheritedByDefault) {
             // inherit
             return getParentValue(styleData);
         } else {

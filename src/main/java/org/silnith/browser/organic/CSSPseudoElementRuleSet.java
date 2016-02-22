@@ -72,16 +72,15 @@ public class CSSPseudoElementRuleSet {
             final StyledText beforeContent = new StyledText(beforeElement, beforeString);
             beforeElement.addChild(beforeContent);
             // add style rules to pseudo element
-            for (final CSSRule rule : beforeRules) {
-                if (rule.shouldApply(beforeElement)) {
-                    rule.apply(beforeElement);
-                    final PropertyName propertyName = rule.getPropertyName();
-                    final PropertyAccessor<?> propertyAccessor =
-                            propertyAccessorFactory.getPropertyAccessor(propertyName);
-//                    propertyAccessor.computeValue(beforeStyleData);
-                    propertyAccessor.computeParsedValue(beforeStyleData);
-                }
-            }
+//            for (final CSSRule rule : beforeRules) {
+//                if (rule.shouldApply(beforeElement)) {
+//                    rule.apply(beforeElement);
+//                    final PropertyName propertyName = rule.getPropertyName();
+//                    final PropertyAccessor<?> propertyAccessor =
+//                            propertyAccessorFactory.getPropertyAccessor(propertyName);
+//                    propertyAccessor.computeParsedValue(beforeStyleData);
+//                }
+//            }
             final Display beforeDisplay = displayAccessor.getComputedValue(beforeElement.getStyleData());
             if (beforeDisplay != Display.NONE) {
                 styledElement.setBeforeContent(beforeElement);
@@ -94,15 +93,15 @@ public class CSSPseudoElementRuleSet {
             final StyledText afterContent = new StyledText(afterElement, afterString);
             afterElement.addChild(afterContent);
             // add style rules to pseudo element
-            for (final CSSRule rule : afterRules) {
-                if (rule.shouldApply(afterElement)) {
-                    rule.apply(afterElement);
-                    final PropertyName propertyName = rule.getPropertyName();
-                    final PropertyAccessor<?> propertyAccessor =
-                            propertyAccessorFactory.getPropertyAccessor(propertyName);
-                    propertyAccessor.computeValue(afterStyleData);
-                }
-            }
+//            for (final CSSRule rule : afterRules) {
+//                if (rule.shouldApply(afterElement)) {
+//                    rule.apply(afterElement);
+//                    final PropertyName propertyName = rule.getPropertyName();
+//                    final PropertyAccessor<?> propertyAccessor =
+//                            propertyAccessorFactory.getPropertyAccessor(propertyName);
+//                    propertyAccessor.computeParsedValue(afterStyleData);
+//                }
+//            }
             final Display afterDisplay = displayAccessor.getComputedValue(afterElement.getStyleData());
             if (afterDisplay != Display.NONE) {
                 styledElement.setAfterContent(afterElement);

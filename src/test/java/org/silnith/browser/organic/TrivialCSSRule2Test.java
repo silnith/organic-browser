@@ -75,7 +75,7 @@ public class TrivialCSSRule2Test {
         final StyledDOMElement bodyStyle = (StyledDOMElement) styleInformation.getChildren().get(1);
         final StyledDOMElement pStyle = (StyledDOMElement) bodyStyle.getChildren().get(1);
         final StyledDOMElement emStyle = (StyledDOMElement) pStyle.getChildren().get(1);
-        final List<Token> parsedSpecifiedValue = emStyle.getStyleData().getParsedSpecifiedValue(PropertyName.FONT_SIZE);
+        final List<Token> parsedSpecifiedValue = emStyle.getStyleData().getSpecifiedValue(PropertyName.FONT_SIZE);
         
         assertEquals(2, parsedSpecifiedValue.size());
         final Token token = parsedSpecifiedValue.get(1);

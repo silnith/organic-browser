@@ -12,6 +12,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Set;
 
 import org.junit.Before;
@@ -75,7 +76,7 @@ public class PaddingRightAccessorTest {
     }
     
     @Test
-    public void testComputeValueSpecifiedAbsolute() {
+    public void testComputeValueSpecifiedAbsolute() throws IOException {
         final AbsoluteLength fivePixels = new AbsoluteLength(5, AbsoluteUnit.PX);
         
         when((AbsoluteLength) lengthParser.parse(anyString())).thenReturn(fivePixels);
@@ -83,7 +84,7 @@ public class PaddingRightAccessorTest {
         final StyleData styleData = new StyleData(null);
         styleData.setSpecifiedValue(PropertyName.PADDING_RIGHT, "5px");
         
-        paddingRightAccessor.computeValue(styleData);
+        paddingRightAccessor.computeParsedValue(styleData);
         
         assertTrue(styleData.isPropertyComputed(PropertyName.PADDING_RIGHT));
         assertEquals(fivePixels, styleData.getComputedValue(PropertyName.PADDING_RIGHT));
@@ -93,7 +94,7 @@ public class PaddingRightAccessorTest {
     }
     
     @Test
-    public void testComputeValueSpecifiedAbsoluteInvalid() {
+    public void testComputeValueSpecifiedAbsoluteInvalid() throws IOException {
         final AbsoluteLength negativeFivePixels = new AbsoluteLength( -5, AbsoluteUnit.PX);
         
         when((AbsoluteLength) lengthParser.parse(anyString())).thenReturn(negativeFivePixels);
@@ -101,7 +102,7 @@ public class PaddingRightAccessorTest {
         final StyleData styleData = new StyleData(null);
         styleData.setSpecifiedValue(PropertyName.PADDING_RIGHT, "-5px");
         
-        paddingRightAccessor.computeValue(styleData);
+        paddingRightAccessor.computeParsedValue(styleData);
         
         assertTrue(styleData.isPropertyComputed(PropertyName.PADDING_RIGHT));
         final Length<?> computedValue = (Length<?>) styleData.getComputedValue(PropertyName.PADDING_RIGHT);
@@ -113,7 +114,7 @@ public class PaddingRightAccessorTest {
     }
     
     @Test
-    public void testComputeValueSpecifiedRelative() {
+    public void testComputeValueSpecifiedRelative() throws IOException {
         final AbsoluteLength onePoint = new AbsoluteLength(1, AbsoluteUnit.PT);
         final RelativeLength twoEM = new RelativeLength(2, RelativeUnit.EM);
         
@@ -123,7 +124,7 @@ public class PaddingRightAccessorTest {
         final StyleData styleData = new StyleData(null);
         styleData.setSpecifiedValue(PropertyName.PADDING_RIGHT, "2em");
         
-        paddingRightAccessor.computeValue(styleData);
+        paddingRightAccessor.computeParsedValue(styleData);
         
         assertTrue(styleData.isPropertyComputed(PropertyName.PADDING_RIGHT));
         assertEquals(new AbsoluteLength(2, AbsoluteUnit.PT), styleData.getComputedValue(PropertyName.PADDING_RIGHT));
@@ -133,7 +134,7 @@ public class PaddingRightAccessorTest {
     }
     
     @Test
-    public void testComputeValueSpecifiedRelativeInvalid() {
+    public void testComputeValueSpecifiedRelativeInvalid() throws IOException {
         final AbsoluteLength onePoint = new AbsoluteLength(1, AbsoluteUnit.PT);
         final RelativeLength negativeTwoEM = new RelativeLength( -2, RelativeUnit.EM);
         
@@ -143,7 +144,7 @@ public class PaddingRightAccessorTest {
         final StyleData styleData = new StyleData(null);
         styleData.setSpecifiedValue(PropertyName.PADDING_RIGHT, "-2em");
         
-        paddingRightAccessor.computeValue(styleData);
+        paddingRightAccessor.computeParsedValue(styleData);
         
         assertTrue(styleData.isPropertyComputed(PropertyName.PADDING_RIGHT));
         final Length<?> computedValue = (Length<?>) styleData.getComputedValue(PropertyName.PADDING_RIGHT);
@@ -155,7 +156,7 @@ public class PaddingRightAccessorTest {
     }
     
     @Test
-    public void testComputeValueSpecifiedPercent() {
+    public void testComputeValueSpecifiedPercent() throws IOException {
         final PercentageLength fiftyPercent = new PercentageLength(50);
         
         when((PercentageLength) lengthParser.parse(anyString())).thenReturn(fiftyPercent);
@@ -163,7 +164,7 @@ public class PaddingRightAccessorTest {
         final StyleData styleData = new StyleData(null);
         styleData.setSpecifiedValue(PropertyName.PADDING_RIGHT, "50%");
         
-        paddingRightAccessor.computeValue(styleData);
+        paddingRightAccessor.computeParsedValue(styleData);
         
         assertTrue(styleData.isPropertyComputed(PropertyName.PADDING_RIGHT));
         assertEquals(fiftyPercent, styleData.getComputedValue(PropertyName.PADDING_RIGHT));
@@ -182,7 +183,7 @@ public class PaddingRightAccessorTest {
         final StyleData styleData = new StyleData(parentStyle);
         parentStyle.setComputedValue(PropertyName.PADDING_RIGHT, fivePixels);
         
-        paddingRightAccessor.computeValue(styleData);
+        paddingRightAccessor.computeParsedValue(styleData);
         
         assertTrue(styleData.isPropertyComputed(PropertyName.PADDING_RIGHT));
         final Length<?> computedValue = (Length<?>) styleData.getComputedValue(PropertyName.PADDING_RIGHT);
@@ -194,7 +195,7 @@ public class PaddingRightAccessorTest {
     }
     
     @Test
-    public void testComputeValueInherit() {
+    public void testComputeValueInherit() throws IOException {
         final AbsoluteLength fivePixels = new AbsoluteLength(5, AbsoluteUnit.PX);
         
         when((AbsoluteLength) lengthParser.parse(anyString())).thenReturn(fivePixels);
@@ -204,7 +205,7 @@ public class PaddingRightAccessorTest {
         parentStyle.setComputedValue(PropertyName.PADDING_RIGHT, fivePixels);
         styleData.setSpecifiedValue(PropertyName.PADDING_RIGHT, "inherit");
         
-        paddingRightAccessor.computeValue(styleData);
+        paddingRightAccessor.computeParsedValue(styleData);
         
         assertTrue(styleData.isPropertyComputed(PropertyName.PADDING_RIGHT));
         assertEquals(fivePixels, styleData.getComputedValue(PropertyName.PADDING_RIGHT));

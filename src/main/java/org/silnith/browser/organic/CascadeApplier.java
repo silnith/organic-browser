@@ -36,12 +36,6 @@ public class CascadeApplier {
      * @param styledElement
      */
     public void cascade(final StyledElement styledElement) {
-//        for (final CSSRule cssRule : stylesheet.getRules()) {
-//            if (cssRule.shouldApply(styledElement)) {
-//                cssRule.apply(styledElement);
-//            }
-//        }
-        
         compute(styledElement);
         
         /*
@@ -59,8 +53,6 @@ public class CascadeApplier {
             if (child instanceof StyledElement) {
                 final StyledElement childElement = (StyledElement) child;
                 cascade(childElement);
-//			} else if (child instanceof AnonymousStyledElement) {
-//				compute(child);
             }
         }
     }
@@ -99,7 +91,6 @@ public class CascadeApplier {
                 // disjoint will iterate over the second parameter, so we want that to be the smaller collection
                 if (Collections.disjoint(uncomputedPropertyNames, dependencies)) {
                     iterator.remove();
-//                    propertyAccessor.computeValue(styleData);
                     propertyAccessor.computeParsedValue(styleData);
                 }
             }

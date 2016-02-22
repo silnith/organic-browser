@@ -1,6 +1,7 @@
 package org.silnith.browser.organic;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.browser.organic.parser.css3.grammar.Parser;
 import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
+import org.silnith.browser.organic.parser.css3.lexical.Tokenizer;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
@@ -65,8 +67,7 @@ public class StyleData {
     
     private final Map<PropertyName, Boolean> propertySpecified;
     
-    private final Map<PropertyName, String> specifiedValues;
-    private final Map<PropertyName, List<Token>> parsedSpecifiedValues;
+    private final Map<PropertyName, List<Token>> specifiedValues;
     
     /**
      * A map that records which properties have been computed and which have not.
@@ -82,7 +83,6 @@ public class StyleData {
         this.propertyInherited = new EnumMap<>(PropertyName.class);
         this.propertySpecified = new EnumMap<>(PropertyName.class);
         this.specifiedValues = new EnumMap<>(PropertyName.class);
-        this.parsedSpecifiedValues = new EnumMap<>(PropertyName.class);
         this.propertyComputed = new EnumMap<>(PropertyName.class);
         this.computedValue = new EnumMap<>(PropertyName.class);
         
@@ -103,12 +103,12 @@ public class StyleData {
     
     /**
      * Returns {@code true} if the property is specified and the value is the
-     * string <kbd>"inherit"</kbd>.
+     * keyword <kbd>inherit</kbd>.
      * 
      * @param propertyName the name of the property to check
      * @return {@code true} if the named property is inherited in this styling data
      */
-    public boolean getInherit(final PropertyName propertyName) {
+    public boolean isInherit(final PropertyName propertyName) {
         if ( !isPropertySpecified(propertyName)) {
             throw new IllegalStateException();
         }
@@ -133,11 +133,19 @@ public class StyleData {
      * 
      * @param propertyName
      * @param propertyValue
+     * @throws IOException 
      */
-    public void setSpecifiedValue(final PropertyName propertyName, final String propertyValue) {
+    @Deprecated
+    public void setSpecifiedValue(final PropertyName propertyName, final String propertyValue) throws IOException {
+        final Parser cssParser = new Parser(new Tokenizer(new StringReader(propertyValue)));
+        cssParser.prime();
+        final List<Token> tokens = cssParser.parseListOfComponentValues();
+        setParsedSpecifiedValue(propertyName, tokens);
+    }
+    
+    public void setInherit(final PropertyName propertyName) {
         propertySpecified.put(propertyName, true);
-        specifiedValues.put(propertyName, propertyValue);
-        propertyInherited.put(propertyName, "inherit".equals(propertyValue));
+        propertyInherited.put(propertyName, true);
     }
 
     /**
@@ -150,26 +158,8 @@ public class StyleData {
      */
     public void setParsedSpecifiedValue(final PropertyName propertyName, final List<Token> propertyValue) {
         propertySpecified.put(propertyName, true);
-        parsedSpecifiedValues.put(propertyName, propertyValue);
         propertyInherited.put(propertyName, false);
-        try {
-            final Parser cssParser = new Parser(new TokenListStream(propertyValue));
-            cssParser.prime();
-            final Token token = cssParser.parseComponentValue();
-            if (token.getType() == Token.Type.LEXICAL_TOKEN) {
-                final LexicalToken lexicalToken = (LexicalToken) token;
-                if (lexicalToken.getLexicalType() == LexicalToken.LexicalType.IDENT_TOKEN) {
-                    final IdentToken identToken = (IdentToken) lexicalToken;
-                    if ("inherit".equals(identToken.getStringValue())) {
-                        propertyInherited.put(propertyName, true);
-                    }
-                }
-            }
-        } catch (final IOException e) {
-            // do nothing
-        } catch (final RuntimeException e) {
-            // do nothing
-        }
+        specifiedValues.put(propertyName, propertyValue);
     }
     
     /**
@@ -179,25 +169,11 @@ public class StyleData {
      * @param propertyName
      * @return
      */
-    public String getSpecifiedValue(final PropertyName propertyName) {
+    public List<Token> getSpecifiedValue(final PropertyName propertyName) {
         if ( !isPropertySpecified(propertyName)) {
             throw new IllegalStateException();
         }
         return specifiedValues.get(propertyName);
-    }
-
-    /**
-     * Returns the specified value for the given property.  If the property is
-     * not specified, this throws a runtime exception.
-     * 
-     * @param propertyName
-     * @return
-     */
-    public List<Token> getParsedSpecifiedValue(final PropertyName propertyName) {
-        if ( !isPropertySpecified(propertyName)) {
-            throw new IllegalStateException();
-        }
-        return parsedSpecifiedValues.get(propertyName);
     }
     
     /**
@@ -238,7 +214,7 @@ public class StyleData {
     
     @Override
     public String toString() {
-        return "StyleData {specifiedValues: " + specifiedValues + ", parsedSpecifiedValues: " + parsedSpecifiedValues + ", computedValues: " + computedValue + "}";
+        return "StyleData {parsedSpecifiedValues: " + specifiedValues + ", computedValues: " + computedValue + ", propertyInherited: " + propertyInherited + "}";
     }
     
 }
