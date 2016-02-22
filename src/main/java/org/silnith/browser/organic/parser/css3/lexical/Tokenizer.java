@@ -49,6 +49,7 @@ import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.RIGHT_PA
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.RIGHT_SQUARE_BRACKET;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SEMICOLON;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SHIFT_OUT;
+import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SOLIDUS;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.SPACE;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.TILDE;
 import static org.silnith.browser.organic.parser.util.UnicodeCodePoints.VERTICAL_LINE;
@@ -423,12 +424,9 @@ public class Tokenizer implements TokenStream {
     protected LexicalToken consumeToken() throws IOException {
         consume();
         switch (currentInputCodePoint) {
-//        case LINE_FEED: // fall through
-//        case CHARACTER_TABULATION: // fall through
-//        case SPACE: {
-//            consumeWhitespace();
-//            return new WhitespaceToken();
-//        } // break;
+        /*
+         * Whitespace is in the default case.
+         */
         case QUOTATION_MARK: {
             return consumeStringToken(QUOTATION_MARK);
         } // break;
@@ -516,6 +514,23 @@ public class Tokenizer implements TokenStream {
                 return new DelimToken(FULL_STOP);
             }
         } // break;
+        case SOLIDUS: {
+            if (nextInputCodePoint == ASTERISK) {
+                consume();
+                while (nextInputCodePoint != EOF) {
+                    consume();
+                    if (currentInputCodePoint == ASTERISK && nextInputCodePoint == SOLIDUS) {
+                        consume();
+                        break;
+                    }
+                }
+                return consumeToken();
+            } else {
+                assert currentInputCodePoint == SOLIDUS;
+                
+                return new DelimToken(SOLIDUS);
+            }
+        } // break;
         case COLON: {
             return new ColonToken();
         } // break;
@@ -580,6 +595,9 @@ public class Tokenizer implements TokenStream {
         case RIGHT_CURLY_BRACKET: {
             return new RightCurlyBracketToken();
         } // break;
+        /*
+         * Digit is handled in the default case.
+         */
         case LATIN_CAPITAL_LETTER_U: // fall through
         case LATIN_SMALL_LETTER_U: {
             if (nextInputCodePoint == PLUS_SIGN && (isHexDigit(lookahead[0]) || lookahead[0] == QUESTION_MARK)) {
@@ -590,6 +608,9 @@ public class Tokenizer implements TokenStream {
                 return consumeIdentLikeToken();
             }
         } // break;
+        /*
+         * Name-start code point is handled in the default case.
+         */
         case VERTICAL_LINE: {
             if (nextInputCodePoint == EQUALS_SIGN) {
                 consume();
@@ -617,20 +638,21 @@ public class Tokenizer implements TokenStream {
             return new EOFToken();
         } // break;
         default: {
-            // Copied from above.  Keep or ditch?
             if (isWhitespace(currentInputCodePoint)) {
                 while (isWhitespace(currentInputCodePoint)) {
                     consume();
                 }
                 return new WhitespaceToken();
-            }
-            if (isDigit(currentInputCodePoint)) {
+            } else if (isDigit(currentInputCodePoint)) {
                 reconsume();
                 return consumeNumericToken();
             } else if (isNameStartCodePoint(currentInputCodePoint)) {
                 reconsume();
                 return consumeIdentLikeToken();
             } else {
+                /*
+                 * anything else
+                 */
                 return new DelimToken((char) currentInputCodePoint);
             }
         } // break;
