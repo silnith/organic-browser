@@ -55,6 +55,7 @@ public class PropertyAccessorFactory {
         this.accessors.put(PropertyName.DISPLAY, new DisplayAccessor());
         this.accessors.put(PropertyName.POSITION, new PositionAccessor());
         this.accessors.put(PropertyName.FONT_SIZE, fontSizeAccessor);
+        this.accessors.put(PropertyName.FONT_STYLE, new FontStyleAccessor());
         this.accessors.put(PropertyName.MARGIN_TOP, new MarginTopAccessor(this.lengthParser, fontSizeAccessor));
         this.accessors.put(PropertyName.MARGIN_RIGHT, new MarginRightAccessor(this.lengthParser, fontSizeAccessor));
         this.accessors.put(PropertyName.MARGIN_BOTTOM, new MarginBottomAccessor(this.lengthParser, fontSizeAccessor));

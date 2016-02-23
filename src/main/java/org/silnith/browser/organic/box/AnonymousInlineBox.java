@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
@@ -14,6 +15,7 @@ import java.awt.geom.Point2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.text.BreakIterator;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ import org.silnith.browser.organic.StyledText;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
+import org.silnith.css.model.data.FontStyle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -174,13 +177,13 @@ public class AnonymousInlineBox implements InlineLevelBox {
         
     }
     
-//	private final PropertyAccessor<AbsoluteLength> fontSizeAccessor;
-    
     private final StyledText styledText;
     
     private final AbsoluteLength fontSize;
     
-    public AnonymousInlineBox(final PropertyAccessor<AbsoluteLength> fontSizeAccessor, final StyledText styledText) {
+    private final FontStyle fontStyle;
+    
+    public AnonymousInlineBox(final PropertyAccessor<AbsoluteLength> fontSizeAccessor, final PropertyAccessor<FontStyle> fontStyleAccessor, final StyledText styledText) {
         super();
         if (fontSizeAccessor == null) {
             throw new NullPointerException();
@@ -188,9 +191,9 @@ public class AnonymousInlineBox implements InlineLevelBox {
         if (styledText == null) {
             throw new NullPointerException();
         }
-//		this.fontSizeAccessor = fontSizeAccessor;
         this.styledText = styledText;
         this.fontSize = fontSizeAccessor.getComputedValue(styledText.getStyleData()).convertTo(AbsoluteUnit.PT);
+        this.fontStyle = fontStyleAccessor.getComputedValue(styledText.getStyleData());
     }
     
     private float getPixels(final AbsoluteLength length) {
@@ -203,7 +206,22 @@ public class AnonymousInlineBox implements InlineLevelBox {
     
     private Font getFont(final Graphics2D graphics) {
         // TODO: font family, weight, transform
-        final Font font = graphics.getFont().deriveFont(getPoints(fontSize));
+        Font font = graphics.getFont();
+//        Collections.singletonMap(TextAttribute.FAMILY, Font.SERIF);
+        // apply size
+        font = font.deriveFont(getPoints(fontSize));
+        switch (fontStyle) {
+        case NORMAL: {
+            font = font.deriveFont(Collections.singletonMap(TextAttribute.POSTURE, TextAttribute.POSTURE_REGULAR));
+        } break;
+        case ITALIC: {
+            font = font.deriveFont(Font.ITALIC);
+        } break;
+        case OBLIQUE: {
+            font = font.deriveFont(Collections.singletonMap(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE));
+        } break;
+        default: break;
+        }
         return font;
     }
     
@@ -277,6 +295,15 @@ public class AnonymousInlineBox implements InlineLevelBox {
         }
     }
     
+    private static final Map<Object, Object> renderingHints;
+    
+    static {
+        renderingHints = new HashMap<>();
+        renderingHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        renderingHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        renderingHints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+    }
+    
     @Override
     public synchronized LayoutResults layoutContents(final AbsoluteLength containingBlockWidth,
             final AbsoluteLength targetWidth, final Graphics2D graphics, final boolean canOverflow) {
@@ -288,6 +315,7 @@ public class AnonymousInlineBox implements InlineLevelBox {
         }
         
         final String text = styledText.getText();
+        graphics.addRenderingHints(renderingHints);
         // derive font takes size in points, not pixels
         final Font font = getFont(graphics);
         final FontMetrics fontMetrics = graphics.getFontMetrics(font);

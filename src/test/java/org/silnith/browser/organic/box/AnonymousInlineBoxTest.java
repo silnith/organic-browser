@@ -29,6 +29,7 @@ import org.silnith.browser.organic.box.InlineLevelBox.LayoutResults;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
+import org.silnith.css.model.data.FontStyle;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,6 +39,9 @@ public class AnonymousInlineBoxTest {
     
     @Mock
     private PropertyAccessor<AbsoluteLength> fontSizeAccessor;
+    
+    @Mock
+    private PropertyAccessor<FontStyle> fontStyleAccessor;
     
     @Mock
     private StyledText styledText;
@@ -62,6 +66,7 @@ public class AnonymousInlineBoxTest {
         final AbsoluteLength fontSize = new AbsoluteLength(12, AbsoluteUnit.PT);
         
         when(fontSizeAccessor.getComputedValue(any(StyleData.class))).thenReturn(fontSize);
+        when(fontStyleAccessor.getComputedValue(any(StyleData.class))).thenReturn(FontStyle.NORMAL);
         when(graphics2d.getFont()).thenReturn(font);
         when(graphics2d.getFontMetrics(any(Font.class))).thenReturn(fontMetrics);
         when(fontMetrics.getFontRenderContext()).thenReturn(fontRenderContext);
@@ -116,7 +121,7 @@ public class AnonymousInlineBoxTest {
     public void testLayoutContents() {
         when(styledText.getText()).thenReturn("This is a test.");
         
-        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, styledText);
+        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, null, styledText);
         
         final AbsoluteLength parentWidth = new AbsoluteLength(5, AbsoluteUnit.IN);
         final AbsoluteLength targetWidth = new AbsoluteLength(5, AbsoluteUnit.IN);
@@ -131,7 +136,7 @@ public class AnonymousInlineBoxTest {
     public void testLayoutContentsCannotFitNoOverflow() {
         when(styledText.getText()).thenReturn("This is a test.");
         
-        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, styledText);
+        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, null, styledText);
         
         final AbsoluteLength parentWidth = new AbsoluteLength(1, AbsoluteUnit.PX);
         final AbsoluteLength targetWidth = new AbsoluteLength(1, AbsoluteUnit.PX);
@@ -146,7 +151,7 @@ public class AnonymousInlineBoxTest {
     public void testLayoutContentsCannotFitWithOverflow() {
         when(styledText.getText()).thenReturn("This is a test.");
         
-        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, styledText);
+        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, null, styledText);
         
         final AbsoluteLength parentWidth = new AbsoluteLength(1, AbsoluteUnit.PX);
         final AbsoluteLength targetWidth = new AbsoluteLength(1, AbsoluteUnit.PX);
@@ -168,7 +173,7 @@ public class AnonymousInlineBoxTest {
     public void testLayoutContentsZeroWidthNoOverflow() {
         when(styledText.getText()).thenReturn("This is a test.");
         
-        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, styledText);
+        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, null, styledText);
         
         final AbsoluteLength parentWidth = AbsoluteLength.ZERO;
         final AbsoluteLength targetWidth = AbsoluteLength.ZERO;
@@ -183,7 +188,7 @@ public class AnonymousInlineBoxTest {
     public void testLayoutContentsZeroWidthWithOverflow() {
         when(styledText.getText()).thenReturn("This is a test.");
         
-        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, styledText);
+        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, null, styledText);
         
         final AbsoluteLength parentWidth = new AbsoluteLength( -1, AbsoluteUnit.PX);
         final AbsoluteLength targetWidth = new AbsoluteLength( -1, AbsoluteUnit.PX);
@@ -205,7 +210,7 @@ public class AnonymousInlineBoxTest {
     public void testLayoutContentsNegativeWidthNoOverflow() {
         when(styledText.getText()).thenReturn("This is a test.");
         
-        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, styledText);
+        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, null, styledText);
         
         final AbsoluteLength parentWidth = new AbsoluteLength( -1, AbsoluteUnit.PX);
         final AbsoluteLength targetWidth = new AbsoluteLength( -1, AbsoluteUnit.PX);
@@ -220,7 +225,7 @@ public class AnonymousInlineBoxTest {
     public void testLayoutContentsNegativeWidthWithOverflow() {
         when(styledText.getText()).thenReturn("This is a test.");
         
-        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, styledText);
+        anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, null, styledText);
         
         final AbsoluteLength parentWidth = new AbsoluteLength(1, AbsoluteUnit.PX);
         final AbsoluteLength targetWidth = new AbsoluteLength(1, AbsoluteUnit.PX);

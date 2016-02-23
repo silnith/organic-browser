@@ -17,6 +17,7 @@ import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.Display;
+import org.silnith.css.model.data.FontStyle;
 import org.silnith.css.model.data.ListStylePosition;
 import org.silnith.css.model.data.PropertyName;
 import org.w3c.dom.DOMImplementation;
@@ -95,10 +96,13 @@ public class Program {
         final PropertyAccessor<AbsoluteLength> fontSizeAccessor =
                 (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_SIZE);
         @SuppressWarnings("unchecked")
+        final PropertyAccessor<FontStyle> fontStyleAccessor =
+                (PropertyAccessor<FontStyle>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_STYLE);
+        @SuppressWarnings("unchecked")
         final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
                 (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
                         PropertyName.LIST_STYLE_POSITION);
-        final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, listStylePositionAccessor);
+        final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, fontStyleAccessor, listStylePositionAccessor);
         final BlockLevelBox blockBox = formatter.createBlockBox(styledElement);
         
         // debug output of the formatting information

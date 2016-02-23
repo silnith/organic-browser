@@ -5,7 +5,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.beans.Transient;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JViewport;
@@ -44,7 +47,13 @@ public class BoxRenderer extends JPanel implements ChangeListener {
     protected synchronized void paintComponent(final Graphics g) {
         super.paintComponent(g);
         
-        renderableContent.paintComponent(new Point(), (Graphics2D) g);
+        final Graphics2D g2 = (Graphics2D) g;
+        
+        final Map<Object, Object> hints = new HashMap<>();
+        hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.addRenderingHints(hints);
+        
+        renderableContent.paintComponent(new Point(), g2);
     }
     
     @Override
