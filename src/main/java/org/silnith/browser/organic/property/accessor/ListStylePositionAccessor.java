@@ -47,7 +47,8 @@ public class ListStylePositionAccessor extends PropertyAccessor<ListStylePositio
         } break;
         default: {} break;
         }
-        throw new IllegalArgumentException("Unknown list style position: " + specifiedValue);
+        throw new IllegalArgumentException(
+                "Illegal value for property: " + getPropertyName() + ": " + token);
     }
 
     @Override

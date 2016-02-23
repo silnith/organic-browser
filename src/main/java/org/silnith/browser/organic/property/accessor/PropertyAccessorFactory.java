@@ -33,7 +33,7 @@ public class PropertyAccessorFactory {
     
     private final PercentageLengthParser percentageLengthParser;
     
-    private final LengthParser lengthParser;
+    private final LengthParser<?> lengthParser;
     
     private final Map<PropertyName, PropertyAccessor<?>> accessors;
     
@@ -45,7 +45,7 @@ public class PropertyAccessorFactory {
         this.relativeLengthParser = new RelativeLengthParser(this.cssNumberParser);
         this.percentageLengthParser = new PercentageLengthParser(this.cssNumberParser);
         this.lengthParser =
-                new LengthParser(this.absoluteLengthParser, this.relativeLengthParser, this.percentageLengthParser);
+                new LengthParser<>(this.absoluteLengthParser, this.relativeLengthParser, this.percentageLengthParser);
                 
         final ColorAccessor colorAccessor = new ColorAccessor(this.colorParser);
         final FontSizeAccessor fontSizeAccessor = new FontSizeAccessor(this.lengthParser);
@@ -56,6 +56,7 @@ public class PropertyAccessorFactory {
         this.accessors.put(PropertyName.POSITION, new PositionAccessor());
         this.accessors.put(PropertyName.FONT_SIZE, fontSizeAccessor);
         this.accessors.put(PropertyName.FONT_STYLE, new FontStyleAccessor());
+        this.accessors.put(PropertyName.FONT_WEIGHT, new FontWeightAccessor());
         this.accessors.put(PropertyName.MARGIN_TOP, new MarginTopAccessor(this.lengthParser, fontSizeAccessor));
         this.accessors.put(PropertyName.MARGIN_RIGHT, new MarginRightAccessor(this.lengthParser, fontSizeAccessor));
         this.accessors.put(PropertyName.MARGIN_BOTTOM, new MarginBottomAccessor(this.lengthParser, fontSizeAccessor));

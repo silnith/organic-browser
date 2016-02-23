@@ -10,6 +10,7 @@ import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.Display;
 import org.silnith.css.model.data.FontStyle;
+import org.silnith.css.model.data.FontWeight;
 import org.silnith.css.model.data.ListStylePosition;
 
 
@@ -28,15 +29,20 @@ public class BoxFormatter {
     
     private final PropertyAccessor<FontStyle> fontStyleAccessor;
     
+    private final PropertyAccessor<FontWeight> fontWeightAccessor;
+    
     private final PropertyAccessor<ListStylePosition> listStylePositionAccessor;
     
     public BoxFormatter(final PropertyAccessor<Display> displayAccessor,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
-            PropertyAccessor<FontStyle> fontStyleAccessor, final PropertyAccessor<ListStylePosition> listStylePositionAccessor) {
+            final PropertyAccessor<FontStyle> fontStyleAccessor,
+            final PropertyAccessor<FontWeight> fontWeightAccessor,
+            final PropertyAccessor<ListStylePosition> listStylePositionAccessor) {
         super();
         this.displayAccessor = displayAccessor;
         this.fontSizeAccessor = fontSizeAccessor;
         this.fontStyleAccessor = fontStyleAccessor;
+        this.fontWeightAccessor = fontWeightAccessor;
         this.listStylePositionAccessor = listStylePositionAccessor;
     }
     
@@ -67,7 +73,7 @@ public class BoxFormatter {
                 
                 // do createInlineLevelBox with an inline child appended to the
                 // front for the marker
-                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontStyleAccessor, styledElement);
+                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 final AnonymousBlockBox anonymousBlockBox = new AnonymousBlockBox(styledElement);
                 anonymousBlockBox.addChild(markerBox);
                 box.addChild(anonymousBlockBox);
@@ -80,7 +86,7 @@ public class BoxFormatter {
                 final BlockBoxForBlocks box = new BlockBoxForBlocks(styledElement);
                 
                 // make block box for marker, then block box for child contents
-                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontStyleAccessor, styledElement);
+                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 box.addChild(markerBox);
                 
                 fillInBlockChildren(styledElement, box, styledElement.getChildren());
@@ -97,7 +103,7 @@ public class BoxFormatter {
             case INSIDE: {
                 final BlockBoxForFlow box = new BlockBoxForFlow(styledElement);
                 
-                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontStyleAccessor, styledElement);
+                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 box.addChild(markerBox);
                 
                 fillInInlineChildren(box, styledElement.getChildren());
@@ -107,7 +113,7 @@ public class BoxFormatter {
             case OUTSIDE: {
                 // make block box for marker and anonymous block box for list
                 // item
-                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontStyleAccessor, styledElement);
+                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 
                 final BlockBoxForBlocks blockBoxForBlocks = new BlockBoxForBlocks(styledElement);
                 blockBoxForBlocks.addChild(markerBox);
@@ -181,7 +187,7 @@ public class BoxFormatter {
         } else if (styledContent instanceof StyledText) {
             final StyledText styledText = (StyledText) styledContent;
             
-            final AnonymousInlineBox anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, fontStyleAccessor, styledText);
+            final AnonymousInlineBox anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledText);
             
             return anonymousInlineBox;
         } else {

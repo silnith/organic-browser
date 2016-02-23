@@ -5,6 +5,7 @@ import org.silnith.browser.organic.StyledText;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.FontStyle;
+import org.silnith.css.model.data.FontWeight;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,8 +26,9 @@ public class InlineListItemMarker extends AnonymousInlineBox {
      */
     public InlineListItemMarker(final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
             final PropertyAccessor<FontStyle> fontStyleAccessor,
+            final PropertyAccessor<FontWeight> fontWeightAccessor,
             final StyledElement listItemElement) {
-        super(fontSizeAccessor, fontStyleAccessor, new StyledText(listItemElement, "1. "));
+        super(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, new StyledText(listItemElement, "1. "));
         this.listItemElement = listItemElement;
     }
     

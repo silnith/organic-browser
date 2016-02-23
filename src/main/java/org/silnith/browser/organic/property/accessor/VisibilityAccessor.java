@@ -11,7 +11,6 @@ import org.silnith.browser.organic.parser.css3.grammar.Parser;
 import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
-import org.silnith.css.model.data.Position;
 import org.silnith.css.model.data.PropertyName;
 import org.silnith.css.model.data.Visibility;
 
@@ -48,7 +47,8 @@ public class VisibilityAccessor extends PropertyAccessor<Visibility> {
         } break;
         default: {} break;
         }
-        throw new IllegalArgumentException("Illegal property value: " + getPropertyName() + ": " + specifiedValue);
+        throw new IllegalArgumentException(
+                "Illegal value for property: " + getPropertyName() + ": " + token);
     }
 
     @Override

@@ -47,7 +47,8 @@ public class FontStyleAccessor extends PropertyAccessor<FontStyle> {
         } break;
         default: {} break;
         }
-        throw new IllegalArgumentException("Unknown font style: " + token);
+        throw new IllegalArgumentException(
+                "Illegal value for property: " + getPropertyName() + ": " + token);
     }
     
     @Override

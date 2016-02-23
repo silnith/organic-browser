@@ -65,8 +65,7 @@ public abstract class BorderWidthAccessor extends PropertyAccessor<AbsoluteLengt
             throw new IllegalArgumentException(
                     "Border width values cannot be percentages: " + getPropertyName() + ": " + length);
         } // break;
-        default:
-            throw new IllegalArgumentException();
+        default: throw new IllegalArgumentException("Unknown length type: " + length.getType());
         }
         
         if (absoluteLength.getLength().floatValue() < 0) {

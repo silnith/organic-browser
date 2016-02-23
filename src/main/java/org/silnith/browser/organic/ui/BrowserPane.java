@@ -39,6 +39,7 @@ import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.Display;
 import org.silnith.css.model.data.FontStyle;
+import org.silnith.css.model.data.FontWeight;
 import org.silnith.css.model.data.ListStylePosition;
 import org.silnith.css.model.data.PropertyName;
 import org.w3c.dom.DOMException;
@@ -186,10 +187,14 @@ public class BrowserPane extends JPanel {
                         (PropertyAccessor<FontStyle>) propertyAccessorFactory.getPropertyAccessor(
                                 PropertyName.FONT_STYLE);
                 @SuppressWarnings("unchecked")
+                final PropertyAccessor<FontWeight> fontWeightAccessor =
+                        (PropertyAccessor<FontWeight>) propertyAccessorFactory.getPropertyAccessor(
+                                PropertyName.FONT_WEIGHT);
+                @SuppressWarnings("unchecked")
                 final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
                         (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
                                 PropertyName.LIST_STYLE_POSITION);
-                final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, fontStyleAccessor, listStylePositionAccessor);
+                final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);
                 

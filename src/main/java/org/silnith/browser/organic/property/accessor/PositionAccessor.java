@@ -55,7 +55,7 @@ public class PositionAccessor extends PropertyAccessor<Position> {
         default: {} break;
         }
         throw new IllegalArgumentException(
-                "Illegal value for property: " + getPropertyName() + ": " + specifiedValue);
+                "Illegal value for property: " + getPropertyName() + ": " + token);
     }
 
     @Override

@@ -61,7 +61,7 @@ public abstract class BorderStyleAccessor extends PropertyAccessor<BorderStyle> 
         default: {} break;
         }
         throw new IllegalArgumentException(
-                "Border style illegal value: " + getPropertyName() + ": " + specifiedValue);
+                "Illegal value for property: " + getPropertyName() + ": " + token);
     }
 
     @Override

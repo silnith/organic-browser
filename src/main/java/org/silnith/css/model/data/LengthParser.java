@@ -61,10 +61,7 @@ public class LengthParser<T extends Unit> implements PropertyValueParser<Length<
     public Length<T> parse(List<Token> specifiedValue) throws IOException {
         final Parser cssParser = new Parser(new TokenListStream(specifiedValue));
         cssParser.prime();
-        return parseOneToken(cssParser.parseComponentValue());
-    }
-
-    private Length<T> parseOneToken(final Token token) {
+        final Token token = cssParser.parseComponentValue();
         switch (token.getType()) {
         case LEXICAL_TOKEN: {
             final LexicalToken lexicalToken = (LexicalToken) token;

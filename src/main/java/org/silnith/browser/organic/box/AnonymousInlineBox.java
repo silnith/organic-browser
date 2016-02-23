@@ -15,7 +15,7 @@ import java.awt.geom.Point2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.text.BreakIterator;
-import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +24,7 @@ import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
 import org.silnith.css.model.data.FontStyle;
+import org.silnith.css.model.data.FontWeight;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -183,7 +184,12 @@ public class AnonymousInlineBox implements InlineLevelBox {
     
     private final FontStyle fontStyle;
     
-    public AnonymousInlineBox(final PropertyAccessor<AbsoluteLength> fontSizeAccessor, final PropertyAccessor<FontStyle> fontStyleAccessor, final StyledText styledText) {
+    private final FontWeight fontWeight;
+    
+    public AnonymousInlineBox(final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
+            final PropertyAccessor<FontStyle> fontStyleAccessor,
+            final PropertyAccessor<FontWeight> fontWeightAccessor,
+            final StyledText styledText) {
         super();
         if (fontSizeAccessor == null) {
             throw new NullPointerException();
@@ -194,6 +200,7 @@ public class AnonymousInlineBox implements InlineLevelBox {
         this.styledText = styledText;
         this.fontSize = fontSizeAccessor.getComputedValue(styledText.getStyleData()).convertTo(AbsoluteUnit.PT);
         this.fontStyle = fontStyleAccessor.getComputedValue(styledText.getStyleData());
+        this.fontWeight = fontWeightAccessor.getComputedValue(styledText.getStyleData());
     }
     
     private float getPixels(final AbsoluteLength length) {
@@ -208,21 +215,35 @@ public class AnonymousInlineBox implements InlineLevelBox {
         // TODO: font family, weight, transform
         Font font = graphics.getFont();
 //        Collections.singletonMap(TextAttribute.FAMILY, Font.SERIF);
-        // apply size
-        font = font.deriveFont(getPoints(fontSize));
+        final Map<AttributedCharacterIterator.Attribute, Object> textAttributes = new HashMap<>();
         switch (fontStyle) {
         case NORMAL: {
-            font = font.deriveFont(Collections.singletonMap(TextAttribute.POSTURE, TextAttribute.POSTURE_REGULAR));
+            textAttributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_REGULAR);
         } break;
         case ITALIC: {
             font = font.deriveFont(Font.ITALIC);
         } break;
         case OBLIQUE: {
-            font = font.deriveFont(Collections.singletonMap(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE));
+            textAttributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
         } break;
-        default: break;
         }
-        return font;
+        textAttributes.put(TextAttribute.SIZE, getPoints(fontSize));
+        textAttributes.put(TextAttribute.WEIGHT, fontWeightAttributes.get(fontWeight));
+        return font.deriveFont(textAttributes);
+    }
+    
+    private static final Map<FontWeight, Float> fontWeightAttributes;
+    static {
+        fontWeightAttributes = new EnumMap<>(FontWeight.class);
+        fontWeightAttributes.put(FontWeight.WEIGHT_100, TextAttribute.WEIGHT_EXTRA_LIGHT);
+        fontWeightAttributes.put(FontWeight.WEIGHT_200, TextAttribute.WEIGHT_LIGHT);
+        fontWeightAttributes.put(FontWeight.WEIGHT_300, TextAttribute.WEIGHT_DEMILIGHT);
+        fontWeightAttributes.put(FontWeight.WEIGHT_400, TextAttribute.WEIGHT_REGULAR);
+        fontWeightAttributes.put(FontWeight.WEIGHT_500, TextAttribute.WEIGHT_SEMIBOLD);
+        fontWeightAttributes.put(FontWeight.WEIGHT_600, TextAttribute.WEIGHT_DEMIBOLD);
+        fontWeightAttributes.put(FontWeight.WEIGHT_700, TextAttribute.WEIGHT_BOLD);
+        fontWeightAttributes.put(FontWeight.WEIGHT_800, TextAttribute.WEIGHT_HEAVY);
+        fontWeightAttributes.put(FontWeight.WEIGHT_900, TextAttribute.WEIGHT_ULTRABOLD);
     }
     
     @Override
