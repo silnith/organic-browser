@@ -25,6 +25,8 @@ public class BoxFormatter {
     
     private final PropertyAccessor<Display> displayAccessor;
     
+    private final PropertyAccessor<List<String>> fontFamilyAccessor;
+    
     private final PropertyAccessor<AbsoluteLength> fontSizeAccessor;
     
     private final PropertyAccessor<FontStyle> fontStyleAccessor;
@@ -34,12 +36,14 @@ public class BoxFormatter {
     private final PropertyAccessor<ListStylePosition> listStylePositionAccessor;
     
     public BoxFormatter(final PropertyAccessor<Display> displayAccessor,
+            final PropertyAccessor<List<String>> fontFamilyAccessor,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
             final PropertyAccessor<FontStyle> fontStyleAccessor,
             final PropertyAccessor<FontWeight> fontWeightAccessor,
             final PropertyAccessor<ListStylePosition> listStylePositionAccessor) {
         super();
         this.displayAccessor = displayAccessor;
+        this.fontFamilyAccessor = fontFamilyAccessor;
         this.fontSizeAccessor = fontSizeAccessor;
         this.fontStyleAccessor = fontStyleAccessor;
         this.fontWeightAccessor = fontWeightAccessor;
@@ -73,7 +77,7 @@ public class BoxFormatter {
                 
                 // do createInlineLevelBox with an inline child appended to the
                 // front for the marker
-                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 final AnonymousBlockBox anonymousBlockBox = new AnonymousBlockBox(styledElement);
                 anonymousBlockBox.addChild(markerBox);
                 box.addChild(anonymousBlockBox);
@@ -86,7 +90,7 @@ public class BoxFormatter {
                 final BlockBoxForBlocks box = new BlockBoxForBlocks(styledElement);
                 
                 // make block box for marker, then block box for child contents
-                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 box.addChild(markerBox);
                 
                 fillInBlockChildren(styledElement, box, styledElement.getChildren());
@@ -103,7 +107,7 @@ public class BoxFormatter {
             case INSIDE: {
                 final BlockBoxForFlow box = new BlockBoxForFlow(styledElement);
                 
-                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 box.addChild(markerBox);
                 
                 fillInInlineChildren(box, styledElement.getChildren());
@@ -113,7 +117,7 @@ public class BoxFormatter {
             case OUTSIDE: {
                 // make block box for marker and anonymous block box for list
                 // item
-                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 
                 final BlockBoxForBlocks blockBoxForBlocks = new BlockBoxForBlocks(styledElement);
                 blockBoxForBlocks.addChild(markerBox);
@@ -187,7 +191,7 @@ public class BoxFormatter {
         } else if (styledContent instanceof StyledText) {
             final StyledText styledText = (StyledText) styledContent;
             
-            final AnonymousInlineBox anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, styledText);
+            final AnonymousInlineBox anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledText);
             
             return anonymousInlineBox;
         } else {
@@ -207,8 +211,7 @@ public class BoxFormatter {
                 switch (childDisplay) {
                 case INLINE: {
                     runOfInlineContent.add(childElement);
-                }
-                    break;
+                } break;
                 case BLOCK: {
                     if ( !runOfInlineContent.isEmpty()) {
                         // create anonymous block box
@@ -223,11 +226,9 @@ public class BoxFormatter {
                     }
                     final BlockLevelBox childBox = createBlockBox(childElement);
                     box.addChild(childBox);
-                }
-                    break;
+                } break;
                 case NONE: {
-                }
-                    break;
+                } break;
                 case LIST_ITEM: {
                     if ( !runOfInlineContent.isEmpty()) {
                         // create anonymous block box
@@ -242,8 +243,7 @@ public class BoxFormatter {
                     }
                     final BlockLevelBox childBox = createListItemBox(childElement);
                     box.addChild(childBox);
-                }
-                    break;
+                } break;
                 default: {
                     throw new UnsupportedOperationException("Display: " + childDisplay);
                 } // break;

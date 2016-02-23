@@ -1,5 +1,7 @@
 package org.silnith.browser.organic.box;
 
+import java.util.List;
+
 import org.silnith.browser.organic.StyledElement;
 import org.silnith.browser.organic.StyledText;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
@@ -25,10 +27,11 @@ public class InlineListItemMarker extends AnonymousInlineBox {
      * @param listItemElement the list item being marked
      */
     public InlineListItemMarker(final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
+            final PropertyAccessor<List<String>> fontFamilyAccessor,
             final PropertyAccessor<FontStyle> fontStyleAccessor,
             final PropertyAccessor<FontWeight> fontWeightAccessor,
             final StyledElement listItemElement) {
-        super(fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, new StyledText(listItemElement, "1. "));
+        super(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, new StyledText(listItemElement, "1. "));
         this.listItemElement = listItemElement;
     }
     

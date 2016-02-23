@@ -6,6 +6,7 @@ import java.util.Map;
 import org.silnith.css.model.data.AbsoluteLengthParser;
 import org.silnith.css.model.data.CSSNumberParser;
 import org.silnith.css.model.data.ColorParser;
+import org.silnith.css.model.data.FontFamilyNameParser;
 import org.silnith.css.model.data.LengthParser;
 import org.silnith.css.model.data.PercentageLengthParser;
 import org.silnith.css.model.data.PropertyName;
@@ -54,6 +55,7 @@ public class PropertyAccessorFactory {
         this.accessors.put(PropertyName.BACKGROUND_COLOR, new BackgroundColorAccessor(colorParser));
         this.accessors.put(PropertyName.DISPLAY, new DisplayAccessor());
         this.accessors.put(PropertyName.POSITION, new PositionAccessor());
+        this.accessors.put(PropertyName.FONT_FAMILY, new FontFamilyAccessor(new FontFamilyNameParser()));
         this.accessors.put(PropertyName.FONT_SIZE, fontSizeAccessor);
         this.accessors.put(PropertyName.FONT_STYLE, new FontStyleAccessor());
         this.accessors.put(PropertyName.FONT_WEIGHT, new FontWeightAccessor());

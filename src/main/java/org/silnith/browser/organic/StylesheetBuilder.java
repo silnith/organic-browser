@@ -117,7 +117,7 @@ public class StylesheetBuilder {
                             final DeclarationNode declarationNode = (DeclarationNode) declaration;
                             
                             final String name = declarationNode.getName();
-                            System.out.println("declaration name: " + name);
+//                            System.out.println("declaration name: " + name);
                             final List<Token> value = declarationNode.getValue();
                             
                             // for each declaration, invoke a property-specific parse
@@ -172,16 +172,16 @@ public class StylesheetBuilder {
                                 inherit = false;
                                 break;
                             }
-                            System.out.print("property value: ");
-                            if (inherit) {
-                                System.out.print("inherit");
-                            } else {
-                                System.out.print(propertyValue);
-                            }
-                            if (important) {
-                                System.out.print(" ! important");
-                            }
-                            System.out.println();
+//                            System.out.print("property value: ");
+//                            if (inherit) {
+//                                System.out.print("inherit");
+//                            } else {
+//                                System.out.print(propertyValue);
+//                            }
+//                            if (important) {
+//                                System.out.print(" ! important");
+//                            }
+//                            System.out.println();
                             
                             final ParsedCSSRule parsedCSSRule;
                             if (inherit) {
@@ -393,8 +393,9 @@ public class StylesheetBuilder {
                     final String media = element.getAttribute("media");
                     
                     if (type.equals("text/css")) {
-                        System.out.println("inline");
+//                        System.out.println("inline stylesheet");
                         final String stylesheetText = element.getTextContent();
+                        System.out.println(stylesheetText);
                         try (final StringReader reader = new StringReader(stylesheetText)) {
                             stylesheets.add(new Stylesheet(readStylesheetRules(reader), new ArrayList<>()));
                         } catch (final IOException e) {

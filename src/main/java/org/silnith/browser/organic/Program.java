@@ -106,7 +106,7 @@ public class Program {
         final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
                 (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
                         PropertyName.LIST_STYLE_POSITION);
-        final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
+        final BoxFormatter formatter = new BoxFormatter(displayAccessor, null, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
         final BlockLevelBox blockBox = formatter.createBlockBox(styledElement);
         
         // debug output of the formatting information

@@ -17,6 +17,7 @@ import java.text.AttributedString;
 import java.text.BreakIterator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.silnith.browser.organic.StyledText;
@@ -180,6 +181,8 @@ public class AnonymousInlineBox implements InlineLevelBox {
     
     private final StyledText styledText;
     
+    private final String fontFamilyName;
+    
     private final AbsoluteLength fontSize;
     
     private final FontStyle fontStyle;
@@ -187,6 +190,7 @@ public class AnonymousInlineBox implements InlineLevelBox {
     private final FontWeight fontWeight;
     
     public AnonymousInlineBox(final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
+            final PropertyAccessor<List<String>> fontFamilyAccessor,
             final PropertyAccessor<FontStyle> fontStyleAccessor,
             final PropertyAccessor<FontWeight> fontWeightAccessor,
             final StyledText styledText) {
@@ -198,6 +202,7 @@ public class AnonymousInlineBox implements InlineLevelBox {
             throw new NullPointerException();
         }
         this.styledText = styledText;
+        this.fontFamilyName = fontFamilyAccessor.getComputedValue(styledText.getStyleData()).get(0);
         this.fontSize = fontSizeAccessor.getComputedValue(styledText.getStyleData()).convertTo(AbsoluteUnit.PT);
         this.fontStyle = fontStyleAccessor.getComputedValue(styledText.getStyleData());
         this.fontWeight = fontWeightAccessor.getComputedValue(styledText.getStyleData());
@@ -212,21 +217,25 @@ public class AnonymousInlineBox implements InlineLevelBox {
     }
     
     private Font getFont(final Graphics2D graphics) {
-        // TODO: font family, weight, transform
-        Font font = graphics.getFont();
-//        Collections.singletonMap(TextAttribute.FAMILY, Font.SERIF);
+        /*
+         * Note that the font size is specified twice.  The first time is an
+         * integer, the second time is a float.  The second value should be
+         * applied.
+         */
+        int style = Font.PLAIN;
         final Map<AttributedCharacterIterator.Attribute, Object> textAttributes = new HashMap<>();
         switch (fontStyle) {
         case NORMAL: {
             textAttributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_REGULAR);
         } break;
         case ITALIC: {
-            font = font.deriveFont(Font.ITALIC);
+            style = Font.ITALIC;
         } break;
         case OBLIQUE: {
             textAttributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
         } break;
         }
+        final Font font = new Font(fontFamilyName, style, (int) getPoints(fontSize));
         textAttributes.put(TextAttribute.SIZE, getPoints(fontSize));
         textAttributes.put(TextAttribute.WEIGHT, fontWeightAttributes.get(fontWeight));
         return font.deriveFont(textAttributes);

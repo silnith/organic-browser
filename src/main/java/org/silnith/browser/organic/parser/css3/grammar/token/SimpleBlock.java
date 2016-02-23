@@ -33,7 +33,7 @@ public class SimpleBlock extends ComponentValue {
 
     @Override
     public String toString() {
-        return "SimpleBlock {"
+        return "{"
                 + "token=" + token
                 + ", "
                 + "value=" + value

@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -159,7 +160,7 @@ public class BrowserPane extends JPanel {
                 final Parser parser = new Parser(download);
                 final Document document = getResult("Parse", parser);
                 
-                printNode(document);
+//                printNode(document);
                 
                 final Styler styler = new Styler(new StyleTreeBuilder(), document);
                 final StyledElement styledElement = getResult("Style", styler);
@@ -179,22 +180,21 @@ public class BrowserPane extends JPanel {
                 final PropertyAccessor<Display> displayAccessor =
                         (PropertyAccessor<Display>) propertyAccessorFactory.getPropertyAccessor(PropertyName.DISPLAY);
                 @SuppressWarnings("unchecked")
+                final PropertyAccessor<List<String>> fontFamilyAccessor =
+                        (PropertyAccessor<List<String>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_FAMILY);
+                @SuppressWarnings("unchecked")
                 final PropertyAccessor<AbsoluteLength> fontSizeAccessor =
-                        (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(
-                                PropertyName.FONT_SIZE);
+                        (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_SIZE);
                 @SuppressWarnings("unchecked")
                 final PropertyAccessor<FontStyle> fontStyleAccessor =
-                        (PropertyAccessor<FontStyle>) propertyAccessorFactory.getPropertyAccessor(
-                                PropertyName.FONT_STYLE);
+                        (PropertyAccessor<FontStyle>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_STYLE);
                 @SuppressWarnings("unchecked")
                 final PropertyAccessor<FontWeight> fontWeightAccessor =
-                        (PropertyAccessor<FontWeight>) propertyAccessorFactory.getPropertyAccessor(
-                                PropertyName.FONT_WEIGHT);
+                        (PropertyAccessor<FontWeight>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_WEIGHT);
                 @SuppressWarnings("unchecked")
                 final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
-                        (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
-                                PropertyName.LIST_STYLE_POSITION);
-                final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
+                        (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(PropertyName.LIST_STYLE_POSITION);
+                final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontFamilyAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);
                 
