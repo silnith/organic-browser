@@ -9,8 +9,18 @@ import org.w3c.dom.Node;
 
 /**
  * This represents a box element that can be layed out inside the CSS box model.
+ * <p>
+ * Block-level elements are those elements of the source document that are formatted visually as blocks (e.g., paragraphs). The following values of the 'display' property make an element block-level: 'block', 'list-item', and 'table'.
+ * <p>
+ * Block-level boxes are boxes that participate in a block formatting context. Each block-level element generates a principal block-level box that contains descendant boxes and generated content and is also the box involved in any positioning scheme. Some block-level elements may generate additional boxes in addition to the principal box: 'list-item' elements. These additional boxes are placed with respect to the principal box.
+ * <p>
+ * Except for table boxes, which are described in a later chapter, and replaced elements, a block-level box is also a block container box. A block container box either contains only block-level boxes or establishes an inline formatting context and thus contains only inline-level boxes. Not all block container boxes are block-level boxes: non-replaced inline blocks and non-replaced table cells are block containers but not block-level boxes. Block-level boxes that are also block containers are called block boxes.
+ * <p>
+ * The three terms "block-level box," "block container box," and "block box" are sometimes abbreviated as "block" where unambiguous.
  * 
  * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#block-boxes">9.2.1 Block-level elements and block boxes</a>
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#block-level">Block-level elements</a>
  */
 public interface BlockLevelBox {
     

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.List;
  * {@link InlineFormattingContext}.
  * 
  * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#inline-formatting">9.4.2 Inline formatting contexts</a>
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#line-box">line box</a>
  */
 public class LineBox implements RenderableLineContent {
     
@@ -52,6 +55,24 @@ public class LineBox implements RenderableLineContent {
     }
     
     @Override
+    public boolean containsPoint(Point2D startPoint, Point2D clickPoint) {
+        final Rectangle2D bounds = new Rectangle2D.Double(startPoint.getX(), startPoint.getY(), size.getWidth(), size.getHeight());
+        final boolean contains = bounds.contains(clickPoint);
+        if (contains) {
+            System.out.println(this);
+        }
+        
+        final Point2D childLocation = new Point2D.Double(startPoint.getX(), startPoint.getY());
+        final Iterator<Point2D> iterator = childLocations.iterator();
+        for (final RenderableLineContent child : children) {
+            final Point2D nextOffset = iterator.next();
+            childLocation.setLocation(startPoint.getX() + nextOffset.getX(), startPoint.getY() + nextOffset.getY());
+            child.containsPoint(childLocation, clickPoint);
+        }
+        return contains;
+    }
+
+    @Override
     public Dimension2D getSize() {
         return size;
     }
@@ -73,6 +94,12 @@ public class LineBox implements RenderableLineContent {
         
 //		final RenderedBox box = new RenderedBox(getSize().width, getSize().height, 1, 1, 1, 1, Color.BLACK);
 //		box.paintComponent(startPoint, graphics);
+    }
+
+    @Override
+    public String toString() {
+        return "LineBox [children=" + children + ", childLocations=" + childLocations + ", size=" + size + ", baseline="
+                + baseline + "]";
     }
     
 }

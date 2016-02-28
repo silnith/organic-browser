@@ -26,6 +26,8 @@ import org.w3c.dom.Node;
  * A block box that contains other block boxes.
  * 
  * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#block-boxes">9.2.1 Block-level elements and block boxes</a>
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#block-formatting">9.4.1 Block formatting contexts</a>
  */
 public class BlockBoxForBlocks implements BlockLevelBox, BlockFormattingContext {
     

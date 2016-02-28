@@ -1,5 +1,6 @@
 package org.silnith.browser.organic.box;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +21,13 @@ import org.silnith.css.model.data.ListStylePosition;
  * This class is thread-safe and re-entrant.
  * 
  * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#box-gen">9.2 Controlling box generation</a>
  */
 public class BoxFormatter {
     
     private final PropertyAccessor<Display> displayAccessor;
+    
+    private final PropertyAccessor<Color> colorAccessor;
     
     private final PropertyAccessor<List<String>> fontFamilyAccessor;
     
@@ -36,6 +40,7 @@ public class BoxFormatter {
     private final PropertyAccessor<ListStylePosition> listStylePositionAccessor;
     
     public BoxFormatter(final PropertyAccessor<Display> displayAccessor,
+            final PropertyAccessor<Color> colorAccessor,
             final PropertyAccessor<List<String>> fontFamilyAccessor,
             final PropertyAccessor<AbsoluteLength> fontSizeAccessor,
             final PropertyAccessor<FontStyle> fontStyleAccessor,
@@ -43,6 +48,7 @@ public class BoxFormatter {
             final PropertyAccessor<ListStylePosition> listStylePositionAccessor) {
         super();
         this.displayAccessor = displayAccessor;
+        this.colorAccessor = colorAccessor;
         this.fontFamilyAccessor = fontFamilyAccessor;
         this.fontSizeAccessor = fontSizeAccessor;
         this.fontStyleAccessor = fontStyleAccessor;
@@ -77,7 +83,7 @@ public class BoxFormatter {
                 
                 // do createInlineLevelBox with an inline child appended to the
                 // front for the marker
-                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, colorAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 final AnonymousBlockBox anonymousBlockBox = new AnonymousBlockBox(styledElement);
                 anonymousBlockBox.addChild(markerBox);
                 box.addChild(anonymousBlockBox);
@@ -90,7 +96,7 @@ public class BoxFormatter {
                 final BlockBoxForBlocks box = new BlockBoxForBlocks(styledElement);
                 
                 // make block box for marker, then block box for child contents
-                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final BlockLevelBox markerBox = new BlockListItemMarker(colorAccessor, fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 box.addChild(markerBox);
                 
                 fillInBlockChildren(styledElement, box, styledElement.getChildren());
@@ -107,7 +113,7 @@ public class BoxFormatter {
             case INSIDE: {
                 final BlockBoxForFlow box = new BlockBoxForFlow(styledElement);
                 
-                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final InlineLevelBox markerBox = new InlineListItemMarker(fontSizeAccessor, colorAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 box.addChild(markerBox);
                 
                 fillInInlineChildren(box, styledElement.getChildren());
@@ -117,7 +123,7 @@ public class BoxFormatter {
             case OUTSIDE: {
                 // make block box for marker and anonymous block box for list
                 // item
-                final BlockLevelBox markerBox = new BlockListItemMarker(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
+                final BlockLevelBox markerBox = new BlockListItemMarker(colorAccessor, fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledElement);
                 
                 final BlockBoxForBlocks blockBoxForBlocks = new BlockBoxForBlocks(styledElement);
                 blockBoxForBlocks.addChild(markerBox);
@@ -165,6 +171,7 @@ public class BoxFormatter {
                  * according to the CSS2 spec section 9.2.1.1
                  */
                 throw new UnsupportedOperationException();
+//                throw new ConvertInlineToBlockFormattingContextException();
             } // break;
             case INLINE: {
                 final InlineBox inlineBox = new InlineBox(styledElement);
@@ -191,7 +198,7 @@ public class BoxFormatter {
         } else if (styledContent instanceof StyledText) {
             final StyledText styledText = (StyledText) styledContent;
             
-            final AnonymousInlineBox anonymousInlineBox = new AnonymousInlineBox(fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledText);
+            final AnonymousInlineBox anonymousInlineBox = new AnonymousInlineBox(colorAccessor, fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, styledText);
             
             return anonymousInlineBox;
         } else {
@@ -287,6 +294,11 @@ public class BoxFormatter {
         return false;
     }
     
+    /**
+     * @param display
+     * @return
+     * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#block-level">Block-level elements</a>
+     */
     private boolean isBlockLevel(final Display display) {
         switch (display) {
         case BLOCK:

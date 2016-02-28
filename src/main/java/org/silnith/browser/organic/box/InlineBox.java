@@ -16,6 +16,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 
+/**
+ * An inline box is one that is both inline-level and whose contents participate in its containing inline formatting context. A non-replaced element with a 'display' value of 'inline' generates an inline box.
+ * 
+ * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#inline-boxes">9.2.2 Inline-level elements and inline boxes</a>
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#inline-box">inline box</a>
+ */
 public class InlineBox implements InlineLevelBox, InlineFormattingContext {
     
     private class Results implements LayoutResults {

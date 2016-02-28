@@ -23,6 +23,17 @@ public class RenderedBackground implements RenderableContent {
     }
     
     @Override
+    public boolean containsPoint(Point2D startPoint, Point2D clickPoint) {
+        final Rectangle2D bounds = new Rectangle2D.Double(startPoint.getX(), startPoint.getY(),
+                size.getWidth(), size.getHeight());
+        final boolean contains = bounds.contains(clickPoint);
+        if (contains) {
+            System.out.println(this);
+        }
+        return contains;
+    }
+
+    @Override
     public Dimension2D getSize() {
         return size;
     }
@@ -31,9 +42,17 @@ public class RenderedBackground implements RenderableContent {
     public void paintComponent(final Point2D startPoint, final Graphics2D graphics) {
         final Shape background = new Rectangle2D.Float((float) startPoint.getX(), (float) startPoint.getY(),
                 (float) size.getWidth(), (float) size.getHeight());
-                
-        graphics.setColor(color);
-        graphics.fill(background);
+        
+        final int alpha = color.getAlpha();
+        if (alpha > 0) {
+            graphics.setColor(color);
+            graphics.fill(background);
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return "RenderedBackground [size=" + size + ", color=" + color + "]";
     }
     
 }

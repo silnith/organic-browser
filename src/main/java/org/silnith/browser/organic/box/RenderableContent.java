@@ -19,4 +19,6 @@ public interface RenderableContent {
     
     void paintComponent(Point2D startPoint, Graphics2D graphics);
     
+    boolean containsPoint(Point2D startPoint, Point2D clickPoint);
+    
 }

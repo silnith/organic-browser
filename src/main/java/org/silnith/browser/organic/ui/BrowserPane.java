@@ -1,6 +1,7 @@
 package org.silnith.browser.organic.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -180,6 +181,8 @@ public class BrowserPane extends JPanel {
                 final PropertyAccessor<Display> displayAccessor =
                         (PropertyAccessor<Display>) propertyAccessorFactory.getPropertyAccessor(PropertyName.DISPLAY);
                 @SuppressWarnings("unchecked")
+                final PropertyAccessor<Color> colorAccessor = (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.COLOR);
+                @SuppressWarnings("unchecked")
                 final PropertyAccessor<List<String>> fontFamilyAccessor =
                         (PropertyAccessor<List<String>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_FAMILY);
                 @SuppressWarnings("unchecked")
@@ -194,7 +197,7 @@ public class BrowserPane extends JPanel {
                 @SuppressWarnings("unchecked")
                 final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
                         (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(PropertyName.LIST_STYLE_POSITION);
-                final BoxFormatter formatter = new BoxFormatter(displayAccessor, fontFamilyAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
+                final BoxFormatter formatter = new BoxFormatter(displayAccessor, colorAccessor, fontFamilyAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);
                 

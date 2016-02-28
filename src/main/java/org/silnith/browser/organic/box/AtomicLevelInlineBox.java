@@ -3,6 +3,7 @@ package org.silnith.browser.organic.box;
 import java.awt.Graphics2D;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import org.silnith.browser.organic.StyledElement;
@@ -15,8 +16,12 @@ import org.w3c.dom.Node;
 /**
  * A formatting box that represents an inline replaced element, such as "img".
  * This inline box participates in a {@link BlockFormattingContext}. (??)
+ * <p>
+ * Inline-level boxes that are not inline boxes (such as replaced inline-level elements, inline-block elements, and inline-table elements) are called atomic inline-level boxes because they participate in their inline formatting context as a single opaque box.
  * 
  * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#inline-boxes">9.2.2 Inline-level elements and inline boxes</a>
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#x13">atomic inline-level boxes</a>
  */
 public class AtomicLevelInlineBox implements InlineLevelBox, BlockFormattingContext {
     
@@ -97,6 +102,15 @@ public class AtomicLevelInlineBox implements InlineLevelBox, BlockFormattingCont
         }
         
         @Override
+        public boolean containsPoint(Point2D startPoint, Point2D clickPoint) {
+            final boolean contains = renderableContent.containsPoint(startPoint, clickPoint);
+            if (contains) {
+                System.out.println(this);
+            }
+            return contains;
+        }
+        
+        @Override
         public Dimension2D getSize() {
             return renderableContent.getSize();
         }
@@ -109,6 +123,11 @@ public class AtomicLevelInlineBox implements InlineLevelBox, BlockFormattingCont
         @Override
         public float getBaseline() {
             return (float) (renderableContent.getSize().getHeight() / 2f);
+        }
+
+        @Override
+        public String toString() {
+            return "Render [renderableContent=" + renderableContent + "]";
         }
         
     }

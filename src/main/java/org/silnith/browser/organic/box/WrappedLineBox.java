@@ -12,6 +12,14 @@ import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
 
 
+/**
+ * This is a wrapper around a single horizontal line of content inside an
+ * {@link InlineFormattingContext}.
+ * 
+ * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#inline-formatting">9.4.2 Inline formatting contexts</a>
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#line-box">line box</a>
+ */
 public class WrappedLineBox extends LineBox {
     
     private final Point2D offset;
@@ -78,6 +86,13 @@ public class WrappedLineBox extends LineBox {
     }
     
     @Override
+    public boolean containsPoint(Point2D startPoint, Point2D clickPoint) {
+        background.containsPoint(startPoint, clickPoint);
+        box.containsPoint(startPoint, clickPoint);
+        return super.containsPoint(startPoint, clickPoint);
+    }
+
+    @Override
     public Dimension2D getSize() {
         return size;
     }
@@ -95,6 +110,12 @@ public class WrappedLineBox extends LineBox {
         final Point2D childStart = new Point2D.Float();
         childStart.setLocation(startPoint.getX() + offset.getX(), startPoint.getY() + offset.getY());
         super.paintComponent(childStart, graphics);
+    }
+
+    @Override
+    public String toString() {
+        return "WrappedLineBox [offset=" + offset + ", baseline=" + baseline + ", size=" + size + ", background="
+                + background + ", box=" + box + "]";
     }
     
 }

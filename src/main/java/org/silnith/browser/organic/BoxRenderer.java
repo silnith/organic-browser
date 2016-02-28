@@ -1,10 +1,13 @@
 package org.silnith.browser.organic;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.Transient;
 
 import javax.swing.JPanel;
@@ -27,6 +30,33 @@ public class BoxRenderer extends JPanel implements ChangeListener {
     
     private static final long serialVersionUID = 1L;
     
+    private final class Listener implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            System.out.println(e.getPoint());
+            final boolean contains = renderableContent.containsPoint(new Point(), e.getPoint());
+            System.out.println(contains);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+        }
+        
+    }
+    
     private final BlockLevelBox blockLevelBox;
     
     private transient RenderableContent renderableContent = null;
@@ -37,7 +67,10 @@ public class BoxRenderer extends JPanel implements ChangeListener {
         super();
         this.blockLevelBox = blockLevelBox;
         
+//        this.setOpaque(true);
+//        this.setBackground(Color.WHITE);
         this.setOpaque(false);
+        this.addMouseListener(new Listener());
     }
     
     @Override

@@ -1,8 +1,11 @@
 package org.silnith.browser.organic;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -79,9 +82,14 @@ public class Program {
         final PropertyAccessorFactory propertyAccessorFactory = new PropertyAccessorFactory();
         final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
         final long cascadeStartTime = System.currentTimeMillis();
+        final Collection<StyledDOMElement> allElements = new HashSet<>();
+        collectElements((StyledDOMElement) styledElement, allElements);
         for (final Stylesheet stylesheet : stylesheets) {
-//            cascadeApplier.cascade(styledElement, stylesheet);
+            for (final CSSRule cssRule : stylesheet.getRules()) {
+                cssRule.apply(allElements);
+            }
         }
+        cascadeApplier.cascade(styledElement);
         final long cascadeEndTime = System.currentTimeMillis();
         System.out.println("Cascade time: " + (cascadeEndTime - cascadeStartTime));
         
@@ -93,6 +101,12 @@ public class Program {
         @SuppressWarnings("unchecked")
         final PropertyAccessor<Display> displayAccessor =
                 (PropertyAccessor<Display>) propertyAccessorFactory.getPropertyAccessor(PropertyName.DISPLAY);
+        @SuppressWarnings("unchecked")
+        final PropertyAccessor<Color> colorAccessor =
+                (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.COLOR);
+        @SuppressWarnings("unchecked")
+        final PropertyAccessor<List<String>> fontFamilyAccessor =
+                (PropertyAccessor<List<String>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_FAMILY);
         @SuppressWarnings("unchecked")
         final PropertyAccessor<AbsoluteLength> fontSizeAccessor =
                 (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_SIZE);
@@ -106,7 +120,7 @@ public class Program {
         final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
                 (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(
                         PropertyName.LIST_STYLE_POSITION);
-        final BoxFormatter formatter = new BoxFormatter(displayAccessor, null, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
+        final BoxFormatter formatter = new BoxFormatter(displayAccessor, colorAccessor, fontFamilyAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
         final BlockLevelBox blockBox = formatter.createBlockBox(styledElement);
         
         // debug output of the formatting information
@@ -128,6 +142,16 @@ public class Program {
         jFrame.setVisible(true);
     }
     
+    private static void collectElements(final StyledDOMElement element, final Collection<StyledDOMElement> collector) {
+        for (final StyledContent content : element.getChildren()) {
+            if (content instanceof StyledDOMElement) {
+                final StyledDOMElement child = (StyledDOMElement) content;
+                collector.add(child);
+                collectElements(child, collector);
+            }
+        }
+    }
+    
     private static Document createDocument(final DOMImplementation domImpl) {
         final DocumentType docType = domImpl.createDocumentType("html", PUBLIC_ID, SYSTEM_ID);
         final Document domDocument = domImpl.createDocument(NAMESPACE, "html", docType);
@@ -141,12 +165,12 @@ public class Program {
         final Element styleElement = domDocument.createElement("style");
         headElement.appendChild(styleElement);
         styleElement.setAttribute("type", "text/css");
-        styleElement.appendChild(domDocument.createTextNode("H1 { padding: 1em; }"));
+        styleElement.appendChild(domDocument.createTextNode("h1 { padding: 1em; } body { font-size: 16pt; }"));
         
         final Element bodyElement = domDocument.createElement("body");
         documentElement.appendChild(bodyElement);
         
-        final Element firstPara = domDocument.createElement("p");
+        final Element firstPara = domDocument.createElement("h1");
         bodyElement.appendChild(firstPara);
         firstPara.appendChild(domDocument.createTextNode("This is a test."));
         

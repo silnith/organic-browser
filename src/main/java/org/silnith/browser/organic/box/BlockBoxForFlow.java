@@ -22,6 +22,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 
+/**
+ * A block-level box that establishes an inline-formatting context.
+ * 
+ * @author kent
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#block-boxes">9.2.1 Block-level elements and block boxes</a>
+ * @see <a href="https://www.w3.org/TR/CSS2/visuren.html#inline-formatting">9.4.2 Inline formatting contexts</a>
+ */
 public class BlockBoxForFlow implements BlockLevelBox, InlineFormattingContext {
     
     private final StyledElement styledElement;

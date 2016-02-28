@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.browser.organic.parser.css3.grammar.Parser;
-import org.silnith.browser.organic.parser.css3.grammar.token.ComponentValue;
 import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
 import org.silnith.browser.organic.parser.css3.lexical.token.FunctionToken;
 import org.silnith.browser.organic.parser.css3.lexical.token.HashToken;
@@ -69,11 +68,7 @@ public class ColorParser {
             final String gStr = sixHexMatcher.group(2);
             final String bStr = sixHexMatcher.group(3);
             
-            final int r = Integer.parseInt(rStr, 16);
-            final int g = Integer.parseInt(gStr, 16);
-            final int b = Integer.parseInt(bStr, 16);
-            
-            return new Color(r, g, b);
+            return parseSixHex(rStr, gStr, bStr);
         }
         final Matcher threeHexMatcher = THREE_HEX_PATTERN.matcher(specifiedValue);
         if (threeHexMatcher.matches()) {
@@ -81,11 +76,7 @@ public class ColorParser {
             final String gStr = threeHexMatcher.group(2);
             final String bStr = threeHexMatcher.group(3);
             
-            final int r = Integer.parseInt(rStr + rStr, 16);
-            final int g = Integer.parseInt(gStr + gStr, 16);
-            final int b = Integer.parseInt(bStr + bStr, 16);
-            
-            return new Color(r, g, b);
+            return parseThreeHex(rStr, gStr, bStr);
         }
         final Matcher rgbMatcher = RGB_CONSTANT_PATTERN.matcher(specifiedValue);
         if (rgbMatcher.matches()) {
@@ -113,6 +104,22 @@ public class ColorParser {
         }
         
         return null;
+    }
+
+    private static Color parseThreeHex(final String rStr, final String gStr, final String bStr) {
+        final int r = Integer.parseInt(rStr + rStr, 16);
+        final int g = Integer.parseInt(gStr + gStr, 16);
+        final int b = Integer.parseInt(bStr + bStr, 16);
+        
+        return new Color(r, g, b);
+    }
+
+    private static Color parseSixHex(final String rStr, final String gStr, final String bStr) {
+        final int r = Integer.parseInt(rStr, 16);
+        final int g = Integer.parseInt(gStr, 16);
+        final int b = Integer.parseInt(bStr, 16);
+        
+        return new Color(r, g, b);
     }
     
     public ColorParser() {
@@ -145,7 +152,16 @@ public class ColorParser {
             switch (lexicalToken.getLexicalType()) {
             case HASH_TOKEN: {
                 final HashToken hashToken = (HashToken) lexicalToken;
-                return parseInternal(hashToken.getStringValue());
+                final String hash = hashToken.getStringValue();
+                switch (hash.length()) {
+                case 3: {
+                    return parseThreeHex(hash.substring(0, 1), hash.substring(1, 2), hash.substring(2, 3));
+                } // break;
+                case 6: {
+                    return parseSixHex(hash.substring(0, 2), hash.substring(2, 4), hash.substring(4, 6));
+                } // break;
+                default: throw new IllegalArgumentException("Illegal hash value: #" + hash);
+                }
             } // break;
             case IDENT_TOKEN: {
                 final IdentToken identToken = (IdentToken) lexicalToken;

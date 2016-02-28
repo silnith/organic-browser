@@ -7,6 +7,7 @@ import java.awt.Shape;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import org.silnith.browser.organic.box.BorderInformation;
 import org.silnith.browser.organic.box.RenderableContent;
@@ -112,6 +113,23 @@ public class RenderedBox implements RenderableContent {
         final Dimension size = new Dimension();
         size.setSize(getWidth(), getHeight());
         return size;
+    }
+
+    @Override
+    public boolean containsPoint(final Point2D startPoint, final Point2D clickPoint) {
+        final Rectangle2D bounds = new Rectangle2D.Double(startPoint.getX(), startPoint.getY(), width, height);
+        final boolean contains = bounds.contains(clickPoint);
+        if (contains) {
+            System.out.println(this);
+        }
+        return contains;
+    }
+    
+    @Override
+    public String toString() {
+        return "RenderedBox [width=" + width + ", height=" + height + ", borderTop=" + borderTop + ", borderRight="
+                + borderRight + ", borderBottom=" + borderBottom + ", borderLeft=" + borderLeft + ", borderInformation="
+                + borderInformation + "]";
     }
     
 }
