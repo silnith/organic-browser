@@ -23,9 +23,8 @@ public class FontFamilyAccessor extends PropertyAccessor<List<String>> {
     static {
         VALID_FONT_FAMILY_NAMES = new HashSet<>();
         final GraphicsEnvironment localGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        final String[] availableFontFamilyNames = localGraphicsEnvironment.getAvailableFontFamilyNames();
+        final String[] availableFontFamilyNames = localGraphicsEnvironment.getAvailableFontFamilyNames(Locale.ENGLISH);
         for (final String fontFamilyName : availableFontFamilyNames) {
-            System.out.println(fontFamilyName);
             VALID_FONT_FAMILY_NAMES.add(fontFamilyName.toUpperCase(Locale.ENGLISH));
         }
 //        VALID_FONT_FAMILY_NAMES.addAll(Arrays.asList(availableFontFamilyNames));
