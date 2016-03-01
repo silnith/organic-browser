@@ -187,12 +187,12 @@ public class Tokenizer implements TokenStream {
     @PostConstruct
     protected void prime() throws IOException {
         if (primed) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot prime tokenizer twice.");
         }
         currentInputCodePoint = 0;
-        nextInputCodePoint = reader.read();
-        lookahead[0] = reader.read();
-        lookahead[1] = reader.read();
+        nextInputCodePoint = readCodePoint();
+        lookahead[0] = readCodePoint();
+        lookahead[1] = readCodePoint();
         lookahead[2] = 0;
         /*
          * We only use three elements of look-ahead, kept in nextInputCodePoint,
@@ -246,17 +246,55 @@ public class Tokenizer implements TokenStream {
             lookahead[1] = lookahead[2];
             lookahead[2] = 0;
         } else {
-            lookahead[1] = reader.read();
+            lookahead[1] = readCodePoint();
         }
         
 //        System.out.print("consumed: '");
-//        System.out.print((char) currentInputCodePoint);
+//        System.out.print(toChars(currentInputCodePoint));
 //        System.out.println("'");
 //        System.out.print("lookahead: '");
-//        System.out.print((char) nextInputCodePoint);
-//        System.out.print((char) lookahead[0]);
-//        System.out.print((char) lookahead[1]);
+//        System.out.print(toChars(nextInputCodePoint));
+//        System.out.print(toChars(lookahead[0]));
+//        System.out.print(toChars(lookahead[1]));
 //        System.out.println("'");
+    }
+    
+    private char[] toChars(final int codePoint) {
+        if (codePoint == EOF) {
+            return new char[] { '-', '1' };
+        } else {
+            return Character.toChars(codePoint);
+        }
+    }
+
+    private int readCodePoint() throws IOException {
+        final int nextCharacter = reader.read();
+        if (nextCharacter == EOF) {
+            return nextCharacter;
+        } else {
+            final char highSurrogate = (char) nextCharacter;
+            if (Character.isHighSurrogate(highSurrogate)) {
+                final int charRead = reader.read();
+                if (charRead == EOF) {
+                    /*
+                     * EOF can be ignored since further reads will return the same thing.
+                     */
+                    return nextCharacter;
+                } else {
+                    final char lowSurrogate = (char) charRead;
+                    if (Character.isLowSurrogate(lowSurrogate)) {
+                        return Character.toCodePoint(highSurrogate, lowSurrogate);
+                    } else {
+                        System.out.println("Discarding high surrogate not followed by a low surrogate.");
+                        System.out.println("high surrogate: \\u" + Integer.toHexString(nextCharacter));
+                        System.out.println("following character: \\u" + Integer.toHexString(charRead));
+                        return charRead;
+                    }
+                }
+            } else {
+                return nextCharacter;
+            }
+        }
     }
     
     /**
@@ -282,10 +320,10 @@ public class Tokenizer implements TokenStream {
         
 //        System.out.println("reconsume");
 //        System.out.print("lookahead: '");
-//        System.out.print((char) nextInputCodePoint);
-//        System.out.print((char) lookahead[0]);
-//        System.out.print((char) lookahead[1]);
-//        System.out.print((char) lookahead[2]);
+//        System.out.print(toChars(nextInputCodePoint));
+//        System.out.print(toChars(lookahead[0]));
+//        System.out.print(toChars(lookahead[1]));
+//        System.out.print(toChars(lookahead[2]));
 //        System.out.println("'");
     }
     
@@ -678,7 +716,7 @@ public class Tokenizer implements TokenStream {
                 /*
                  * anything else
                  */
-                return new DelimToken((char) currentInputCodePoint);
+                return new DelimToken(currentInputCodePoint);
             }
         } // break;
         }
@@ -752,8 +790,8 @@ public class Tokenizer implements TokenStream {
                 } else if (isNewline(nextInputCodePoint)) {
                     consume();
                 } else if (isValidEscape()) {
-                    final char[] escapedCodePoint = consumeEscapedCodePoint();
-                    stringToken.append(escapedCodePoint);
+                    final int escapedCodePoint = consumeEscapedCodePoint();
+                    stringToken.append(Character.toChars(escapedCodePoint));
                 }
             } break;
             default: {
@@ -767,7 +805,7 @@ public class Tokenizer implements TokenStream {
                         throw new ParseErrorException("Newline in string.");
                     }
                 } else {
-                    stringToken.append((char) currentInputCodePoint);
+                    stringToken.append(Character.toChars(currentInputCodePoint));
                 }
             } break;
             }
@@ -836,8 +874,8 @@ public class Tokenizer implements TokenStream {
             } // break;
             case REVERSE_SOLIDUS: {
                 if (isValidEscape()) {
-                    final char[] escapedCodePoint = consumeEscapedCodePoint();
-                    urlToken.append(escapedCodePoint);
+                    final int escapedCodePoint = consumeEscapedCodePoint();
+                    urlToken.append(Character.toChars(escapedCodePoint));
                 } else {
                     if (isAllowParseErrors()) {
                         consumeRemnantsOfBadURL();
@@ -868,8 +906,7 @@ public class Tokenizer implements TokenStream {
                         throw new ParseErrorException("Bad URL.");
                     }
                 } else {
-//                    Character.toChars(currentInputCodePoint);
-                    urlToken.append((char) currentInputCodePoint);
+                    urlToken.append(Character.toChars(currentInputCodePoint));
                 }
             } break;
             }
@@ -892,13 +929,13 @@ public class Tokenizer implements TokenStream {
         int digitsConsumed = 0;
         while (isHexDigit(nextInputCodePoint) && digitsConsumed < 6) {
             consume();
-            consumedStartBuf.append((char) currentInputCodePoint);
+            consumedStartBuf.append(Character.toChars(currentInputCodePoint));
             digitsConsumed++;
         }
         boolean containsQuestionMarks = false;
         while (nextInputCodePoint == QUESTION_MARK && digitsConsumed < 6) {
             consume();
-            consumedStartBuf.append((char) currentInputCodePoint);
+            consumedStartBuf.append(Character.toChars(currentInputCodePoint));
             digitsConsumed++;
             containsQuestionMarks = true;
         }
@@ -923,7 +960,7 @@ public class Tokenizer implements TokenStream {
             digitsConsumed = 0;
             while (isHexDigit(nextInputCodePoint) && digitsConsumed < 6) {
                 consume();
-                consumedEndBuffer.append((char) currentInputCodePoint);
+                consumedEndBuffer.append(Character.toChars(currentInputCodePoint));
                 digitsConsumed++;
             }
             endRange = Integer.parseInt(consumedEndBuffer.toString(), 16);
@@ -947,23 +984,23 @@ public class Tokenizer implements TokenStream {
      * 
      * @see <a href="https://www.w3.org/TR/css-syntax-3/#consume-an-escaped-code-point">4.3.7. Consume an escaped code point</a>
      */
-    protected char[] consumeEscapedCodePoint() throws IOException {
+    protected int consumeEscapedCodePoint() throws IOException {
         assert currentInputCodePoint == REVERSE_SOLIDUS;
         assert !isNewline(nextInputCodePoint);
         
         consume();
         switch (currentInputCodePoint) {
         case EOF: {
-            return Character.toChars(REPLACEMENT_CHARACTER);
+            return REPLACEMENT_CHARACTER;
         } // break;
         default: {
             if (isHexDigit(currentInputCodePoint)) {
                 final StringBuilder buf = new StringBuilder();
-                buf.append((char) currentInputCodePoint);
+                buf.append(Character.toChars(currentInputCodePoint));
                 int digitsConsumed = 0;
                 while (isHexDigit(nextInputCodePoint) && digitsConsumed < 5) {
                     consume();
-                    buf.append((char) currentInputCodePoint);
+                    buf.append(Character.toChars(currentInputCodePoint));
                     digitsConsumed++;
                 }
                 if (isWhitespace(nextInputCodePoint)) {
@@ -971,12 +1008,12 @@ public class Tokenizer implements TokenStream {
                 }
                 final int codePoint = Integer.parseInt(buf.toString(), 16);
                 if (codePoint == 0 || isSurrogateCodePoint(codePoint) || codePoint > MAXIMUM_ALLOWED_CODE_POINT) {
-                    return Character.toChars(REPLACEMENT_CHARACTER);
+                    return REPLACEMENT_CHARACTER;
                 } else {
-                    return Character.toChars(codePoint);
+                    return codePoint;
                 }
             } else {
-                return Character.toChars(currentInputCodePoint);
+                return currentInputCodePoint;
             }
         } // break;
         }
@@ -1122,9 +1159,10 @@ public class Tokenizer implements TokenStream {
         do {
             consume();
             if (isNameCodePoint(currentInputCodePoint)) {
-                buf.append((char) currentInputCodePoint);
+                buf.append(Character.toChars(currentInputCodePoint));
             } else if (isValidEscape()) {
-                buf.append(consumeEscapedCodePoint());
+                final int escapedCodePoint = consumeEscapedCodePoint();
+                buf.append(Character.toChars(escapedCodePoint));
             } else {
                 /*
                  * TODO:
@@ -1152,45 +1190,45 @@ public class Tokenizer implements TokenStream {
         TypedNumericValueToken.NumericType type = TypedNumericValueToken.NumericType.INTEGER;
         if (nextInputCodePoint == PLUS_SIGN || nextInputCodePoint == HYPHEN_MINUS) {
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
         }
         while (isDigit(nextInputCodePoint)) {
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
         }
         if (nextInputCodePoint == FULL_STOP && isDigit(lookahead[0])) {
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
             type = TypedNumericValueToken.NumericType.NUMBER;
             while (isDigit(nextInputCodePoint)) {
                 consume();
-                rep.append((char) currentInputCodePoint);
+                rep.append(Character.toChars(currentInputCodePoint));
             }
         }
         final boolean nextInputCodePointIsE = nextInputCodePoint == LATIN_CAPITAL_LETTER_E || nextInputCodePoint == LATIN_SMALL_LETTER_E;
         if (nextInputCodePointIsE && isDigit(lookahead[0])) {
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
             type = TypedNumericValueToken.NumericType.NUMBER;
             while (isDigit(nextInputCodePoint)) {
                 consume();
-                rep.append((char) currentInputCodePoint);
+                rep.append(Character.toChars(currentInputCodePoint));
             }
         } else if (nextInputCodePointIsE && (lookahead[0] == HYPHEN_MINUS || lookahead[0] == PLUS_SIGN) && isDigit(lookahead[1])) {
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
             consume();
-            rep.append((char) currentInputCodePoint);
+            rep.append(Character.toChars(currentInputCodePoint));
             type = TypedNumericValueToken.NumericType.NUMBER;
             while (isDigit(nextInputCodePoint)) {
                 consume();
-                rep.append((char) currentInputCodePoint);
+                rep.append(Character.toChars(currentInputCodePoint));
             }
         }
         
