@@ -9,28 +9,28 @@ import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.KeywordParser;
 import org.silnith.css.model.data.PropertyName;
-import org.silnith.css.model.data.Visibility;
+import org.silnith.css.model.data.TextTransform;
 
 
-public class VisibilityAccessor extends PropertyAccessor<Visibility> {
+public class TextTransformAccessor extends PropertyAccessor<TextTransform> {
     
-    private final KeywordParser<Visibility> parser;
+    private final KeywordParser<TextTransform> parser;
     
-    public VisibilityAccessor() {
-        super(PropertyName.VISIBILITY, true);
-        this.parser = new KeywordParser<>(Visibility.class);
+    public TextTransformAccessor() {
+        super(PropertyName.TEXT_TRANSFORM, true);
+        this.parser = new KeywordParser<>(TextTransform.class);
+    }
+
+    @Override
+    public TextTransform getInitialValue(StyleData styleData) {
+        return TextTransform.NONE;
     }
     
     @Override
-    public Visibility getInitialValue(final StyleData styleData) {
-        return Visibility.VISIBLE;
-    }
-    
-    @Override
-    protected Visibility parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+    protected TextTransform parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         return parser.parse(specifiedValue);
     }
-
+    
     @Override
     public Set<PropertyName> getDependencies() {
         return Collections.emptySet();

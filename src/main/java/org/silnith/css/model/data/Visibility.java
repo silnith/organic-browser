@@ -7,14 +7,10 @@ package org.silnith.css.model.data;
  * @see PropertyName#VISIBILITY
  * @see org.silnith.browser.organic.property.accessor.VisibilityAccessor
  */
-public enum Visibility {
+public enum Visibility implements Keyword {
     VISIBLE("visible"),
     HIDDEN("hidden"),
     COLLAPSE("collapse");
-    
-    public static Visibility getFromValue(final String value) {
-        return null;
-    }
     
     private final String value;
     
@@ -24,6 +20,11 @@ public enum Visibility {
     
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean is(String identifier) {
+        return value.equals(identifier);
     }
     
 }

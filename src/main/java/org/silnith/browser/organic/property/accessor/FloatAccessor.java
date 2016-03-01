@@ -7,30 +7,30 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.css.model.data.CSSFloat;
 import org.silnith.css.model.data.KeywordParser;
 import org.silnith.css.model.data.PropertyName;
-import org.silnith.css.model.data.Visibility;
 
 
-public class VisibilityAccessor extends PropertyAccessor<Visibility> {
+public class FloatAccessor extends PropertyAccessor<CSSFloat> {
     
-    private final KeywordParser<Visibility> parser;
+    private final KeywordParser<CSSFloat> parser;
     
-    public VisibilityAccessor() {
-        super(PropertyName.VISIBILITY, true);
-        this.parser = new KeywordParser<>(Visibility.class);
+    public FloatAccessor() {
+        super(PropertyName.FLOAT, false);
+        this.parser = new KeywordParser<>(CSSFloat.class);
+    }
+
+    @Override
+    public CSSFloat getInitialValue(StyleData styleData) {
+        return CSSFloat.NONE;
     }
     
     @Override
-    public Visibility getInitialValue(final StyleData styleData) {
-        return Visibility.VISIBLE;
-    }
-    
-    @Override
-    protected Visibility parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+    protected CSSFloat parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         return parser.parse(specifiedValue);
     }
-
+    
     @Override
     public Set<PropertyName> getDependencies() {
         return Collections.emptySet();

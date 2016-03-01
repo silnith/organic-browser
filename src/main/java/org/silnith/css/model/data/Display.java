@@ -11,7 +11,7 @@ import java.util.Map;
  * @see PropertyName#DISPLAY
  * @see org.silnith.browser.organic.property.accessor.DisplayAccessor
  */
-public enum Display {
+public enum Display implements Keyword {
     INLINE("inline"),
     BLOCK("block"),
     LIST_ITEM("list-item"),
@@ -49,6 +49,11 @@ public enum Display {
     
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean is(String identifier) {
+        return value.equals(identifier);
     }
     
 }

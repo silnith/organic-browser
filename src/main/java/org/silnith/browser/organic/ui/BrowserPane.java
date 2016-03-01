@@ -177,26 +177,19 @@ public class BrowserPane extends JPanel {
                 
 //                printNode(styledElement.createDOM(document));
                 
-                @SuppressWarnings("unchecked")
                 final PropertyAccessor<Display> displayAccessor =
-                        (PropertyAccessor<Display>) propertyAccessorFactory.getPropertyAccessor(PropertyName.DISPLAY);
-                @SuppressWarnings("unchecked")
-                final PropertyAccessor<Color> colorAccessor = (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.COLOR);
-                @SuppressWarnings("unchecked")
+                        propertyAccessorFactory.getPropertyAccessor(PropertyName.DISPLAY);
+                final PropertyAccessor<Color> colorAccessor = propertyAccessorFactory.getPropertyAccessor(PropertyName.COLOR);
                 final PropertyAccessor<List<String>> fontFamilyAccessor =
-                        (PropertyAccessor<List<String>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_FAMILY);
-                @SuppressWarnings("unchecked")
+                        propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_FAMILY);
                 final PropertyAccessor<AbsoluteLength> fontSizeAccessor =
-                        (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_SIZE);
-                @SuppressWarnings("unchecked")
+                        propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_SIZE);
                 final PropertyAccessor<FontStyle> fontStyleAccessor =
-                        (PropertyAccessor<FontStyle>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_STYLE);
-                @SuppressWarnings("unchecked")
+                        propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_STYLE);
                 final PropertyAccessor<FontWeight> fontWeightAccessor =
-                        (PropertyAccessor<FontWeight>) propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_WEIGHT);
-                @SuppressWarnings("unchecked")
+                        propertyAccessorFactory.getPropertyAccessor(PropertyName.FONT_WEIGHT);
                 final PropertyAccessor<ListStylePosition> listStylePositionAccessor =
-                        (PropertyAccessor<ListStylePosition>) propertyAccessorFactory.getPropertyAccessor(PropertyName.LIST_STYLE_POSITION);
+                        propertyAccessorFactory.getPropertyAccessor(PropertyName.LIST_STYLE_POSITION);
                 final BoxFormatter formatter = new BoxFormatter(displayAccessor, colorAccessor, fontFamilyAccessor, fontSizeAccessor, fontStyleAccessor, fontWeightAccessor, listStylePositionAccessor);
                 final Formatter2 formatter2 = new Formatter2(formatter, styledElement);
                 final BlockLevelBox blockBox = getResult("Format", formatter2);

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public enum ListStyleType {
+public enum ListStyleType implements Keyword {
     DISC("disc"),
     CIRCLE("circle"),
     SQUARE("square"),
@@ -42,6 +42,11 @@ public enum ListStyleType {
     
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public boolean is(String identifier) {
+        return key.equals(identifier);
     }
     
 }

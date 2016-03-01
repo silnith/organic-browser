@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public enum ListStylePosition {
+public enum ListStylePosition implements Keyword {
     INSIDE("inside"),
     OUTSIDE("outside");
     
@@ -29,6 +29,11 @@ public enum ListStylePosition {
     
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public boolean is(String identifier) {
+        return key.equals(identifier);
     }
     
 }

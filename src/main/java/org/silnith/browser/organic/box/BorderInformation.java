@@ -17,45 +17,45 @@ public class BorderInformation {
     private static final PropertyAccessorFactory propertyAccessorFactory = PropertyAccessorFactory.getInstance();
     
     private static final PropertyAccessor<BorderStyle> borderTopStyleAccessor =
-            (PropertyAccessor<BorderStyle>) propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_TOP_STYLE);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_TOP_STYLE);
             
     private static final PropertyAccessor<BorderStyle> borderRightStyleAccessor =
-            (PropertyAccessor<BorderStyle>) propertyAccessorFactory.getPropertyAccessor(
+            propertyAccessorFactory.getPropertyAccessor(
                     PropertyName.BORDER_RIGHT_STYLE);
                     
     private static final PropertyAccessor<BorderStyle> borderBottomStyleAccessor =
-            (PropertyAccessor<BorderStyle>) propertyAccessorFactory.getPropertyAccessor(
+            propertyAccessorFactory.getPropertyAccessor(
                     PropertyName.BORDER_BOTTOM_STYLE);
                     
     private static final PropertyAccessor<BorderStyle> borderLeftStyleAccessor =
-            (PropertyAccessor<BorderStyle>) propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_LEFT_STYLE);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_LEFT_STYLE);
             
     private static final PropertyAccessor<Color> borderTopColorAccessor =
-            (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_TOP_COLOR);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_TOP_COLOR);
             
     private static final PropertyAccessor<Color> borderRightColorAccessor =
-            (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_RIGHT_COLOR);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_RIGHT_COLOR);
             
     private static final PropertyAccessor<Color> borderBottomColorAccessor =
-            (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_BOTTOM_COLOR);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_BOTTOM_COLOR);
             
     private static final PropertyAccessor<Color> borderLeftColorAccessor =
-            (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_LEFT_COLOR);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.BORDER_LEFT_COLOR);
             
     private static final PropertyAccessor<AbsoluteLength> borderTopWidthAccessor =
-            (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(
+            propertyAccessorFactory.getPropertyAccessor(
                     PropertyName.BORDER_TOP_WIDTH);
                     
     private static final PropertyAccessor<AbsoluteLength> borderRightWidthAccessor =
-            (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(
+            propertyAccessorFactory.getPropertyAccessor(
                     PropertyName.BORDER_RIGHT_WIDTH);
                     
     private static final PropertyAccessor<AbsoluteLength> borderBottomWidthAccessor =
-            (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(
+            propertyAccessorFactory.getPropertyAccessor(
                     PropertyName.BORDER_BOTTOM_WIDTH);
                     
     private static final PropertyAccessor<AbsoluteLength> borderLeftWidthAccessor =
-            (PropertyAccessor<AbsoluteLength>) propertyAccessorFactory.getPropertyAccessor(
+            propertyAccessorFactory.getPropertyAccessor(
                     PropertyName.BORDER_LEFT_WIDTH);
                     
     @Deprecated

@@ -14,16 +14,16 @@ public class PaddingInformation {
     private static final PropertyAccessorFactory propertyAccessorFactory = PropertyAccessorFactory.getInstance();
     
     private static final PropertyAccessor<Length<?>> paddingTopAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_TOP);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_TOP);
             
     private static final PropertyAccessor<Length<?>> paddingRightAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_RIGHT);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_RIGHT);
             
     private static final PropertyAccessor<Length<?>> paddingBottomAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_BOTTOM);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_BOTTOM);
             
     private static final PropertyAccessor<Length<?>> paddingLeftAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_LEFT);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.PADDING_LEFT);
             
     public static PaddingInformation getPaddingInformation(final StyleData styleData) {
         final Length<?> paddingTop = paddingTopAccessor.getComputedValue(styleData);

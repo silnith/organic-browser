@@ -3,7 +3,7 @@ package org.silnith.css.model.data;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum FontStyle {
+public enum FontStyle implements Keyword {
     NORMAL("normal"),
     ITALIC("italic"),
     OBLIQUE("oblique");
@@ -32,6 +32,11 @@ public enum FontStyle {
     
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean is(String identifier) {
+        return value.equals(identifier);
     }
     
 }

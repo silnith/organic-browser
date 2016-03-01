@@ -11,7 +11,7 @@ import java.util.Map;
  * @see PropertyName#POSITION
  * @see org.silnith.browser.organic.property.accessor.PositionAccessor
  */
-public enum Position {
+public enum Position implements Keyword {
     STATIC("static"),
     RELATIVE("relative"),
     ABSOLUTE("absolute"),
@@ -38,6 +38,11 @@ public enum Position {
     
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean is(String identifier) {
+        return value.equals(identifier);
     }
     
 }

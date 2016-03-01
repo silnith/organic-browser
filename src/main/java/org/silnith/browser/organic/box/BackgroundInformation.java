@@ -13,7 +13,7 @@ public class BackgroundInformation {
     private static final PropertyAccessorFactory propertyAccessorFactory = PropertyAccessorFactory.getInstance();
     
     private static final PropertyAccessor<Color> backgroundColorAccessor =
-            (PropertyAccessor<Color>) propertyAccessorFactory.getPropertyAccessor(PropertyName.BACKGROUND_COLOR);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.BACKGROUND_COLOR);
             
     public static BackgroundInformation getBackgroundInformation(final StyleData styleData) {
         final Color color = backgroundColorAccessor.getComputedValue(styleData);

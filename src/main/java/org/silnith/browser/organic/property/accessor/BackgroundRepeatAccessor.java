@@ -7,30 +7,30 @@ import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.css.model.data.BackgroundRepeat;
 import org.silnith.css.model.data.KeywordParser;
 import org.silnith.css.model.data.PropertyName;
-import org.silnith.css.model.data.Visibility;
 
 
-public class VisibilityAccessor extends PropertyAccessor<Visibility> {
+public class BackgroundRepeatAccessor extends PropertyAccessor<BackgroundRepeat> {
     
-    private final KeywordParser<Visibility> parser;
+    private final KeywordParser<BackgroundRepeat> parser;
     
-    public VisibilityAccessor() {
-        super(PropertyName.VISIBILITY, true);
-        this.parser = new KeywordParser<>(Visibility.class);
+    public BackgroundRepeatAccessor() {
+        super(PropertyName.BACKGROUND_REPEAT, false);
+        this.parser = new KeywordParser<>(BackgroundRepeat.class);
+    }
+
+    @Override
+    public BackgroundRepeat getInitialValue(StyleData styleData) {
+        return BackgroundRepeat.REPEAT;
     }
     
     @Override
-    public Visibility getInitialValue(final StyleData styleData) {
-        return Visibility.VISIBLE;
-    }
-    
-    @Override
-    protected Visibility parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+    protected BackgroundRepeat parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         return parser.parse(specifiedValue);
     }
-
+    
     @Override
     public Set<PropertyName> getDependencies() {
         return Collections.emptySet();

@@ -9,28 +9,28 @@ import org.silnith.browser.organic.StyleData;
 import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.KeywordParser;
 import org.silnith.css.model.data.PropertyName;
-import org.silnith.css.model.data.Visibility;
+import org.silnith.css.model.data.WhiteSpace;
 
 
-public class VisibilityAccessor extends PropertyAccessor<Visibility> {
+public class WhiteSpaceAccessor extends PropertyAccessor<WhiteSpace> {
     
-    private final KeywordParser<Visibility> parser;
+    private final KeywordParser<WhiteSpace> parser;
     
-    public VisibilityAccessor() {
-        super(PropertyName.VISIBILITY, true);
-        this.parser = new KeywordParser<>(Visibility.class);
+    public WhiteSpaceAccessor() {
+        super(PropertyName.WHITE_SPACE, true);
+        this.parser = new KeywordParser<>(WhiteSpace.class);
+    }
+
+    @Override
+    public WhiteSpace getInitialValue(StyleData styleData) {
+        return WhiteSpace.NORMAL;
     }
     
     @Override
-    public Visibility getInitialValue(final StyleData styleData) {
-        return Visibility.VISIBLE;
-    }
-    
-    @Override
-    protected Visibility parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
+    protected WhiteSpace parse(StyleData styleData, List<Token> specifiedValue) throws IOException {
         return parser.parse(specifiedValue);
     }
-
+    
     @Override
     public Set<PropertyName> getDependencies() {
         return Collections.emptySet();

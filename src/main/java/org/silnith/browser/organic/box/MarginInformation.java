@@ -14,16 +14,16 @@ public class MarginInformation {
     private static final PropertyAccessorFactory propertyAccessorFactory = PropertyAccessorFactory.getInstance();
     
     private static final PropertyAccessor<Length<?>> marginTopAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_TOP);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_TOP);
             
     private static final PropertyAccessor<Length<?>> marginRightAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_RIGHT);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_RIGHT);
             
     private static final PropertyAccessor<Length<?>> marginBottomAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_BOTTOM);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_BOTTOM);
             
     private static final PropertyAccessor<Length<?>> marginLeftAccessor =
-            (PropertyAccessor<Length<?>>) propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_LEFT);
+            propertyAccessorFactory.getPropertyAccessor(PropertyName.MARGIN_LEFT);
             
     public static MarginInformation getMarginInformation(final StyleData styleData) {
         final Length<?> marginTop = marginTopAccessor.getComputedValue(styleData);
