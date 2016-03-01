@@ -220,10 +220,8 @@ public class Tokenizer {
         this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPE_START, new ScriptDataDoubleEscapeStartState(this));
         this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPED, new ScriptDataDoubleEscapedState(this));
         this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPED_DASH, new ScriptDataDoubleEscapedDashState(this));
-        this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH,
-                new ScriptDataDoubleEscapedDashDashState(this));
-        this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN,
-                new ScriptDataDoubleEscapedLessThanSignState(this));
+        this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH, new ScriptDataDoubleEscapedDashDashState(this));
+        this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN, new ScriptDataDoubleEscapedLessThanSignState(this));
         this.stateTokenizer.put(State.SCRIPT_DATA_DOUBLE_ESCAPE_END, new ScriptDataDoubleEscapeEndState(this));
         this.stateTokenizer.put(State.BEFORE_ATTRIBUTE_NAME, new BeforeAttributeNameState(this));
         this.stateTokenizer.put(State.ATTRIBUTE_NAME, new AttributeNameState(this));
@@ -248,19 +246,14 @@ public class Tokenizer {
         this.stateTokenizer.put(State.AFTER_DOCTYPE_NAME, new AfterDOCTYPENameState(this));
         this.stateTokenizer.put(State.AFTER_DOCTYPE_PUBLIC_KEYWORD, new AfterDOCTYPEPublicKeywordState(this));
         this.stateTokenizer.put(State.BEFORE_DOCTYPE_PUBLIC_IDENTIFIER, new BeforeDOCTYPEPublicIdentifierState(this));
-        this.stateTokenizer.put(State.DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED,
-                new DOCTYPEPublicIdentifierDoubleQuotedState(this));
-        this.stateTokenizer.put(State.DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED,
-                new DOCTYPEPublicIdentifierSingleQuotedState(this));
+        this.stateTokenizer.put(State.DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED, new DOCTYPEPublicIdentifierDoubleQuotedState(this));
+        this.stateTokenizer.put(State.DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED, new DOCTYPEPublicIdentifierSingleQuotedState(this));
         this.stateTokenizer.put(State.AFTER_DOCTYPE_PUBLIC_IDENTIFIER, new AfterDOCTYPEPublicIdentifierState(this));
-        this.stateTokenizer.put(State.BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS,
-                new BetweenDOCTYPEPublicAndSystemIdentifiersState(this));
+        this.stateTokenizer.put(State.BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS, new BetweenDOCTYPEPublicAndSystemIdentifiersState(this));
         this.stateTokenizer.put(State.AFTER_DOCTYPE_SYSTEM_KEYWORD, new AfterDOCTYPESystemKeywordState(this));
         this.stateTokenizer.put(State.BEFORE_DOCTYPE_SYSTEM_IDENTIFIER, new BeforeDOCTYPESystemIdentifierState(this));
-        this.stateTokenizer.put(State.DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED,
-                new DOCTYPESystemIdentifierDoubleQuotedState(this));
-        this.stateTokenizer.put(State.DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED,
-                new DOCTYPESystemIdentifierSingleQuotedState(this));
+        this.stateTokenizer.put(State.DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, new DOCTYPESystemIdentifierDoubleQuotedState(this));
+        this.stateTokenizer.put(State.DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, new DOCTYPESystemIdentifierSingleQuotedState(this));
         this.stateTokenizer.put(State.AFTER_DOCTYPE_SYSTEM_IDENTIFIER, new AfterDOCTYPESystemIdentifierState(this));
         this.stateTokenizer.put(State.BOGUS_DOCTYPE, new BogusDOCTYPEState(this));
         this.stateTokenizer.put(State.CDATA_SECTION, new CDATASectionState(this));

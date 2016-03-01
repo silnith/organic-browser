@@ -317,9 +317,9 @@ public class TokenizerTest {
 
         // This is solely so the assertion passes.
         tokenizer.consume();
-        final char[] escapedCodePoint = tokenizer.consumeEscapedCodePoint();
+        final int escapedCodePoint = tokenizer.consumeEscapedCodePoint();
         
-        assertArrayEquals(new char[] {'\u2018'}, escapedCodePoint);
+        assertEquals('\u2018', escapedCodePoint);
         assertEquals('f', tokenizer.getNextInputCodePoint());
     }
     

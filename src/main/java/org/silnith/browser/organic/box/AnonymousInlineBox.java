@@ -387,6 +387,11 @@ public class AnonymousInlineBox implements InlineLevelBox {
             throw new NullPointerException();
         }
         
+        /*
+         * TODO: Implement the correct whitespace handling.
+         * 
+         * https://www.w3.org/TR/CSS2/text.html#propdef-white-space
+         */
         final String text;
         if (true) {
             text = styledText.getText().trim().replaceAll("\\s+", " ").concat(" ");
