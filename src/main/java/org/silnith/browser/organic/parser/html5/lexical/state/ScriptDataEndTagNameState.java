@@ -17,9 +17,7 @@ import org.silnith.browser.organic.parser.html5.lexical.token.Token;
 
 
 /**
- * @see <a href=
- *      "http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#script-data-end-tag-name-state">
- *      12.2.4.19 Script data end tag name state</a>
+ * @see <a href="https://www.w3.org/TR/html5/syntax.html#script-data-end-tag-name-state">8.2.4.19 Script data end tag name state</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class ScriptDataEndTagNameState extends TokenizerState {
@@ -133,7 +131,7 @@ public class ScriptDataEndTagNameState extends TokenizerState {
     
     private List<Token> defaultCase(final int ch) throws IOException {
         unconsume(ch);
-        setTokenizerState(Tokenizer.State.DATA);
+        setTokenizerState(Tokenizer.State.SCRIPT_DATA);
         final String content = "</" + clearTemporaryBuffer();
         return CharacterToken.toTokens(content);
     }

@@ -42,6 +42,7 @@ import org.silnith.browser.organic.parser.html5.grammar.mode.InitialInsertionMod
 import org.silnith.browser.organic.parser.html5.grammar.mode.InsertionMode;
 import org.silnith.browser.organic.parser.html5.grammar.mode.TextInsertionMode;
 import org.silnith.browser.organic.parser.html5.lexical.Tokenizer;
+import org.silnith.browser.organic.parser.html5.lexical.token.CharacterToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.StartTagToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.TagToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.Token;
@@ -280,7 +281,7 @@ public class Parser {
         this.originalInsertionMode = null;
         this.stop = false;
         final DOMImplementation domImplementation = registry.getDOMImplementation("Core 2.0");
-//		final DOMImplementation domImplementation = registry.getDOMImplementation("Core 2.0 HTML 2.0");
+//        final DOMImplementation domImplementation = registry.getDOMImplementation("Core 2.0 HTML 2.0");
         this.document = domImplementation.createDocument(InsertionMode.HTML_NAMESPACE, "html", null);
         this.headElementPointer = null;
         this.formElementPointer = null;
@@ -576,7 +577,7 @@ public class Parser {
      *      stack of open elements</a>
      */
     public Element popOpenElement() {
-        return stackOfOpenElements.remove(getNumOpenElements() - 1);
+        return stackOfOpenElements.remove(stackOfOpenElements.size() - 1);
     }
     
     /**
@@ -965,6 +966,7 @@ public class Parser {
     
     public void emitToken() throws IOException {
         final Token token = getNextToken();
+        System.out.println(token);
         int count = 0;
         boolean accepted;
         do {
@@ -1018,10 +1020,11 @@ public class Parser {
             ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
         final DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
         final URL url;
-//		url = new URL("http://slashdot.org/");
-//		url = new URL("http://w3.org/");
-//		url = new URL("http://ejohn.org/");
-        url = new URL("http://rgsb.org/");
+//        url = new URL("http://slashdot.org/");
+        url = new URL("http://fark.com/");
+//        url = new URL("http://w3.org/");
+//        url = new URL("http://ejohn.org/");
+//        url = new URL("http://rgsb.org/");
         final boolean predownload = true;
         final Reader reader;
         if (predownload) {
@@ -1059,7 +1062,7 @@ public class Parser {
                 System.out.println(
                         "--------------------------------------------------------------------------------------------------------");
                 System.out.println();
-                serializer.write(parser.document, output);
+//                serializer.write(parser.document, output);
                 System.out.println();
                 System.out.println(
                         "--------------------------------------------------------------------------------------------------------");
@@ -1077,6 +1080,20 @@ public class Parser {
         System.out.println(
                 "--------------------------------------------------------------------------------------------------------");
         System.out.println();
+    }
+    
+    private List<CharacterToken> pendingTableCharacterTokens;
+
+    public void setPendingTableCharacterTokens() {
+        this.pendingTableCharacterTokens = new ArrayList<>();
+    }
+    
+    public List<CharacterToken> getPendingTableCharacterTokens() {
+        return pendingTableCharacterTokens;
+    }
+    
+    public void appendToPendingTableCharacterTokens(final CharacterToken characterToken) {
+        pendingTableCharacterTokens.add(characterToken);
     }
     
 }

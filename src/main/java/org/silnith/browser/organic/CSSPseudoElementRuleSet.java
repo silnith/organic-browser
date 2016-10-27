@@ -67,10 +67,10 @@ public class CSSPseudoElementRuleSet {
         final DisplayAccessor displayAccessor = new DisplayAccessor();
         if (beforeString != null) {
             // create pseudo element as first child of styledElement
-            final StyleData beforeStyleData = StyleData.getAnonymousElementStyle(styledElement.getStyleData());
-            final PseudoElement beforeElement = new PseudoElement(styledElement, ":before", beforeStyleData);
-            final StyledText beforeContent = new StyledText(beforeElement, beforeString);
-            beforeElement.addChild(beforeContent);
+//            final StyleData beforeStyleData = StyleData.getAnonymousElementStyle(styledElement.getStyleData());
+//            final PseudoElement beforeElement = new PseudoElement(styledElement, ":before", beforeStyleData);
+//            final StyledText beforeContent = new StyledText(beforeElement, beforeString);
+//            beforeElement.addChild(beforeContent);
             // add style rules to pseudo element
 //            for (final CSSRule rule : beforeRules) {
 //                if (rule.shouldApply(beforeElement)) {
@@ -81,17 +81,17 @@ public class CSSPseudoElementRuleSet {
 //                    propertyAccessor.computeParsedValue(beforeStyleData);
 //                }
 //            }
-            final Display beforeDisplay = displayAccessor.getComputedValue(beforeElement.getStyleData());
-            if (beforeDisplay != Display.NONE) {
-                styledElement.setBeforeContent(beforeElement);
-            }
+//            final Display beforeDisplay = displayAccessor.getComputedValue(beforeElement.getStyleData());
+//            if (beforeDisplay != Display.NONE) {
+//                styledElement.setBeforeContent(beforeElement);
+//            }
         }
         if (afterString != null) {
             // create pseudo element as last child of styledElement
-            final StyleData afterStyleData = StyleData.getAnonymousElementStyle(styledElement.getStyleData());
-            final PseudoElement afterElement = new PseudoElement(styledElement, ":after", afterStyleData);
-            final StyledText afterContent = new StyledText(afterElement, afterString);
-            afterElement.addChild(afterContent);
+//            final StyleData afterStyleData = StyleData.getAnonymousElementStyle(styledElement.getStyleData());
+//            final PseudoElement afterElement = new PseudoElement(styledElement, ":after", afterStyleData);
+//            final StyledText afterContent = new StyledText(afterElement, afterString);
+//            afterElement.addChild(afterContent);
             // add style rules to pseudo element
 //            for (final CSSRule rule : afterRules) {
 //                if (rule.shouldApply(afterElement)) {
@@ -102,10 +102,10 @@ public class CSSPseudoElementRuleSet {
 //                    propertyAccessor.computeParsedValue(afterStyleData);
 //                }
 //            }
-            final Display afterDisplay = displayAccessor.getComputedValue(afterElement.getStyleData());
-            if (afterDisplay != Display.NONE) {
-                styledElement.setAfterContent(afterElement);
-            }
+//            final Display afterDisplay = displayAccessor.getComputedValue(afterElement.getStyleData());
+//            if (afterDisplay != Display.NONE) {
+//                styledElement.setAfterContent(afterElement);
+//            }
         }
     }
     

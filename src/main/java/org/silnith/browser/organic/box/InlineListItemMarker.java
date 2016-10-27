@@ -3,6 +3,7 @@ package org.silnith.browser.organic.box;
 import java.awt.Color;
 import java.util.List;
 
+import org.silnith.browser.organic.StyledDOMElement;
 import org.silnith.browser.organic.StyledElement;
 import org.silnith.browser.organic.StyledText;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
@@ -32,7 +33,7 @@ public class InlineListItemMarker extends AnonymousInlineBox {
             final PropertyAccessor<List<String>> fontFamilyAccessor,
             final PropertyAccessor<FontStyle> fontStyleAccessor,
             final PropertyAccessor<FontWeight> fontWeightAccessor,
-            final StyledElement listItemElement) {
+            final StyledDOMElement listItemElement) {
         super(colorAccessor, fontSizeAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, new StyledText(listItemElement, "1. "));
         this.listItemElement = listItemElement;
     }

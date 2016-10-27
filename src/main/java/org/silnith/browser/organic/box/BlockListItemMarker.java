@@ -3,7 +3,7 @@ package org.silnith.browser.organic.box;
 import java.awt.Color;
 import java.util.List;
 
-import org.silnith.browser.organic.StyledElement;
+import org.silnith.browser.organic.StyledDOMElement;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.FontStyle;
@@ -18,7 +18,7 @@ public class BlockListItemMarker extends AnonymousBlockBox {
             final PropertyAccessor<List<String>> fontFamilyAccessor,
             final PropertyAccessor<FontStyle> fontStyleAccessor,
             final PropertyAccessor<FontWeight> fontWeightAccessor,
-            final StyledElement parentElement) {
+            final StyledDOMElement parentElement) {
         super(parentElement);
         this.addChild(new InlineListItemMarker(fontSizeAccessor, colorAccessor, fontFamilyAccessor, fontStyleAccessor, fontWeightAccessor, parentElement));
     }

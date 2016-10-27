@@ -1,5 +1,7 @@
 package org.silnith.browser.organic;
 
+import java.util.Locale;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -8,8 +10,9 @@ import org.w3c.dom.Node;
 public class StyledText extends StyledContent {
     
     private final String text;
+    private String spacedText;
     
-    public StyledText(final StyledElement parent, final String text) {
+    public StyledText(final StyledDOMElement parent, final String text) {
         super(parent);
         // styled text must have a parent, namely an element
         if (parent == null) {
@@ -19,12 +22,26 @@ public class StyledText extends StyledContent {
             throw new NullPointerException();
         }
         this.text = text;
+        this.spacedText = null;
     }
     
+    @Override
+    public Locale getLanguage() {
+        return getParent().getLanguage();
+    }
+
     public String getText() {
         return text;
     }
     
+    public String getSpacedText() {
+        return spacedText;
+    }
+    
+    public void setSpacedText(final String spacedText) {
+        this.spacedText = spacedText;
+    }
+
     @Override
     public StyleData getStyleData() {
         return getParent().getStyleData();

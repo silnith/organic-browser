@@ -7,11 +7,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.border.AbstractBorder;
-
 import org.silnith.browser.organic.parser.ParseErrorException;
-import org.silnith.browser.organic.parser.html5.grammar.dom.AfterLastChildInsertionPosition;
-import org.silnith.browser.organic.parser.html5.grammar.dom.InsertionPosition;
 import org.silnith.browser.organic.parser.html5.lexical.token.CharacterToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.CommentToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.DOCTYPEToken;

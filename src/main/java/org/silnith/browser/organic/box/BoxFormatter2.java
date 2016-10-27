@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.silnith.browser.organic.StyledContent;
+import org.silnith.browser.organic.StyledDOMElement;
 import org.silnith.browser.organic.StyledElement;
 import org.silnith.browser.organic.StyledText;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
@@ -66,7 +67,7 @@ public class BoxFormatter2 {
         }
     }
     
-    protected BlockLevelBox createListItemBox(final StyledElement styledElement) {
+    protected BlockLevelBox createListItemBox(final StyledDOMElement styledElement) {
         // generate marker box for (possible) counter
         // marker box does not inherit background from principal
         // generate principal box for list item content
@@ -211,8 +212,8 @@ public class BoxFormatter2 {
         final List<StyledContent> runOfInlineContent = new ArrayList<>();
         for (final StyledContent child : children) {
             // dispatch
-            if (child instanceof StyledElement) {
-                final StyledElement childElement = (StyledElement) child;
+            if (child instanceof StyledDOMElement) {
+                final StyledDOMElement childElement = (StyledDOMElement) child;
                 
                 final Display childDisplay = displayAccessor.getComputedValue(childElement.getStyleData());
                 switch (childDisplay) {

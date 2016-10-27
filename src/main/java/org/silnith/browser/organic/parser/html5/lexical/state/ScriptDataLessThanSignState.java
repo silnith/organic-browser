@@ -13,9 +13,7 @@ import org.silnith.browser.organic.parser.html5.lexical.token.Token;
 
 
 /**
- * @see <a href=
- *      "http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#script-data-less-than-sign-state">
- *      12.2.4.17 Script data less-than sign state</a>
+ * @see <a href="https://www.w3.org/TR/html5/syntax.html#script-data-less-than-sign-state">8.2.4.17 Script data less-than sign state</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class ScriptDataLessThanSignState extends TokenizerState {

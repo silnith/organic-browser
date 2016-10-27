@@ -1,5 +1,7 @@
 package org.silnith.browser.organic;
 
+import java.util.Locale;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -11,16 +13,18 @@ import org.w3c.dom.Node;
  */
 public abstract class StyledContent {
     
-    private final StyledElement parent;
+    private final StyledDOMElement parent;
     
-    public StyledContent(final StyledElement parent) {
+    public StyledContent(final StyledDOMElement parent) {
         // may be null
         this.parent = parent;
     }
     
     public abstract StyleData getStyleData();
     
-    public StyledElement getParent() {
+    public abstract Locale getLanguage();
+    
+    public StyledDOMElement getParent() {
         return parent;
     }
     

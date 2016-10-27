@@ -20,14 +20,14 @@ public class StyleTreeBuilder {
     public StyleTreeBuilder() {
     }
     
-    public StyledElement addStyleInformation(final Document document) {
+    public StyledDOMElement addStyleInformation(final Document document) {
         final Element element = document.getDocumentElement();
-        final StyledElement styledElement = createStyleTree(null, element);
+        final StyledDOMElement styledElement = createStyleTree(null, element);
         
         return styledElement;
     }
     
-    private StyledElement createStyleTree(final StyledElement parent, final Element element) {
+    private StyledDOMElement createStyleTree(final StyledDOMElement parent, final Element element) {
         final StyleData parentStyleData;
         if (parent == null) {
             parentStyleData = null;
@@ -35,7 +35,7 @@ public class StyleTreeBuilder {
             parentStyleData = parent.getStyleData();
         }
         final StyleData styleData = new StyleData(parentStyleData);
-        final StyledElement styledElement = new StyledDOMElement(parent, element, styleData);
+        final StyledDOMElement styledElement = new StyledDOMElement(parent, element, styleData);
         
         Node child = element.getFirstChild();
         while (child != null) {

@@ -20,14 +20,19 @@ import java.text.BreakIterator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.silnith.browser.organic.LanguageResolver;
 import org.silnith.browser.organic.StyledText;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
+import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
+import org.silnith.css.model.data.Direction;
 import org.silnith.css.model.data.FontStyle;
 import org.silnith.css.model.data.FontWeight;
+import org.silnith.css.model.data.PropertyName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -307,7 +312,8 @@ public class AnonymousInlineBox implements InlineLevelBox {
         if (targetWidth == null) {
             throw new NullPointerException();
         }
-        
+
+        final Locale language = styledText.getLanguage();
         final String text = styledText.getText();
         // derive font takes size in points, not pixels
         final Font font = getFont(graphics);
@@ -319,9 +325,10 @@ public class AnonymousInlineBox implements InlineLevelBox {
          */
         final Map<AttributedCharacterIterator.Attribute, Object> attributes = new HashMap<>();
         attributes.put(TextAttribute.FONT, font);
+        attributes.put(TextAttribute.LANGUAGE, language);
         
         final FontRenderContext frc = fontMetrics.getFontRenderContext();
-        final BreakIterator br = BreakIterator.getWordInstance();
+        final BreakIterator br = BreakIterator.getWordInstance(language);
         br.setText(text);
         int start = br.first();
         int end = br.next();
@@ -392,12 +399,15 @@ public class AnonymousInlineBox implements InlineLevelBox {
          * 
          * https://www.w3.org/TR/CSS2/text.html#propdef-white-space
          */
+        final Locale language = styledText.getLanguage();
         final String text;
         if (true) {
             text = styledText.getText().trim().replaceAll("\\s+", " ").concat(" ");
         } else {
             text = styledText.getText();
         }
+        final PropertyAccessor<Direction> directionAccessor = PropertyAccessorFactory.getInstance().getPropertyAccessor(PropertyName.DIRECTION);
+        final Direction direction = directionAccessor.getComputedValue(styledText.getStyleData());
         graphics.addRenderingHints(renderingHints);
         // derive font takes size in points, not pixels
         final Font font = getFont(graphics);
@@ -407,10 +417,20 @@ public class AnonymousInlineBox implements InlineLevelBox {
             // zero glyphs, but still have line height
             throw new UnsupportedOperationException();
         } else {
-            final BreakIterator br = BreakIterator.getLineInstance();
+            final BreakIterator br = BreakIterator.getLineInstance(language);
             final AttributedString as = new AttributedString(text);
             as.addAttribute(TextAttribute.FONT, font);
             as.addAttribute(TextAttribute.FOREGROUND, color);
+            as.addAttribute(TextAttribute.LANGUAGE, language);
+//            switch (direction) {
+//            case LTR: {
+//                as.addAttribute(TextAttribute.RUN_DIRECTION, TextAttribute.RUN_DIRECTION_LTR);
+//            } break;
+//            case RTL: {
+//                as.addAttribute(TextAttribute.RUN_DIRECTION, TextAttribute.RUN_DIRECTION_RTL);
+//            } break;
+//            default: break;
+//            }
             final AttributedCharacterIterator aci = as.getIterator();
             final FontRenderContext frc = fontMetrics.getFontRenderContext();
             final LineBreakMeasurer lbm = new LineBreakMeasurer(aci, br, frc);

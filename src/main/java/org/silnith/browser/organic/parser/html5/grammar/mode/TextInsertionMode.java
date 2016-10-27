@@ -11,9 +11,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * @see <a href=
- *      "https://www.w3.org/TR/html5/syntax.html#parsing-main-incdata">
- *     8.2.5.4.8 The "text" insertion mode</a>
+ * @see <a href="https://www.w3.org/TR/html5/syntax.html#parsing-main-incdata">8.2.5.4.8 The "text" insertion mode</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class TextInsertionMode extends InsertionMode {
@@ -29,7 +27,7 @@ public class TextInsertionMode extends InsertionMode {
             final CharacterToken characterToken = (CharacterToken) token;
             assert characterToken.getCharacter() != NULL;
             insertCharacter(characterToken);
-            return true;
+            return TOKEN_HANDLED;
         } // break;
         case EOF: {
             if (isAllowParseErrors()) {
@@ -65,7 +63,7 @@ public class TextInsertionMode extends InsertionMode {
             default: {
                 popCurrentNode();
                 setInsertionMode(getOriginalInsertionMode());
-                return true;
+                return TOKEN_HANDLED;
             } // break;
             }
         } // break;

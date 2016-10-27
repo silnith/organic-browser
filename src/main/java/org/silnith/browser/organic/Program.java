@@ -74,7 +74,10 @@ public class Program {
         jFrame.getContentPane().add(jScrollPane);
         
         final StyleTreeBuilder styleTreeBuilder = new StyleTreeBuilder();
-        final StyledElement styledElement = styleTreeBuilder.addStyleInformation(domDocument);
+        final StyledDOMElement styledElement = styleTreeBuilder.addStyleInformation(domDocument);
+        
+        final LanguageResolver languageResolver = new LanguageResolver();
+        languageResolver.setLanguage(styledElement);
         
         final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
         final Collection<Stylesheet> stylesheets = stylesheetBuilder.buildStylesheets(domDocument, URI.create(""));
@@ -148,6 +151,8 @@ public class Program {
         final DocumentType docType = domImpl.createDocumentType("html", PUBLIC_ID, SYSTEM_ID);
         final Document domDocument = domImpl.createDocument(NAMESPACE, "html", docType);
         final Element documentElement = domDocument.getDocumentElement();
+        documentElement.setAttribute("lang", "en-US");
+        documentElement.setAttribute("dir", "LTR");
         
         final Element headElement = domDocument.createElement("head");
         documentElement.appendChild(headElement);

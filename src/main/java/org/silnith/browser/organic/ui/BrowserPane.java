@@ -24,12 +24,14 @@ import org.silnith.browser.organic.BoxRenderer;
 import org.silnith.browser.organic.CSSPseudoElementRuleSet;
 import org.silnith.browser.organic.CSSRule;
 import org.silnith.browser.organic.CascadeApplier;
+import org.silnith.browser.organic.LanguageResolver;
 import org.silnith.browser.organic.StyleTreeBuilder;
 import org.silnith.browser.organic.StyledContent;
 import org.silnith.browser.organic.StyledDOMElement;
 import org.silnith.browser.organic.StyledElement;
 import org.silnith.browser.organic.Stylesheet;
 import org.silnith.browser.organic.StylesheetBuilder;
+import org.silnith.browser.organic.WhitespaceCollapser;
 import org.silnith.browser.organic.box.BlockLevelBox;
 import org.silnith.browser.organic.box.BoxFormatter;
 import org.silnith.browser.organic.network.Download;
@@ -164,7 +166,10 @@ public class BrowserPane extends JPanel {
 //                printNode(document);
                 
                 final Styler styler = new Styler(new StyleTreeBuilder(), document);
-                final StyledElement styledElement = getResult("Style", styler);
+                final StyledDOMElement styledElement = getResult("Style", styler);
+                
+                final LanguageResolver languageResolver = new LanguageResolver();
+                languageResolver.setLanguage(styledElement);
                 
                 final StylesheetBuilder stylesheetBuilder = new StylesheetBuilder();
                 final URI uri = url.toURI();
@@ -174,6 +179,9 @@ public class BrowserPane extends JPanel {
                 final CascadeApplier cascadeApplier = new CascadeApplier(propertyAccessorFactory);
                 final Cascader cascader = new Cascader(cascadeApplier, styledElement, stylesheets);
                 getResult("Cascade", cascader);
+                
+                final WhitespaceCollapser whitespaceCollapser = new WhitespaceCollapser();
+                whitespaceCollapser.collapseWhitespace(styledElement);
                 
 //                printNode(styledElement.createDOM(document));
                 
@@ -253,7 +261,7 @@ public class BrowserPane extends JPanel {
         
     }
     
-    private class Styler implements Callable<StyledElement> {
+    private class Styler implements Callable<StyledDOMElement> {
         
         private final StyleTreeBuilder styleTreeBuilder;
         
@@ -266,7 +274,7 @@ public class BrowserPane extends JPanel {
         }
         
         @Override
-        public StyledElement call() throws Exception {
+        public StyledDOMElement call() throws Exception {
             return styleTreeBuilder.addStyleInformation(document);
         }
         

@@ -13,9 +13,7 @@ import org.silnith.browser.organic.parser.html5.lexical.token.Token;
 
 
 /**
- * @see <a href=
- *      "http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#script-data-end-tag-open-state">
- *      12.2.4.18 Script data end tag open state</a>
+ * @see <a href="https://www.w3.org/TR/html5/syntax.html#script-data-end-tag-open-state">8.2.4.18 Script data end tag open state</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class ScriptDataEndTagOpenState extends TokenizerState {

@@ -15,9 +15,7 @@ import org.silnith.browser.organic.parser.html5.lexical.token.Token;
 
 
 /**
- * @see <a href=
- *      "http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html#script-data-state">
- *      12.2.4.6 Script data state</a>
+ * @see <a href="https://www.w3.org/TR/html5/syntax.html#script-data-state">8.2.4.6 Script data state</a>
  * @author <a href="mailto:silnith@gmail.com">Kent Rosenkoetter</a>
  */
 public class ScriptDataState extends TokenizerState {

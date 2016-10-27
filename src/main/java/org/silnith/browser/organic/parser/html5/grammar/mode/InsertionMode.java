@@ -20,6 +20,7 @@ import org.silnith.browser.organic.parser.html5.lexical.token.CommentToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.StartTagToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.TagToken;
 import org.silnith.browser.organic.parser.html5.lexical.token.Token;
+import org.silnith.browser.organic.parser.util.UnicodeCodePoints;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -749,18 +750,26 @@ public abstract class InsertionMode {
      *      space characters</a>
      */
     protected boolean isPendingTableCharacterTokensListContainsCharactersThatAreNotSpaceCharacters() {
-        // TODO
-        throw new UnsupportedOperationException();
+        for (final CharacterToken characterToken : parser.getPendingTableCharacterTokens()) {
+            final char character = characterToken.getCharacter();
+            switch (character) {
+            case UnicodeCodePoints.SPACE: // fall through
+            case UnicodeCodePoints.CHARACTER_TABULATION: // fall through
+            case UnicodeCodePoints.LINE_FEED: // fall through
+            case UnicodeCodePoints.FORM_FEED: // fall through
+            case UnicodeCodePoints.CARRIAGE_RETURN: break;
+            default: return true;
+            }
+        }
+        return false;
     }
     
     protected List<CharacterToken> getPendingTableCharacterTokens() {
-        // TODO
-        throw new UnsupportedOperationException();
+        return parser.getPendingTableCharacterTokens();
     }
     
     protected void setPendingTableCharacterTokens() {
-        // TODO
-        throw new UnsupportedOperationException();
+        parser.setPendingTableCharacterTokens();
     }
     
     /**
@@ -770,8 +779,7 @@ public abstract class InsertionMode {
      *      pending table character tokens</a>
      */
     protected void appendToPendingTableCharacterTokens(final CharacterToken characterToken) {
-        // TODO
-        throw new UnsupportedOperationException();
+        parser.appendToPendingTableCharacterTokens(characterToken);
     }
     
     /**

@@ -316,7 +316,7 @@ public class Tokenizer {
             tokenQueue.addAll(dispatch());
             // TODO: Remove this once I'm confident in the lexer.
             if (count++ > 1024) {
-                throw new ParseErrorException("Too many stack frames!");
+                throw new ParseErrorException("Too many state changes!");
             }
         }
         final Token nextToken = tokenQueue.remove();
@@ -438,10 +438,10 @@ public class Tokenizer {
     
     public static void main(final String[] args) throws IOException {
         final URL url;
-//		url = new URL("http://slashdot.org/");
-//		url = new URL("http://w3.org/");
-//		url = new URL("http://ejohn.org/");
-        url = new URL("http://rgsb.org/");
+        url = new URL("http://slashdot.org/");
+//        url = new URL("http://w3.org/");
+//        url = new URL("http://ejohn.org/");
+//        url = new URL("http://rgsb.org/");
         final URLConnection connection = url.openConnection();
         final String contentEncoding = connection.getContentEncoding();
         final Reader reader;

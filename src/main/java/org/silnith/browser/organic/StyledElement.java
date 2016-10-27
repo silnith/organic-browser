@@ -19,7 +19,7 @@ public abstract class StyledElement extends StyledContent {
     
     private PseudoElement after;
     
-    public StyledElement(final StyledElement parent, final StyleData styleData) {
+    public StyledElement(final StyledDOMElement parent, final StyleData styleData) {
         super(parent);
         // parent may be null
         if (styleData == null) {
