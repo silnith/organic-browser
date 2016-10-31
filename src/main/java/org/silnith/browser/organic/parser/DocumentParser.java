@@ -7,8 +7,8 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.silnith.browser.organic.network.Download;
-import org.silnith.browser.organic.parser.html5.grammar.Parser;
-import org.silnith.browser.organic.parser.html5.lexical.Tokenizer;
+import org.silnith.parser.html5.Parser;
+import org.silnith.parser.html5.lexical.Tokenizer;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
@@ -128,7 +128,7 @@ public class DocumentParser {
             throw new RuntimeException(e);
         }
         final Tokenizer tokenizer = new Tokenizer(reader);
-        final Parser parser = new Parser(tokenizer, registry);
+        final Parser parser = new Parser(tokenizer, domImpl);
         final Document document = parser.parse();
 //		document.normalizeDocument();
 

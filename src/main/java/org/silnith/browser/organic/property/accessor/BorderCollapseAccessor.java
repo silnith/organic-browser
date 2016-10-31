@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
-import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.BorderCollapse;
 import org.silnith.css.model.data.KeywordParser;
 import org.silnith.css.model.data.PropertyName;
+import org.silnith.parser.css3.Token;
 
 
 public class BorderCollapseAccessor extends PropertyAccessor<BorderCollapse> {

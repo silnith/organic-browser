@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.lexical.TokenStream;
-import org.silnith.browser.organic.parser.css3.lexical.token.ColonToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.DelimToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.HashToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.LeftSquareBracketToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
+import org.silnith.parser.css3.Token;
+import org.silnith.parser.css3.lexical.TokenStream;
+import org.silnith.parser.css3.lexical.token.ColonToken;
+import org.silnith.parser.css3.lexical.token.DelimToken;
+import org.silnith.parser.css3.lexical.token.HashToken;
+import org.silnith.parser.css3.lexical.token.IdentToken;
+import org.silnith.parser.css3.lexical.token.LeftSquareBracketToken;
+import org.silnith.parser.css3.lexical.token.LexicalToken;
 
 public class SelectorParser {
     

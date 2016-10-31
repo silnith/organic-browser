@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
-import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AbsoluteUnit;
 import org.silnith.css.model.data.Length;
 import org.silnith.css.model.data.LengthParser;
 import org.silnith.css.model.data.PropertyName;
 import org.silnith.css.model.data.RelativeLength;
+import org.silnith.parser.css3.Token;
 
 
 /**

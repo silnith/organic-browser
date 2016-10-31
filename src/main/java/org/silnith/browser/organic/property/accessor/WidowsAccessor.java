@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
-import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.grammar.Parser;
-import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
-import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.NumberToken;
 import org.silnith.css.model.data.PropertyName;
+import org.silnith.parser.css3.Token;
+import org.silnith.parser.css3.grammar.Parser;
+import org.silnith.parser.css3.lexical.TokenListStream;
+import org.silnith.parser.css3.lexical.token.LexicalToken;
+import org.silnith.parser.css3.lexical.token.NumberToken;
 
 
 public class WidowsAccessor extends PropertyAccessor<Integer> {

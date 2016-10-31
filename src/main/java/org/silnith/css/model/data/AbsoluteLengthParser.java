@@ -2,9 +2,9 @@ package org.silnith.css.model.data;
 
 import java.util.List;
 
-import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
-import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
+import org.silnith.parser.css3.Token;
+import org.silnith.parser.css3.lexical.token.DimensionToken;
+import org.silnith.parser.css3.lexical.token.LexicalToken;
 
 /**
  * A parser for CSS absolute length values.  A length value is simply a CSS number with a unit suffix.

@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.silnith.browser.organic.parser.css3.Token;
-import org.silnith.browser.organic.parser.css3.grammar.Parser;
-import org.silnith.browser.organic.parser.css3.lexical.Tokenizer;
 import org.silnith.browser.organic.property.accessor.PropertyAccessor;
 import org.silnith.browser.organic.property.accessor.PropertyAccessorFactory;
 import org.silnith.css.model.data.PropertyName;
+import org.silnith.parser.css3.Token;
+import org.silnith.parser.css3.grammar.Parser;
+import org.silnith.parser.css3.lexical.Tokenizer;
 
 
 /**

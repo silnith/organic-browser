@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.silnith.browser.organic.StyleData;
-import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.css.model.data.ColorParser;
 import org.silnith.css.model.data.PropertyName;
+import org.silnith.parser.css3.Token;
 
 public class OutlineColorAccessor extends PropertyThatDependsOnTheColorPropertyAccessor {
 
