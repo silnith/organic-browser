@@ -3,9 +3,9 @@ package org.silnith.browser.organic;
 import java.util.Collection;
 import java.util.List;
 
+import org.silnith.browser.organic.parser.css3.Token;
 import org.silnith.browser.organic.parser.css3.selector.Selector;
 import org.silnith.css.model.data.PropertyName;
-import org.silnith.parser.css3.Token;
 
 
 /**

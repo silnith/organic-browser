@@ -3,15 +3,15 @@ package org.silnith.css.model.data;
 import java.io.IOException;
 import java.util.List;
 
-import org.silnith.parser.css3.Token;
-import org.silnith.parser.css3.grammar.Parser;
-import org.silnith.parser.css3.grammar.token.ComponentValue;
-import org.silnith.parser.css3.lexical.TokenListStream;
-import org.silnith.parser.css3.lexical.token.DimensionToken;
-import org.silnith.parser.css3.lexical.token.IdentToken;
-import org.silnith.parser.css3.lexical.token.LexicalToken;
-import org.silnith.parser.css3.lexical.token.NumberToken;
-import org.silnith.parser.css3.lexical.token.PercentageToken;
+import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.grammar.token.ComponentValue;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
+import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.NumberToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.PercentageToken;
 
 /**
  * A parser for CSS length values.  A CSS length value is simply a CSS number

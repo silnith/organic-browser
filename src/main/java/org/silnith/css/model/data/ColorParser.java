@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.silnith.parser.css3.Token;
-import org.silnith.parser.css3.grammar.Parser;
-import org.silnith.parser.css3.lexical.TokenListStream;
-import org.silnith.parser.css3.lexical.token.FunctionToken;
-import org.silnith.parser.css3.lexical.token.HashToken;
-import org.silnith.parser.css3.lexical.token.IdentToken;
-import org.silnith.parser.css3.lexical.token.LexicalToken;
+import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
+import org.silnith.browser.organic.parser.css3.lexical.token.FunctionToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.HashToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
 
 
 /**

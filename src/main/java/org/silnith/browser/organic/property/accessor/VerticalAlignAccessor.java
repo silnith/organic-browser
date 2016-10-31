@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.silnith.browser.organic.StyleData;
+import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.grammar.Parser;
+import org.silnith.browser.organic.parser.css3.lexical.TokenListStream;
+import org.silnith.browser.organic.parser.css3.lexical.token.DimensionToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.NumberToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.TypedNumericValueToken;
 import org.silnith.css.model.data.AbsoluteLength;
 import org.silnith.css.model.data.AlignAndOffset;
 import org.silnith.css.model.data.LengthParser;
 import org.silnith.css.model.data.PropertyName;
 import org.silnith.css.model.data.VerticalAlignment;
-import org.silnith.parser.css3.Token;
-import org.silnith.parser.css3.grammar.Parser;
-import org.silnith.parser.css3.lexical.TokenListStream;
-import org.silnith.parser.css3.lexical.token.DimensionToken;
-import org.silnith.parser.css3.lexical.token.IdentToken;
-import org.silnith.parser.css3.lexical.token.LexicalToken;
-import org.silnith.parser.css3.lexical.token.NumberToken;
-import org.silnith.parser.css3.lexical.token.TypedNumericValueToken;
 
 
 public class VerticalAlignAccessor extends PropertyAccessor<AlignAndOffset> {

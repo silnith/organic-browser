@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.silnith.parser.css3.Token;
-import org.silnith.parser.css3.lexical.token.IdentToken;
-import org.silnith.parser.css3.lexical.token.LexicalToken;
-import org.silnith.parser.css3.lexical.token.StringToken;
+import org.silnith.browser.organic.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.lexical.token.IdentToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.LexicalToken;
+import org.silnith.browser.organic.parser.css3.lexical.token.StringToken;
 
 
 public class FontFamilyNameParser implements PropertyValueParser<String> {

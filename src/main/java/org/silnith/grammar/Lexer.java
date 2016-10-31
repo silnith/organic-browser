@@ -5,7 +5,7 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.silnith.parser.util.UnicodeCodePoints;
+import org.silnith.browser.organic.parser.util.UnicodeCodePoints;
 
 
 public class Lexer implements Iterable<UnicodeTerminalSymbols> {

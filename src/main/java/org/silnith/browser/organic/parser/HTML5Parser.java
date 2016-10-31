@@ -7,8 +7,8 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 
 import org.silnith.browser.organic.network.Download;
-import org.silnith.parser.html5.Parser;
-import org.silnith.parser.html5.lexical.Tokenizer;
+import org.silnith.browser.organic.parser.html5.grammar.Parser;
+import org.silnith.browser.organic.parser.html5.lexical.Tokenizer;
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 
@@ -33,7 +33,7 @@ public class HTML5Parser implements FileParser<Document> {
             reader = new InputStreamReader(in, contentEncoding);
         }
         final Tokenizer tokenizer = new Tokenizer(reader);
-        final Parser parser = new Parser(tokenizer, registry.getDOMImplementation("Core 3.0 +LS 3.0"));
+        final Parser parser = new Parser(tokenizer, registry);
         return parser.parse();
     }
     

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.silnith.parser.css3.Token;
+import org.silnith.browser.organic.parser.css3.Token;
 
 
 /**
