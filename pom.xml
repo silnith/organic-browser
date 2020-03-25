@@ -2,7 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.silnith</groupId>
+    <parent>
+        <groupId>org.silnith</groupId>
+        <artifactId>parent-pom</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
 	<artifactId>organic-browser</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Organic Browser</name>
@@ -10,15 +14,8 @@
 	<description>A browser that grew organically.</description>
 	<inceptionYear>2014</inceptionYear>
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.release>8</maven.compiler.release>
 	</properties>
-	<organization>
-		<name>silnith.org</name>
-		<url>https://silnith.org/</url>
-	</organization>
 	<scm>
 		<url>https://github.com/silnith/organic-browser</url>
         <connection>scm:git:https://github.com/silnith/organic-browser.git</connection>
@@ -40,6 +37,11 @@
 			<artifactId>cssparser</artifactId>
 			<version>0.9.15</version>
 		</dependency>
+        <dependency>
+            <groupId>org.w3c.css</groupId>
+            <artifactId>sac</artifactId>
+            <version>1.3</version>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
