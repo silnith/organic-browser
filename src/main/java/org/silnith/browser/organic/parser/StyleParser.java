@@ -21,8 +21,6 @@ import org.w3c.css.sac.SiblingSelector;
 import org.w3c.css.sac.SimpleSelector;
 import org.w3c.css.sac.helpers.ParserFactory;
 
-import com.steadystate.css.parser.CSSOMParser;
-
 
 public class StyleParser {
     
@@ -32,9 +30,6 @@ public class StyleParser {
     
     public void parseStyleRules(final Download download) throws Exception {
         final String content = download.getContent();
-        
-        Class.forName(CSSOMParser.class.getName());
-        new CSSOMParser();
         
         final ParserFactory factory = new ParserFactory();
         
